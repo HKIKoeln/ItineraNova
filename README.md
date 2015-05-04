@@ -1,7 +1,5 @@
 # ItineraNova
 
-This repository is out-of-date.
-
 [Itinera Nova](http://itineranova.be) is the collaborative transcription platform of the City Archive of Leuven.
 The platform was developed by HKI Cologne between 2009 and 2012. The database meanwhile contains several
 thousand transcrbed of register book pages.
