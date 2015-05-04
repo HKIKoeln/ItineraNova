@@ -1,0 +1,39 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ead="urn:isbn:1-931666-22-9">
+  <xrx:id>tag:itineranova.be,2011:/in/service/new-pers-indexentry</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>new-pers-indexentry</xrx:key>
+      <xrx:default>New person indexentry</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:body>
+  {
+    let $register := $data//ead:archdesc/ead:did/ead:unitid/text()
+    let $pers-id := 
+        for $id in data($data//ead:persname[@role='alderman' or @role='mayor']/@id)
+        return
+        substring-after($id, concat('pers-', $register, '-'))
+    let $max-id := xs:integer(max($pers-id))
+    return
+    <indexentry xmlns="urn:isbn:1-931666-22-9">
+        <namegrp>
+        <title/>
+        {
+            for $pos at $num in (1 to 15)
+            return
+            <persname id="{ concat('pers-', $register, '-', xs:string($num + $max-id)) }" role="alderman"/>
+        }
+        {
+            for $pos at $num in (1 to 5)
+            return
+            <persname id="{ concat('pers-', $register, '-', xs:string($num + $max-id + 9)) }" role="mayor"/>
+        }
+        </namegrp>
+    </indexentry>
+  }
+  </xrx:body>
+</xrx:service>

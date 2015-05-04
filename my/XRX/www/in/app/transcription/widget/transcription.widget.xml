@@ -1,0 +1,711 @@
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/transcription</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>transcription-editor</xrx:key>
+      <xrx:default>Transcription Editor</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/fullscreen</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>false</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:js>
+      <script type="text/javascript" src="{ conf:param('request-root') }jquery.min.js"/>
+      <script src="{ conf:param('request-root') }jquery.mousewheel.js"/>
+      <script src="{ conf:param('request-root') }jquery/ui/jquery.ui.core.js"/>
+      <script src="{ conf:param('request-root') }jquery/ui/jquery.ui.widget.js"/>
+      <script src="{ conf:param('request-root') }jquery/ui/jquery.ui.mouse.js"/>
+      <script src="{ conf:param('request-root') }jquery/ui/jquery.ui.tabs.js"/>
+      <script src="{ conf:param('request-root') }jquery/ui/jquery.ui.draggable.js"/>
+      <script src="{ conf:param('request-root') }jquery/ui/jquery.ui.selectable.js"/>
+      <script src="{ conf:param('request-root') }jquery/ui/jquery.ui.button.js"/>
+      <script src="{ conf:param('request-root') }jquery.ui.imageann.js"/>
+      <script src="{ conf:param('request-root') }jquery.ui.textann.js"/>
+      <script src="{ conf:param('request-root') }jquery.ui.transcriptionEditor.js"/>
+      <script src="{ conf:param('request-root') }codemirror.js"></script>
+      <script src="{ conf:param('request-root') }insyntax.js"></script>
+      <script type="text/javascript">
+      <!-- 
+        $(document).ready(function()
+        {{
+            
+            $(function() {{
+              $( "#ui-transcriptionEditor" ).transcriptionEditor();
+            }});
+                        
+            $(function() {{
+              $( "#ui-imageann" ).imageann();
+            }});
+
+            $(function() {{
+              $( "#ui-textann" ).textann();
+            }});
+            
+            $(function() {{
+              $( "#dtabs" ).tabs(); 
+            }});   
+            
+        }});
+      -->
+      </script>
+
+    </xrx:js>
+    <xrx:css>
+      <link rel="stylesheet" href="{ conf:param('request-root') }codemirror.css"/>
+      <link rel="stylesheet" href="{ conf:param('request-root') }insyntax.css"/>
+      <link rel="stylesheet" href="{ conf:param('request-root') }jquery/themes/base/jquery.ui.all.css"/>
+      <style type="text/css"> 
+      
+#ui-imageselect .ui-selecting {{ background: #FECA40; }}
+#ui-imageselect .ui-selected {{ background: #F39814; color: white; }}
+#ui-imageselect {{ list-style-type: none; margin: 0; padding: 0; }}
+#ui-imageselect li {{ margin: 0px; padding: 0.4em; font-size: 1.4em; height: 18px; }}
+#ui-imageselect .ui-widget-content {{ cursor:pointer }}
+
+
+.CodeMirror{{
+  width:100%;
+  border: 1px solid #ddd;
+  margin:0;
+  padding:0;
+}}
+
+#ui-textann .ui-textann-textarea{{
+  position:relative;
+  float:none;
+}}
+
+#ui-textann .ui-textann-submit{{
+  width:100%;
+  padding:0;
+  margin:0; 
+}}
+
+#dtabs .inner-tab{{
+  margin:0;
+  padding:0;
+}}
+
+#syntax-help{{
+  position:absolute;
+  width:300px;
+  height:400px;
+  left:50%;
+  margin-left:-150px;
+  top:50%;
+  margin-top:-200px;
+  background:white;
+  z-index:9999;
+  border:solid #888 2px;
+  -webkit-box-shadow: 10px 10px 5px #888;
+  -moz-box-shadow: 10px 10px 5px #888;
+  box-shadow: 10px 10px 5px #888;
+}}
+
+/*
+*
+* jQuery ui Transcription Editor
+*
+*/
+#ui-transcriptionEditor{{
+  position:relative;
+  float:left;
+  height:100%;
+  width:100%;
+  margin:0;
+  padding:0;
+}}
+#ui-transcriptionEditor *{{
+  font-family:"Trebuchet MS", regular, sans-serif;
+}}
+
+/*
+*
+* jQuery ui Transcription 
+* Editor header
+*
+*/
+#ui-transcriptionEditor-header{{
+  position:relative;
+  float:left;
+  width:100%;
+  margin-top:20px;
+  margin-bottom:20px;
+}}
+#ui-transcriptionEditor-header .headings{{
+  position:relative;
+  float:left;
+  margin-left:50px;
+}}
+#ui-transcriptionEditor-header .heading{{
+  font-size:25px;
+  margin:0;
+  padding:0;
+  margin-right:10px;
+}}
+#ui-transcriptionEditor-header .header-menu{{
+  position:relative;
+  float:right;
+  top:8px;
+  margin-right:70px;
+}}
+#ui-savedstatus-response{{
+  position:absolute;
+  top:28px;
+  left:286px;
+  color:rgb(200,200,200);
+}}
+
+/*
+*
+* jQuery ui Transcription 
+* Editor toolbar
+*
+*/
+#ui-transcriptionEditor-toolbar{{
+  position:relative;
+  float:left;
+  width:100%;
+  text-align:center;
+  background:rgb(230,230,230);
+  border-top:solid rgb(200,200,200) 1px;
+  border-bottom:solid rgb(200,200,200) 1px;
+}}
+#ui-toolbar-wrapper{{
+  margin:auto;
+  position:relative;
+  margin-left:280px;
+  margin-right:70px;
+}}
+#ui-transcriptionEditor-toolbar .ui-toolbar-button{{
+  position:relative;
+  float:left;
+  margin:3px;
+}}
+#ui-transcriptionEditor-toolbar .button-right{{
+  float:right;
+}}
+#ui-transcriptionEditor-toolbar *{{
+  font-size:16px;
+  color:black;
+}}
+.ui-toolbar-button .ui-dropdown{{
+  position:absolute;
+  left:.3em;
+  top:2.3em;
+  background:white;
+  color:black;
+  border:solid rgb(200,200,200) 1px;
+  z-index:999;
+  display:none;
+}}
+.ui-dropdown ul{{
+  list-style:none;
+  margin:5px;
+  padding:0;
+}}
+
+/*
+*
+* jQuery ui Transcription 
+* Editor imageann
+*
+*/
+#ui-transcriptionEditor-imageann{{
+  position:relative;
+  float:left;
+  width:100%;
+  padding:0;
+  margin:0;
+  background:grey;
+}}
+
+#folio-links{{
+  position:absolute;
+  right:0px;
+  z-index:99;
+  background:white;
+}}
+
+#folio-links .folio-link{{
+  margin:5px;
+}}
+
+#selected-folio{{
+  position:absolute;
+  left:0px;
+  z-index:99;
+  background:white;
+}}
+
+#inner-selected-folio{{
+  margin:5px;
+}}
+
+/*
+*
+* jQuery ui Transcription 
+* Editor textann
+*
+*/
+#ui-transcriptionEditor-textann{{
+  position:relative;
+  float:left;
+  width:100%;
+  margin:0;
+  padding:0;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model>
+  </xrx:model>
+  <xrx:view>
+  {
+    (: request parameters :)
+    let $register := $xrx:tokenized-uri[1]
+    let $register-decoded := xmldb:decode($register)
+    let $act := $xrx:tokenized-uri[2]
+    let $act-decoded := xmldb:decode($act)
+    let $is-mode-contribute :=
+      if($xrx:tokenized-uri[last()] = 'contribute') then true() else false()
+    
+    (: db base collections :)
+    let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+    let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+    
+    (: act info :)
+    let $a := $act-db-base-collection//ead:c[@otherlevel='textgroup'][ead:did/ead:unitid=$act-decoded]
+    let $entry := $a/ancestor::atom:entry
+    let $folio-names := $a//ead:dao/@xpointer[.!='']/string() 
+    let $dao-elements :=
+      for $folio-name in $folio-names
+      return
+      $register-db-base-collection//ead:ead//ead:dao[@xlink:title=$folio-name]
+    let $image-urls :=
+      $dao-elements/@xlink:href/string()
+    let $act-already-transcribed :=
+      $a//tei:p[.//text()]
+    let $entry-updated := 
+      substring-before($entry/atom:updated/text(), 'T')
+    let $entry-author :=
+      $entry/atom:author/atom:email/text()
+    let $additions := $entry//ead:c[@otherlevel='text']
+    let $count-additions := count($additions)
+    
+
+    (: public transcriptions as insyntax text :)
+    let $tei2insyntax-xsl := collection('/db/www')/xsl:stylesheet[@id='tei2insyntax'] 
+    let $transcriptions-published-as-insyntax :=
+      for $addition in $additions
+      let $transcription-element := $addition//tei:body/tei:p
+      let $encodingdesc-exists := exists($addition//tei:encodingDesc)
+      let $rendition-element := $addition//tei:rendition[@xml:id='itineranova-syntax']
+      let $itineranova-syntax := 
+        if($encodingdesc-exists) then
+	        if(exists($rendition-element/text())) then
+	        $rendition-element/text()
+	        else ' '
+	      else
+	        transform:transform($transcription-element, $tei2insyntax-xsl, ())/text()
+       
+      return
+      $itineranova-syntax
+    
+    
+    (: transcription info :)
+    let $atom-id := metadata:atomid('transcription', ($register, $act))    
+    
+    (:~
+    #
+    # [A]
+    # transcription entry in private scope
+    #
+    :)
+    
+    (: transcription saved by any user? :)  
+    let $transcription-in-use :=
+      $user:db-base-collection//atom:id[.=$atom-id]/parent::atom:entry
+      
+    (: transcription saved by the actual user? :)
+    let $transcription-user-db-base-collection := 
+      metadata:base-collection('transcription', $register, 'private')
+    let $transcription-in-use-self :=
+      $transcription-user-db-base-collection//atom:id[.=$atom-id]/parent::atom:entry
+    let $is-in-private-scope := exists($transcription-in-use-self)
+    
+    let $email-transcription-owner := $transcription-in-use/atom:author/atom:email/text()
+	   
+
+	  (:~
+	  #
+	  # [B]
+	  # transcription entry in draft scope
+	  #
+	  :)
+	  
+    let $transcription-draft-db-base-collection :=
+      metadata:base-collection('transcription', $register, 'draft')
+    let $transcription-draft :=
+      $transcription-draft-db-base-collection//atom:id[.=$atom-id]/root(.)/atom:entry
+    let $is-in-draft-scope := exists($transcription-draft)
+
+    
+    (:~ 
+    #
+    # transcriptions to be pasted into the textareas 
+    #
+    :)      
+    let $transcriptions := 
+      if($is-mode-contribute) then
+      
+        (: did we arrive from transcriptions to publish widget? :)
+        if($is-in-draft-scope) then
+          tokenize($transcription-draft//atom:content/text(), '\|\|\|\|')
+        
+        (: did we arrive from public act widget :)
+        else $transcriptions-published-as-insyntax
+        
+      else if(not($is-mode-contribute)) then
+      
+        (: did we arrive from my transcriptions widget? :)
+        if($is-in-private-scope) then
+          tokenize($transcription-in-use//atom:content/text(), '\|\|\|\|')
+        
+        (: did we arrive from public act widget :)
+        else
+          $transcriptions-published-as-insyntax
+        
+      else
+        $transcriptions-published-as-insyntax
+    
+    (:~
+    #
+    # Stuff
+    #
+    :)
+    (: labels for save and commit buttons :)
+    let $save-label := i18n:value('save', $xrx:lang, 'Save')
+    let $contribute-label := i18n:value('contribute', $xrx:lang, 'Contribute')   
+    
+    (: save action :)
+    let $action :=
+      concat(
+        conf:param('request-root'), 
+        'service/?atomid=tag:itineranova.be,2011:/in/service/save-transcription'
+      )
+          
+    return
+    <div>
+	    <xrx:auth>
+	      <xrx:rules>
+	        <xrx:rule>
+	          <xrx:user/>
+	          <xrx:dbgroup>atom</xrx:dbgroup>
+	        </xrx:rule>
+	      </xrx:rules>
+	      <xrx:true>
+			    <div id="ui-transcriptionEditor">
+			      <!--
+			        ui transcriptionEditor header
+			       -->
+			      <div id="ui-transcriptionEditor-header">
+			        <div class="headings">
+			          <span class="heading">{ $register-decoded }</span>
+			          <span class="heading">{ $act-decoded }</span>
+			        </div>
+			        <div id="ui-savedstatus-response">
+			          <span class="status-all-changes-saved status-saved" style="display:none">
+			            <xrx:i18n>
+			              <xrx:key>all-changes-saved</xrx:key>
+			              <xrx:default>All changes saved</xrx:default>
+			            </xrx:i18n>
+			          </span>
+			          <span class="status-autosaving status-saved" style="display:none">
+			            <xrx:i18n>
+			              <xrx:key>saving</xrx:key>
+			              <xrx:default>Saving ...</xrx:default>
+			            </xrx:i18n>
+			          </span>
+			          <span class="status-saving status-saved" style="display:none">
+			            <xrx:i18n>
+			              <xrx:key>saving</xrx:key>
+			              <xrx:default>Saving ...</xrx:default>
+			            </xrx:i18n>
+			          </span>
+			          <span class="status-document-modified status-saved" style="display:none">
+			            <xrx:i18n>
+			              <xrx:key>transcription-modified</xrx:key>
+			              <xrx:default>Transcription modified</xrx:default>
+			            </xrx:i18n>
+			          </span>
+			        </div>
+			        <div class="header-menu">    
+	              <span>
+	                <a href="{ register:link($register) }">{ $register }</a><span>&#160;</span>
+	                <a href="{ act:link(($register, $act)) }">{ $act-decoded }</a><span>&#160;</span>
+	                {
+	                if($is-mode-contribute) then
+	                <a href="{ conf:param('request-root') }transcriptions-to-moderate?{ transcription:rquery-string() }#{ $atom-id }">
+	                  <xrx:i18n>
+	                    <xrx:key>transcriptions-to-moderate</xrx:key>
+	                    <xrx:default>Transcriptions to moderate</xrx:default>
+	                  </xrx:i18n>
+	                </a>
+	                else 
+	                <a href="{ conf:param('request-root') }my-transcriptions#{ $atom-id }">
+	                  <xrx:i18n>
+	                    <xrx:key>my-transcriptions</xrx:key>
+	                    <xrx:default>My Transcriptions</xrx:default>
+	                  </xrx:i18n>
+	                </a>
+	                }
+	              </span>
+	            </div>
+			      </div>
+              
+            <!--
+              ui transcriptionEditor toolbar 
+            -->
+            <div id="ui-transcriptionEditor-toolbar">
+              <div id="ui-toolbar-wrapper">
+                <div class="ui-toolbar-button">
+                  <button id="save-button" type="submit" value="test">
+                  { 
+                    if($is-mode-contribute) then
+                    <span>
+                      <xrx:i18n>
+                        <xrx:key>contribute</xrx:key>
+                        <xrx:default>Contribute</xrx:default>
+                      </xrx:i18n>
+                    </span>
+                    else
+                    <span>
+                      <xrx:i18n>
+                        <xrx:key>save</xrx:key>
+                        <xrx:default>Save</xrx:default>
+                      </xrx:i18n>
+                    </span>
+                  }
+                  </button>
+                </div>
+                <div class="ui-toolbar-button">
+	                <span>
+	                  <xrx:i18n>
+	                    <xrx:key>font-size</xrx:key>
+	                    <xrx:default>Font size</xrx:default>
+	                  </xrx:i18n>
+	                  <span>:</span>
+	                </span>
+	                <select id="font-size-button" title="Font size">
+	                 {
+	                 for $option in (0 to 7)
+	                 let $size := $option * 2 + 20
+	                 return
+	                 <option value="{ $size }">{ $size }</option>
+	                 }
+	                 <option value="36" selected="selected">36</option>
+	                </select>
+	              </div>
+	              <div class="ui-toolbar-button">
+                  <span>
+                    <xrx:i18n>
+                      <xrx:key>special-character</xrx:key>
+                      <xrx:default>Special character</xrx:default>
+                    </xrx:i18n>
+                    <span>:</span>
+                  </span>
+                  <select id="special-char-button">
+                    <option value=""></option>
+                    <option value="½">½</option>
+                    <option value="[">[</option>
+                    <option value="]">]</option>
+                  </select>
+	              </div>
+	              <div class="ui-toolbar-button button-right">
+	                <button id="syntax-button">
+	                  <xrx:i18n>
+	                    <xrx:key>syntax</xrx:key>
+	                    <xrx:default>Syntax</xrx:default>
+	                  </xrx:i18n>
+	                  <span>?</span>
+	                </button>
+	              </div>
+	            </div>
+            </div>
+            
+            <div id="syntax-help" style="display:none">
+              <ul class="syntax-labels">
+                <h2>
+                  <xrx:i18n>
+                    <xrx:key>itineranova-transcription-syntax</xrx:key>
+                    <xrx:default>Itinera Nova Transcription Syntax</xrx:default>
+                  </xrx:i18n>
+                </h2>
+                <li>
+			            <span class="cm-glyph">
+			              <xrx:i18n>
+			                <xrx:key>glyph-syntax-label</xrx:key>
+			                <xrx:default>Gly(ph)</xrx:default>
+			              </xrx:i18n>
+			            </span>
+			          </li>
+			          <li>
+			            <span class="cm-superscript">
+			              <xrx:i18n>
+			                <xrx:key>superscript-syntax-label</xrx:key>
+			                <xrx:default>[Superscript]</xrx:default>
+			              </xrx:i18n>
+			            </span>
+			          </li>
+			          <li>
+			            <span class="cm-unsure">
+			              <xrx:i18n>
+			                <xrx:key>unsure-syntax-label</xrx:key>
+			                <xrx:default>Unsure?</xrx:default>
+			              </xrx:i18n>
+			            </span>
+			          </li>
+			          <li>
+			            <span class="cm-linebreak">
+			              <xrx:i18n>
+			                <xrx:key>linebreak-syntax-label</xrx:key>
+			                <xrx:default>Linebreak /</xrx:default>
+			              </xrx:i18n>
+			            </span>
+			          </li>
+			          <li>
+			            <span class="cm-strikethrough">
+			              <xrx:i18n>
+			                <xrx:key>strikethrough-syntax-label</xrx:key>
+			                <xrx:default>=Strikethrough=</xrx:default>
+			              </xrx:i18n>
+			            </span>
+			          </li>
+			          <li>
+			            <span class="cm-pagebreak">
+			              <xrx:i18n>
+			                <xrx:key>pagebreak-syntax-label</xrx:key>
+			                <xrx:default>Pagebreak //</xrx:default>
+			              </xrx:i18n>
+			            </span>
+			          </li>
+			          <li>
+			            <span class="cm-error">
+			              <xrx:i18n>
+			                <xrx:key>error-syntax-label</xrx:key>
+			                <xrx:default>Syntax error</xrx:default>
+			              </xrx:i18n>
+			            </span>
+			          </li>
+	            </ul>
+            </div>
+            
+			      <!--
+			        ui transcriptionEditor imageann
+			      -->
+			      <div id="ui-transcriptionEditor-imageann">
+						  <div id="selected-folio"><span id="select-result"></span></div>
+				      <div id="folio-links">
+				        <ol id="ui-imageselect">
+				          {
+	                for $folio-name at $p in distinct-values($folio-names)
+	                return
+	                <li title="{ $image-urls[$p] }">{ if($p = 1) then attribute class { 'ui-widget-content ui-selected' } else attribute class { 'ui-widget-content' } }{ $folio-name }</li>
+	                }
+				        </ol>
+				      </div>
+				      <div id="ui-imageann" style="width:100%;height:100%;position:relative;overflow:hidden;">
+				        <div>
+					        <img id="img" name="Image" src="{ $image-urls[1] }"/>
+					      </div>
+				      </div>
+			      </div>
+			      <!-- 
+			         textann
+			       -->
+						{
+						  if($transcription-in-use and not($transcription-in-use-self)) then
+			        <div>
+			          <xrx:i18n>
+			            <xrx:key>act-actually-transcribed-by</xrx:key>
+			            <xrx:default>Act is actually transcribed by</xrx:default>
+			          </xrx:i18n>
+			          <span>: </span>
+			          <span>{ user:firstname-name($email-transcription-owner) }</span>
+			        </div>
+              else if($transcription-draft and not($is-mode-contribute)) then
+              <div>
+                <xrx:i18n>
+                  <xrx:key>transcription-actually-moderated-message</xrx:key>
+                  <xrx:default>This transcription is actually moderated.</xrx:default>
+                </xrx:i18n>
+              </div>
+			        else
+				      <div id="ui-transcriptionEditor-textann">
+					      <div style="display:none">
+	                <xrx:i18n>
+	                  <xrx:key>save</xrx:key>
+	                  <xrx:default>Save</xrx:default>
+	                </xrx:i18n>
+                  <xrx:i18n>
+                    <xrx:key>contribute</xrx:key>
+                    <xrx:default>Contribute</xrx:default>
+                  </xrx:i18n>
+	              </div>
+					      <div>
+						      <div id="ui-textann">
+						        <form id="textannForm" class="ui-textann-form" method="post" action="{ $action }">
+						          <div id="dtabs">
+						            <ul>
+						            {
+					              for $addition at $num in $additions
+					              let $unitid := $addition/ead:did/ead:unitid/text()
+					              return
+										    <li><a href="#dtabs-{ $num }">{ $unitid }</a></li>
+											  }
+											  </ul> 
+				                {
+				                for $addition at $num in $additions
+				                return
+				                <div class="inner-tab" id="dtabs-{ $num }">
+							            <textarea class="ui-textann-editor" name="transcription{ $num }">{ $transcriptions[$num] }</textarea>
+							          </div>
+	                      }
+	                    </div>
+					            <input class="ui-textann-data" type="hidden" name="register" value="{ $register }"/>
+						          <input class="ui-textann-data" type="hidden" name="act" value="{ $act }"/>
+						          <input class="ui-textann-data" type="hidden" name="mode" value="{ if($is-mode-contribute) then 'contribute' else () }"/>
+						          <input style="display:none" id="submit-button" class="ui-textann-submit" type="submit" value="{ if($is-mode-contribute) then $contribute-label else $save-label }"/>
+									  </form>
+									</div>
+							  </div>
+				      </div>
+				    }
+			    </div>
+			  </xrx:true>
+			  <xrx:false>
+			    <div>
+			      <a href="/">
+				      <xrx:i18n>
+				        <xrx:key>protected-page-message</xrx:key>
+				        <xrx:default>Protected page. Please login first.</xrx:default>
+				      </xrx:i18n>
+			      </a>
+			    </div>
+			  </xrx:false>
+	    </xrx:auth>
+	  </div>
+  }
+  </xrx:view>
+</xrx:widget>

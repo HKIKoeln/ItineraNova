@@ -1,0 +1,28 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/create-account</xrx:id>
+  <xrx:inherits>tag:www.monasterium.net,2011:/core/service/create-account</xrx:inherits>
+  <xrx:emails>
+    <xrx:email>
+      <xrx:key>confirm-account-email</xrx:key>
+      <mail>
+          <from>{ xs:string(conf:param('mail-service-address')) }</from>
+          <to>{ $requested-email }</to>
+          <cc></cc>
+          <bcc></bcc>
+          <subject>Itinera Nova - Account Service</subject>
+          <message>
+              <text>
+Itinera Nova - Account Service. We got your registration request.
+
+To confirm your account and to finish the registration, please click the following link:
+
+{ $xrx:http-request-root }service/confirm-account?code={ $code }
+
+If you cannot open this link by clicking it, please copy the link into a new browser window.
+
+              </text>
+          </message>
+      </mail>
+    </xrx:email>
+  </xrx:emails>
+</xrx:service>

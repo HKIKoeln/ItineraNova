@@ -1,0 +1,89 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" 
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/newsletter-archive</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>newsletter-archive</xrx:key>
+      <xrx:default>Newsletter archive</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>false</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+      <style type="text/css">
+.entry{{
+  width:700px;
+  float:none;
+}}
+.inner-entry{{
+  margin:10px;
+}}
+.entry-title{{
+  position:relative;
+  float:left;
+}}
+.entry-title *{{
+  font-size:16px;
+  font-weight:bold;
+}}
+.entry-publication{{
+  position:relative;
+  float:none;
+  color:grey;
+}}
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:view>
+    {
+    let $feed-url := xs:anyURI('http://us1.campaign-archive1.com/feed?u=b03ea79dcbd8587a8c3931a42&amp;id=cf7087cd98')
+    let $feed := doc($feed-url)
+    let $all-entries := $feed//*:item
+    let $entries :=
+      for $entry at $pos in $all-entries
+      let $title-element := $entry/*:title
+      let $name := $title-element/node()
+      return
+      if($name eq $all-entries[($pos + 1)]/*:title/node()) then ()
+      else $entry
+    return
+    <div id="dnewsletter-archive">
+      <div class="h2">
+		    <xrx:i18n>
+		      <xrx:key>newsletter-archive</xrx:key>
+		      <xrx:default>Newsletter archive</xrx:default>
+		    </xrx:i18n>
+      </div>
+      {
+      for $entry in $entries
+      let $title := $entry/*:title/node()
+      let $link := $entry/*:link/text()
+      let $publication-date := $entry/*:pubDate/text()
+      return
+      <div class="entry"><div class="inner-entry">
+        <div class="entry-title"><span>{ $title }</span></div>
+        <span>&#160;&#160;</span>
+        <div class="entry-publication">{ $publication-date }</div>
+        <a href="{ $link }" class="entry-link" target="_blank">
+          <xrx:i18n>
+            <xrx:key>read-more</xrx:key>
+            <xrx:default>Read more</xrx:default>
+          </xrx:i18n>
+        </a>
+      </div></div>
+      }
+    </div>
+    }
+  </xrx:view>
+</xrx:widget>

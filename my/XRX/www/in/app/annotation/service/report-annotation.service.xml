@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+    <xrx:id>tag:itineranova.be,2011:/in/service/report-annotation</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key/>
+            <xrx:default/>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>andre.streicher@uni-koeln.de</xrx:author>
+    <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:translateflag>false</xrx:translateflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:variables>
+        <xrx:variable>
+            <xrx:name>$user</xrx:name>
+            <xrx:expression>xmldb:encode(request:get-parameter("user","0"))</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$moderator</xrx:name>
+            <xrx:expression>doc(xmldb:encode-uri(concat(conf:param('xrx-user-db-base-uri'), xmldb:decode($user), ".xml")))//*:moderator/text()</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$registerid</xrx:name>
+            <xrx:expression>request:get-parameter("registerid","0")</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$folio</xrx:name>
+            <xrx:expression>request:get-parameter("folio","0")</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$anno-id</xrx:name>
+            <xrx:expression>xmldb:encode(request:get-parameter("id","0"))</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$file-name</xrx:name>
+            <xrx:expression>concat(translate($anno-id, '.', '_'), '.xml')</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$direct-annotation-path</xrx:name>
+            <xrx:expression>concat(conf:param('annotation-db-base-uri'), xmldb:decode($registerid), '/', xmldb:decode($folio), '/')</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$old-annotation</xrx:name>
+            <xrx:expression>doc(xmldb:encode-uri(concat($direct-annotation-path, $file-name)))//atom:entry</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$xslt</xrx:name>
+            <xrx:expression>collection('/db/www')/xsl:stylesheet[@id='anno-tei2html']</xrx:expression>
+        </xrx:variable>
+    </xrx:variables>
+    <xrx:emails>
+        <xrx:email>
+            <xrx:key>report-annotation-email</xrx:key>
+            <mail>
+                <from>{ xs:string(conf:param('mail-service-address')) }</from>
+                <to>{ xmldb:decode($moderator) }</to>
+                <cc>{ xmldb:decode($user) }</cc>
+                <bcc/>
+                <subject>Itinera Nova - Annotation Service</subject>
+                <message>
+                    <text>
+                        
+                        Itinera Nova - Annotation Service. You have receive an annotation- report.
+                        
+                        Register: { xmldb:decode($registerid) }
+                        Folio: { xmldb:decode($folio) }
+                        User: { user:firstname-name(xmldb:decode($user)) } ({ xmldb:decode($user) })
+                        Annotation: - Category: { xs:string($old-annotation//*:surfaceGrp/@*:type) }
+                                    - Keyword: {transform:transform($old-annotation//*:facsimile/*:surfaceGrp/*:interp[@type='keyword'], $xslt, ())}
+                                    - Transcription: {transform:transform($old-annotation//*:facsimile/*:surfaceGrp/*:span[@type='transcription'], $xslt, ())}
+                        Report comment: { $data }
+                        
+                        You are receiving this email because you are a user of Itinera Nova.
+                        
+                    </text>
+                </message>
+            </mail>
+        </xrx:email>
+    </xrx:emails>
+    <xrx:body>
+	  {
+      (: atom post parameters :)
+      let $actualdate := current-dateTime()
+      let $code := xs:string(sum((year-from-dateTime($actualdate),month-from-dateTime($actualdate),day-from-dateTime($actualdate),hours-from-dateTime($actualdate),minutes-from-dateTime($actualdate),seconds-from-dateTime($actualdate))))
+      let $random := util:random(999)
+      let $report-id := concat($random, $code)   
+      let $report-file-name := concat(translate($report-id, '.', '_'), '.xml')  
+      let $report-path := xmldb:encode-uri(concat(conf:param('xrx-user-atom-base-uri'), xmldb:decode($moderator), '/metadata.annotation.report/', xmldb:decode($registerid), '/', xmldb:decode($folio), '/'))
+      let $report := annotation:report-to-moderator($old-annotation, $user, $report-id, $data)
+             
+      (: atom post :)                      
+      let $save-report := atom:POST($report-path, $report-file-name, $report)
+      let $user-report := 
+                            let $user-path := xmldb:encode-uri(concat(conf:param('xrx-user-atom-base-uri'), xmldb:decode($user), '/metadata.annotation.report/', xmldb:decode($registerid), '/', xmldb:decode($folio), '/'))
+                            return
+                                atom:POST($user-path, $report-file-name, $report)
+      
+      (: send mail:)
+      let $sendmail :=
+            <xrx:sendmail>
+            <xrx:key>report-annotation-email</xrx:key>
+        </xrx:sendmail> 
+      
+      return
+            <response>done</response>   	  
+	  }
+	</xrx:body>
+</xrx:service>

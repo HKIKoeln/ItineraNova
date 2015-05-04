@@ -1,0 +1,157 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:www.monasterium.net,2011:/core/service/qSchema2</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>daniel.ebner@uni-koeln.de</xrx:author>  
+  <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:translateflag>false</xrx:translateflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:variables>
+    <xrx:variable>
+      <xrx:name>$elementExpression</xrx:name>
+      <xrx:expression>request:get-parameter("context", "")</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$elementPath</xrx:name>
+      <xrx:expression>qschema:getPath($elementExpression)</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$elementPathArray</xrx:name>
+      <xrx:expression>qschema:getPathArray($elementPath)</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$element</xrx:name>
+      <xrx:expression>$elementPathArray[fn:last()]</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$localName</xrx:name>
+      <xrx:expression>qschema:getLocalName($element)</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$ns</xrx:name>
+      <xrx:expression>qschema:getNamespace($element)</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$containsPathesArray</xrx:name>
+      <xrx:expression>qschema:geContainsPathesArray($elementExpression)</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$containsElements</xrx:name>
+      <xrx:expression>qschema:geContainsElements($containsPathesArray)</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$xsd</xrx:name>
+      <xrx:expression>qschema:getSchema($ns)</xrx:expression>
+    </xrx:variable>
+  </xrx:variables>
+  <xrx:body>
+		{
+		
+		
+		
+		(:
+		let  $possible-child-elements := qschema:get-children($localName, (), $xsd)		
+		return
+		   <can-contain-elements>
+		   {$possible-child-elements}
+		   </can-contain-elements>
+		:)
+		
+		(:
+		let  $possible-child-elements := qschema:get-child-elements($localName, (), $xsd)		
+		return
+		   <can-contain-elements>
+		   {$possible-child-elements}
+		   </can-contain-elements>
+		:)
+		
+		(:
+		let  $possible-child-elements := qschema:get-child-elements-def($localName, $xsd)		
+		return
+		   <can-contain-elements>
+				{$possible-child-elements}
+			</can-contain-elements>
+		:)
+		
+		
+		let  $possible-child-elements :=  qschema:get-relevant-child-elements($localName, $xsd)		
+		return
+		   <can-contain-elements>
+				{$possible-child-elements}
+			</can-contain-elements>
+		
+		
+		(:
+		let  $label :=   qschema:get-label-of-item($localName, 'element', $xsd)	
+		return
+			$label
+		:)	
+		
+		(:
+		let $element-def := qschema:get-element($localName, $xsd)
+		return $element-def
+		:)
+		(:
+		let $group-def := qschema:get-group($localName, $xsd)
+		return $group-def
+		:)
+		(:
+		let $att-def := qschema:get-attribute($localName, $xsd)
+		return $att-def
+		:)
+		(:
+		let $att-group-def := qschema:get-attribute-group($localName, $xsd)
+		return $att-group-def
+		:)
+		(:
+		let $complex-type-def := qschema:get-complex-type($localName, $xsd)
+		return $complex-type-def
+		:)
+		(: 
+		let $simple-type-def := qschema:get-simple-type($localName, $xsd)
+		return $simple-type-def 
+		:)
+
+		
+		
+		
+		
+		
+		
+
+		 
+		
+		
+		
+	
+		}
+	</xrx:body>
+</xrx:service>

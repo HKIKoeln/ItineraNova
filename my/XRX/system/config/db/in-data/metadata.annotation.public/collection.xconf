@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://exist-db.org/collection-config/1.0">
+    <index xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:vre="http://www.monasterium.net/NS/vre" xmlns:tei="http://www.tei-c.org/ns/1.0/" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:ead="urn:isbn:1-931666-22-9">
+        <fulltext default="none" attributes="no"/>
+        <lucene>
+            <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+            <text match="//atom:content/xrx:revision/xrx:annotation/tei:TEI/tei:facsimile/tei:surface/*"/>
+            <text match="//atom:content/xrx:revision/xrx:annotation/tei:TEI/tei:facsimile/tei:surface/tei:span"/>
+            <text match="//atom:content/xrx:revision/xrx:annotation/tei:TEI/tei:facsimile/tei:surface/tei:interp"/>
+            <text qname="@type" type="xs:string"/>
+            <text qname="tei:surface"><inline qname="tei:abbr"/></text>
+            <text qname="tei:span"><inline qname="tei:abbr"/></text>
+            <text qname="tei:interp"><inline qname="tei:abbr"/></text>
+        </lucene>
+        <create qname="atom:id" type="xs:string"/>
+        <create qname="atom:content" type="xs:string"/>
+        <create qname="tei:TEI" type="xs:string"/>
+        <create qname="xrx:revision" type="xs:string"/>
+        <create qname="xrx:annotation" type="xs:string"/>
+        <create qname="tei:surface" type="xs:string"/>
+        <create qname="tei:facsimile" type="xs:string"/>
+        <create qname="tei:span" type="xs:string"/>
+        <create qname="@type" type="xs:string"/>
+    </index>
+</collection>

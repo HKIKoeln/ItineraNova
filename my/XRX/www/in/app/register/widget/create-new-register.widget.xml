@@ -1,0 +1,135 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" 
+  xmlns:ev="http://www.w3.org/2001/xml-events" 
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/create-new-register</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>create-register</xrx:key>
+      <xrx:default>Create register</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>true</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+  </xrx:res>
+  <xrx:model>
+    <xf:model id="mcreate-new-register">
+      <xf:instance id="inew-register">
+        <data xmlns="">
+          <new-register />
+        </data>
+      </xf:instance>
+      <xf:submission id="screate-new-register" ref="instance('inew-register')"
+        action="{ $xrx:localhost-request-base-url }service/?atomid=tag:itineranova.be,2011:/in/service/create-new-register" 
+        method="post"
+        replace="none">
+        <xf:action ev:event="xforms-submit-done">
+          <xf:message level="ephemeral">Creating register. Please wait...</xf:message>
+          <script type="text/javascript">
+            window.location.reload(true);
+          </script>
+        </xf:action>
+        <xf:action ev:event="xforms-submit-error">
+          <xf:message>Error.</xf:message>
+        </xf:action>
+      </xf:submission>
+    </xf:model>
+  </xrx:model>
+  <xrx:view>
+    {
+      
+    (: 
+      read all register names out of the database
+      concat them to use a simple contains function
+      later
+    :)
+    let $register-db-base-collection := metadata:base-collection('register', 'public')
+    let $db-registers :=
+      string-join(
+        $register-db-base-collection//ead:ead//ead:archdesc//ead:unitid/text()
+        , ''
+      )
+    
+    (: get all register names from the image server :)
+    let $image-server-registers :=
+		    system:as-user(
+		      'admin',
+		      conf:param('dba-password'),
+		      file:list(xs:anyURI('/storage/backup/srv/images/registers'))//file:directory/@name/string()
+		    )
+
+	  
+	  (: which registers are missing then? :)
+    let $missing-registers :=
+	    for $name in $image-server-registers
+	    return
+	    if(contains($db-registers, $name)) then ()
+	    else $name
+	  return
+    <div>
+      <div class="h2">
+        <xrx:i18n>
+          <xrx:key>create-register</xrx:key>
+          <xrx:default>Create register</xrx:default>
+        </xrx:i18n>
+      </div>
+      <xrx:auth>
+        <xrx:rules>
+          <xrx:rule>
+            <xrx:user/>
+            <xrx:role>archivist</xrx:role>
+          </xrx:rule>
+        </xrx:rules>
+        <xrx:true>
+		      <xf:group model="mcreate-new-register">
+		        <div class="div-border-bottom">
+		          <div>
+		            {
+		            if(count($missing-registers) gt 0) then
+		            <div>
+		              <span>
+		                <span>New Registers found on the </span>
+		                <a href="{ conf:param('image-server-base-url') }" target="_blank">Image Server:</a>
+		              </span>
+		              {
+		              for $r in $missing-registers
+		              return
+		              <div>
+		                <b>{ $r }</b>
+		                <span>&#160;&#160;</span>
+		                <xf:trigger>
+		                  <xf:label>Create Register</xf:label>
+		                  <xf:action ev:event="DOMActivate">
+		                    <xf:setvalue ref="instance('inew-register')//new-register"
+		                      value="'{ $r }'" />
+		                    <xf:send submission="screate-new-register" />
+		                  </xf:action>
+		                </xf:trigger>
+		              </div>
+		              }
+		            </div>
+		            else ()
+		            }
+		          </div>
+		        </div>
+		      </xf:group>
+		    </xrx:true>
+		    <xrx:false>
+		      <div>
+		        <span>Please login first.</span>
+		      </div>
+		    </xrx:false>
+		  </xrx:auth>
+    </div>
+    }
+  </xrx:view>
+</xrx:widget>

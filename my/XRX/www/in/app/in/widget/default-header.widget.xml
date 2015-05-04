@@ -1,0 +1,59 @@
+<xrx:widget xmlns:xrx="http://www.monasterium.net/NS/xrx"
+	xmlns="http://www.w3.org/1999/xhtml">
+	<xrx:id>tag:itineranova.be,2011:/in/widget/default-header</xrx:id>
+	<xrx:res>
+		<xrx:css>
+		  <style type="text/css">
+
+#header .logged-in-info{{
+  position:absolute;
+  left:210px;
+  top:0px;
+  color:rgb(100,100,100);
+}}
+
+		  </style>
+		</xrx:css>
+	</xrx:res>
+	<xrx:view>
+		<div id="header">
+			<div id="main-logo">
+				<img src="{ conf:param('request-root') }header.jpg" alt="Itinera Nova Logo" width="1000" />
+			</div>
+			<script type="text/javascript">
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3064654-2']);
+_gaq.push(['_trackPageview']);
+
+(function() {{
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+}})();
+
+      </script>
+			<xrx:auth>
+			  <xrx:rules>
+			    <xrx:rule>
+			      <xrx:user/>
+			      <xrx:dbgroup>atom</xrx:dbgroup>
+			    </xrx:rule>
+			  </xrx:rules>
+			  <xrx:true>
+					<div class="logged-in-info">
+		        <xrx:i18n>
+		          <xrx:key>logged-in-as</xrx:key>
+		          <xrx:default>Logged in as</xrx:default>
+		        </xrx:i18n>
+		        <span>:&#160;</span>
+		        <span>{ user:firstname-name($xrx:user-id) }</span>
+					</div>
+				</xrx:true>
+				<xrx:false>
+				  <span/>
+				</xrx:false>
+			</xrx:auth>
+		</div>
+	</xrx:view>
+</xrx:widget>

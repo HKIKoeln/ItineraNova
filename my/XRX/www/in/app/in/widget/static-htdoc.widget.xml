@@ -1,0 +1,84 @@
+<xrx:widget xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/static-htdoc</xrx:id>
+  <xrx:inherits/>
+  <xrx:title></xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>false</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+      <style type="text/css">
+
+/* 
+*
+*   Link to the htdoc editor
+*/  
+#dwidget .edit-link{{
+  font-size:11px;
+}}
+
+#dwidget .edit-link *{{
+  color:rgb(114,133,108);
+  font-size:11px;
+}}
+
+#static-htdoc{{
+  margin-top:40px;
+  margin-right:100px;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:view>
+    {
+    let $htdoc-entry := htdoc:get($xrx:resolver/xrx:atomid/text())
+    let $htdoc-title := htdoc:title($htdoc-entry)/text()
+    let $htdoc-atomid := $htdoc-entry/atom:id/text()
+    return
+    <div id="dwidget">
+      <div class="h2">
+        <span>{ $htdoc-title }&#160;&#160;</span>
+        <xrx:auth>
+          <xrx:rules>
+            <xrx:rule>
+              <xrx:user/>
+              <xrx:role>html-author</xrx:role>
+            </xrx:rule>
+          </xrx:rules> 
+          <xrx:true>
+            <a href="{ conf:param('request-root') }edit-htdoc/?atomid={ $htdoc-atomid }" class="edit-link">
+              <span>[</span>
+              <xrx:i18n>
+               <xrx:key>edit</xrx:key>
+               <xrx:default>Edit</xrx:default>
+              </xrx:i18n>
+              <span>]</span>
+            </a> 
+          </xrx:true>
+          <xrx:false>
+           <span/>
+          </xrx:false>
+        </xrx:auth>
+      </div>
+      <div id="static-htdoc">
+        <div id="inner-static-htdoc">
+          <div>
+           { htdoc:process($htdoc-entry) }
+          </div>
+          <br />
+          <br />
+          <xrx:subwidget>tag:itineranova.be,2011:/in/widget/last-update-info</xrx:subwidget>
+        </div>
+      </div>
+    </div>
+    }
+  </xrx:view>
+</xrx:widget>

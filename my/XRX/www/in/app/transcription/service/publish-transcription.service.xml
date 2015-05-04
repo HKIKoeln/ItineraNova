@@ -1,0 +1,266 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/publish-transcription</xrx:id>
+  <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:translateflag>false</xrx:translateflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:variables>
+    <xrx:variable>
+      <xrx:name>$register</xrx:name>
+      <xrx:expression>$data//*:register/text()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$act</xrx:name>
+      <xrx:expression>$data//*:act/text()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$act-decoded</xrx:name>
+      <xrx:expression>xmldb:decode($act)</xrx:expression>
+    </xrx:variable>
+    <!-- 
+      atom IDs
+     -->
+    <xrx:variable>
+      <xrx:name>$act-atomid</xrx:name>
+      <xrx:expression>metadata:atomid('act', ($register, $act))</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$transcription-atomid</xrx:name>
+      <xrx:expression>metadata:atomid($transcription:metadata-object-type, ($register, $act))</xrx:expression>
+    </xrx:variable>
+    <!-- 
+      get public act entry
+     -->
+    <xrx:variable>
+      <xrx:name>$public-act-base-collection</xrx:name>
+      <xrx:expression>metadata:base-collection('act', $register, 'public')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$public-act-entry</xrx:name>
+      <xrx:expression>$public-act-base-collection//atom:id[.=$act-atomid]/parent::atom:entry</xrx:expression>
+    </xrx:variable>
+    <!--
+      get transcription entry from draft space 
+     -->
+    <xrx:variable>
+      <xrx:name>$transcription-draft-base-collection</xrx:name>
+      <xrx:expression>metadata:base-collection($transcription:metadata-object-type, $register, 'draft')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$transcription-draft-act-entry</xrx:name>
+      <xrx:expression>$transcription-draft-base-collection//atom:id[.=$transcription-atomid]/parent::atom:entry</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$transcription-author</xrx:name>
+      <xrx:expression>$transcription-draft-act-entry/atom:author/atom:email/text()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$draft-entry-name</xrx:name>
+      <xrx:expression>util:document-name($transcription-draft-act-entry)</xrx:expression>
+    </xrx:variable>
+  </xrx:variables>
+  <xrx:emails>
+    <xrx:email>
+      <xrx:key>publish-transcription-email</xrx:key>
+      <mail xmlns="">
+          <from>{ xs:string(conf:param('mail-service-address')) }</from>
+          <to>{ xs:string($transcription-author) }</to>
+          <cc>{ xs:string($xrx:user-id) }</cc>
+          <bcc></bcc>
+          <subject>Itinera Nova - Editorial Service</subject>
+          <message>
+              <text>
+              
+Itinera Nova - Editorial Service. Your transcription was published.
+
+Register: { $register }
+Act: { $act-decoded }
+Moderator: { user:firstname-name($xrx:user-id) } ({ $xrx:user-id })
+Permanent link: { $xrx:http-request-root }{ $register }/{ $act }/act
+
+You are receiving this email because you are a user of Itinera Nova.
+
+              </text>
+          </message>
+      </mail>
+    </xrx:email>
+  </xrx:emails>
+  <xrx:body>
+  {
+    
+    
+    (: get transcription from transcription draft entry :)
+    let $transcriptions := $transcription-draft-act-entry//atom:content/text()
+    let $tokenize-transcriptions := tokenize($transcriptions, '\|\|\|\|')
+    
+    (: transform insyntax into TEI :)
+    let $transcriptions-as-tei :=
+      for $transcription in $tokenize-transcriptions
+      return
+      if($transcription != '') then
+        transcription:text2tei2($transcription)
+      else <tei:p xmlns:tei="http://www.tei-c.org/ns/1.0/"/>
+            
+    let $validate :=
+    <validate>
+      {
+      for $t at $num in $transcriptions-as-tei
+      let $tei := 
+        <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0/">
+            <tei:teiHeader>
+                <tei:fileDesc>
+                    <tei:titleStmt>
+                        <tei:title/>
+                    </tei:titleStmt>
+                    <tei:editionStmt>
+                        <tei:p/>
+                    </tei:editionStmt>
+                    <tei:extent/>
+                    <tei:publicationStmt>
+                        <tei:p/>
+                    </tei:publicationStmt>
+                    <tei:seriesStmt>
+                        <tei:p/>
+                    </tei:seriesStmt>
+                    <tei:notesStmt>
+                        <tei:note/>
+                    </tei:notesStmt>
+                    <tei:sourceDesc>
+                        <tei:p/>
+                    </tei:sourceDesc>
+                </tei:fileDesc>
+                <tei:revisionDesc>
+                    <tei:change/>
+                </tei:revisionDesc>
+            </tei:teiHeader>
+            <tei:text>
+                <tei:body>
+                    { $transcriptions-as-tei[$num] }
+                </tei:body>
+            </tei:text>
+        </tei:TEI>
+      return
+      if($t//text()) then
+        validation:jaxv-report($tei, xs:anyURI(concat($xrx:localhost-request-base-url, 'tei_all.xsd')))
+      else()
+      }
+    </validate>
+    let $is-valid :=
+      if($validate//*:status[.='invalid']) then false() else true()
+    
+    (: create transcription entry for each addition :)
+    let $transcription-entries :=
+      for $t at $num in $transcriptions-as-tei
+      return
+    <atom:entry xmlns:atom="http://www.w3.org/2005/Atom" id="text">
+      <atom:id/>
+      { $transcription-draft-act-entry/atom:published }
+      { $transcription-draft-act-entry/atom:updated }
+      { $transcription-draft-act-entry/atom:author }
+      { $transcription-draft-act-entry/atom:contributor }
+      <vre:moderator xmlns:vre="http://www.monasterium.net/NS/vre">
+        <vre:email>{ $xrx:user-id }</vre:email>
+      </vre:moderator>
+      <app:control xmlns:app="http://www.w3.org/2007/app">
+        <app:draft>no</app:draft>
+      </app:control>
+      <atom:content type="text/plain">
+        <tei:TEI xmlns:tei="http://www.tei-c.org/ns/1.0/">
+				  <tei:teiHeader>
+				    <tei:fileDesc>
+				      <tei:titleStmt>
+				        <tei:title />
+				      </tei:titleStmt>
+				      <tei:editionStmt>
+				        <tei:p />
+				      </tei:editionStmt>
+				      <tei:extent />
+				      <tei:publicationStmt>
+				        <tei:p />
+				      </tei:publicationStmt>
+				      <tei:seriesStmt>
+				        <tei:p />
+				      </tei:seriesStmt>
+				      <tei:notesStmt>
+				        <tei:note />
+				      </tei:notesStmt>
+				      <tei:sourceDesc>
+				        <tei:p />
+				      </tei:sourceDesc>
+				    </tei:fileDesc>
+				    <tei:revisionDesc>
+				      <tei:change />
+				    </tei:revisionDesc>
+				    <tei:encodingDesc>
+				      <tei:tagsDecl>
+				        <tei:rendition xml:id="itineranova-syntax">{ $tokenize-transcriptions[$num] }</tei:rendition>
+				      </tei:tagsDecl>
+				    </tei:encodingDesc>
+				  </tei:teiHeader>
+				  <tei:text>
+				    <tei:body>
+				      { $transcriptions-as-tei[$num] }
+				    </tei:body>
+				  </tei:text>
+				</tei:TEI>
+      </atom:content>
+    </atom:entry>
+       
+    let $updated-public-entry := transcription:insert($public-act-entry, $transcription-entries)
+
+    let $feed := metadata:feed('act', $register, 'public')
+    let $entry-name := metadata:entryname('act', $act)
+    
+    let $act-draft-feed := metadata:feed('act', $register, 'draft')
+    
+    (: store the act draft entry :)
+    let $store-draft-act := 
+      if($is-valid) then atom:POSTSILENT($act-draft-feed, $entry-name, $updated-public-entry) else ()
+
+    (: when stored publish it :)
+    let $publish := 
+      if($is-valid) then revision:publish($act-atomid, 'draft') else ()
+
+    (: archive the draft transcription entry :)
+    let $archive-transcription-draft := revision:archive($transcription-atomid, 'draft')
+    
+    let $sendmail :=
+      if($is-valid) then
+	    <xrx:sendmail>
+	      <xrx:key>publish-transcription-email</xrx:key>
+	    </xrx:sendmail>
+      else()
+    
+    return
+    
+    if(not($is-valid)) then
+    <xrx:response status="-1">
+      <xrx:message>Transcription could not be transformed into TEI.</xrx:message>
+      <xrx:icon>{ conf:param('request-root') }dialog-error.png</xrx:icon>{ $validate }{ $transcriptions-as-tei }
+    </xrx:response>
+    else
+    <xrx:response status="1">{ $archive-transcription-draft }{ $validate }{ $transcriptions-as-tei }</xrx:response>
+  }
+  </xrx:body>
+</xrx:service>

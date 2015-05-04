@@ -1,0 +1,98 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/save-transcription</xrx:id>
+  <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:translateflag>false</xrx:translateflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:variables>
+    <xrx:variable>
+      <xrx:name>$register</xrx:name>
+      <xrx:expression>request:get-parameter('register', '')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$act</xrx:name>
+      <xrx:expression>request:get-parameter('act', '')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$transcription</xrx:name>
+      <xrx:expression>request:get-parameter('transcription', '')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$is-mode-contribute</xrx:name>
+      <xrx:expression>if(request:get-parameter('mode', '') = 'contribute') then true() else false()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$feed</xrx:name>
+      <xrx:expression>if($is-mode-contribute) then metadata:feed($transcription:metadata-object-type, $register, 'draft') else metadata:feed($transcription:metadata-object-type, $register, 'private')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$entry-base-collection</xrx:name>
+      <xrx:expression>if($is-mode-contribute) then metadata:base-collection($transcription:metadata-object-type, $register, 'draft') else metadata:base-collection($transcription:metadata-object-type, $register, 'private')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$entry-name</xrx:name>
+      <xrx:expression>metadata:entryname($transcription:metadata-object-type, $act)</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$atom-id</xrx:name>
+      <xrx:expression>metadata:atomid($transcription:metadata-object-type, ($register, $act))</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$transcription-exists</xrx:name>
+      <xrx:expression>count($entry-base-collection//atom:id[.=$atom-id]) gt 0</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$existing-transcription</xrx:name>
+      <xrx:expression>root($entry-base-collection//atom:id[.=$atom-id])</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$entry</xrx:name>
+      <xrx:expression>upd:replace-element-content($existing-transcription//atom:content, text{ $transcription })</xrx:expression>
+    </xrx:variable>
+  </xrx:variables>
+  <xrx:body>
+    {  
+      
+    let $update-entry := 
+      
+        if(not($is-mode-contribute)) then
+	        atom:PUT(
+	          $feed,
+	          $entry-name,
+	          $entry
+	        )
+	        
+	      else
+	        atom:CONTRIBUTE(
+	          $feed,
+	          $entry-name,
+	          $entry
+	        )
+	        
+    return
+    ()
+    (:util:log-system-out($entry):)
+    }
+  </xrx:body>
+</xrx:service>

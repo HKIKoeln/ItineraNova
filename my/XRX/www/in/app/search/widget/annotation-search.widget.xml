@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:tei="http://www.tei-c.org/ns/1.0/" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/annotation-search</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key>annotation-search</xrx:key>
+            <xrx:default>Annotation Search</xrx:default>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>andre.streicher@uni-koeln.de</xrx:author>
+    <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:xformsflag>false</xrx:xformsflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:res>
+        <xrx:js>
+            <script type="text/javascript" src="{ conf:param('request-root') }jquery.min.js"/>
+            <script type="text/javascript" src="{ conf:param('request-root') }search-functions.js"/>
+        </xrx:js>
+        <xrx:css>
+            <style type="text/css">
+
+#dsearch .select-block{{
+  position:relative;
+  float:left;
+  width:100%;
+}}
+
+#dsearch .search-field{{
+  padding:10px;
+  width:350px;
+  z-index:9999;
+}}
+
+#dsearch .search-trigger{{
+  padding:10px;
+  z-index:9999;
+}}
+
+#hit-info{{
+  position:relative;
+  float:left;
+  width:100%;
+  margin-top:110px;
+}}
+
+#result{{
+  position:relative;
+  float:left;
+  width:100%;
+}}
+
+#result .annotation{{
+  background:rgb(240,240,240);
+  width:760px;
+  margin:10px;
+  float:left;
+}}
+
+#result .inner-annotation{{
+  margin:10px;
+  float:left;
+}}
+
+#result .informations{{
+  position:relative;
+  top:10px;
+  left:5px;
+  width:520px;
+}}
+
+#result .annotation-link *{{
+  font-size:15px;
+}}
+
+.viewport{{
+  position:relative;
+  overflow:auto;
+  padding:2;
+  margin:5px;
+  float:left;
+  width: 200px;
+  border: solid grey 1px;
+  
+}}
+
+.thumb{{
+    z-index:1;
+    margin:0px;
+    padding:0px;
+    width: 200px;
+}}
+      
+#dsearch .block-navi-link{{
+  position:relative;
+  float:left;
+  margin:5px;
+  font-weight:bold;
+  font-size:1.1em;
+}}
+
+#dsearch a:link, #dsearch a:visited{{
+  text-decoration:none;
+}}
+
+#confine-search{{
+  position:absolute;
+  right:30px;
+  top:95px;
+  text-align:right;
+  z-index:9998;
+}}
+
+#annotation-params{{
+  position:absolute;
+  top:123px;
+  right:30px;
+  text-align:right;
+  z-index:9998;
+}}
+
+#input{{
+  z-index:9999;
+}}
+
+#search-trigger-div{{
+  z-index:9999;
+}}
+
+#add-button{{
+ padding:0.5px;
+}}
+
+#and-options{{
+    display:none;
+}}
+
+#folio{{
+    position:relative;
+    display:none;
+    padding:2px;
+}}
+
+#register-form{{
+    position:relative;
+    padding:3px;
+}}
+
+#annotation-scope{{
+    position:relative;
+    padding:2px;
+}}
+
+#category{{
+    position:relative;
+    padding:2px;
+}}
+
+#folio-input{{
+    width:74px;
+}}
+
+.direct{{
+        display:block;
+        z-index:3;
+        position:absolute;
+        background: rgba(0, 0, 0, 0.0);
+        border:solid red 1px;
+        -moz-border-radius:3px;
+        -webkit-border-radius:3px;
+        -khtml-border-radius:3px;
+        border-radius:3px;
+    }}
+
+.toolimg {{
+         border:solid rgb(160,160,160) 1px;
+         z-index:15;
+         -moz-border-radius:1px;
+         -webkit-border-radius:1px;
+         -khtml-border-radius:1px;
+         border-radius:1px;
+         }}
+
+.tooltip {{
+         display: none;
+         position: absolute;
+         z-index: 99999;
+         }}
+
+      </style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:view>
+  {
+    (: db base collections :)
+    let $register-db-base-collection := metadata:base-collection('register', 'public') 
+    
+    (: 
+      evaluate the search query string
+      if this is not the first visit of
+      the user
+    :)
+    let $annotations := 
+      if(not(search:is-first-visit())) then 
+        util:eval(search:query-string('annotation'))
+      else ()
+      
+    (: count the hits :)
+    let $count := count($annotations)
+
+    (: hit navigation :)
+    let $block := xs:integer(request:get-parameter('block', '1'))
+    let $annotations-per-block := 5
+    let $start := $block*$annotations-per-block - $annotations-per-block + 1
+    let $stop := 
+    if(($start + $annotations-per-block - 1) lt $count) then $start + $annotations-per-block - 1
+    else $count
+    let $blocks-count := xs:integer(ceiling($count div $annotations-per-block))
+    
+    (: select block div :)
+    let $select-block-div :=
+        <div class="select-block">
+            {
+            let $block-link := 
+            string-join(
+            for $param in request:get-parameter-names()
+            return
+            if(not(matches($param, '(block|null)'))) then
+            concat('&amp;', $param, '=', request:get-parameter($param, ''))
+            else ''
+            , ''
+            )
+            for $block-pos in (1 to $blocks-count)
+            return
+            <div class="block-navi-link">
+                <a href="?null={ $block-link }&amp;block={$block-pos}">
+                    { if($block-pos != $block) then xs:string($block-pos) else <b style="background-color:#EF6A2F;color:white">{ xs:string($block-pos) }</b>}
+                </a>
+                <span>&#160;</span>
+            </div>
+            }
+        </div>
+        
+    return
+    <div id="dsearch">
+            <div class="h2">
+                <xrx:i18n>
+                    <xrx:key>annotation-search</xrx:key>
+                    <xrx:default>Annotation Search</xrx:default>
+                </xrx:i18n>
+            </div>
+            <form name="search-form" method="get">
+                <div id="confine-search">
+                    <div id="register-form">
+                        <b>
+                            <xrx:i18n>
+                                <xrx:key>register</xrx:key>
+                                <xrx:default>Register</xrx:default>
+                            </xrx:i18n>:
+                            </b>
+                        <select id="register" name="register" onChange="changeRegister();">
+                            <option value="all">
+                                <xrx:i18n>
+                                    <xrx:key>all</xrx:key>
+                                    <xrx:default>all</xrx:default>
+                                </xrx:i18n>
+                            </option>
+                                    {
+                                    for $ead in $register-db-base-collection//ead:ead
+                                    let $reg := $ead//ead:archdesc/ead:did/ead:unitid/text()
+                                    order by $reg
+                                    return
+                                    <option value="{ $reg }">{ if($search:register = $reg) then attribute selected { 'selected' } else () }{ $reg }</option> 
+                                    }
+                            </select>
+                    </div>
+                    <div id="folio" style="{ if( $search:register != 'all' and $search:register != '')then 'display:block;' else() }">
+                        <b>
+                            <xrx:i18n>
+                                <xrx:key>folio</xrx:key>
+                                <xrx:default>Folio</xrx:default>
+                            </xrx:i18n>:
+                                </b>
+                        <input id="folio-input" name="folio" value="{ $search:folio }"/>
+                        <select name="page">
+                                 {
+                                 for $p in ('R°', 'V°')
+                                 return
+                                 <option value="{ $p }">{ if($search:page = $p) then attribute selected { 'selected' } else () }{ $p }</option>
+                                 }
+                               </select>
+                    </div>
+                </div>
+                <div id="annotation-params" style="{ if( $search:register != 'all'  and $search:register != '')then 'top:148px;' else() }">
+                    <div id="category">
+                        <b>
+                            <xrx:i18n>
+                                <xrx:key>category</xrx:key>
+                                <xrx:default>Category</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </b>
+                        <select name="category-0" id="select-category-0" onChange="checkAdding('0');">
+                                    {
+                                    <option value="all">
+                                <xrx:i18n>
+                                    <xrx:key>all</xrx:key>
+                                    <xrx:default>all</xrx:default>
+                                </xrx:i18n>
+                            </option>,                            
+                                    let $categories := doc(concat(conf:param('annotation-db-base-uri'), 'webapp-data/Categories.xml'))//*:category
+                                    for $category in $categories
+                                    return
+                                    <option value="{ $category/text() }">
+                                        { if($search:category = $category/text()) then attribute selected { 'selected' } else () }
+                                        <xrx:i18n>
+                                    <xrx:key>{$category/text()}</xrx:key>
+                                    <xrx:default>{$category/text()}</xrx:default>
+                                </xrx:i18n>
+                            </option>
+                                    }
+                                </select>
+                        <div id="and-options" style="{ if( $search:category != 'all' and $search:category != '')then 'display:inline;' else() }">
+                            {
+                            let $all-params := request:get-parameter-names()
+                            let $params := 
+                                            for $param in $all-params
+                                            order by $param
+                                            return
+                                                if(starts-with($param, 'category') and $param != 'category-0')then
+                                                    $param
+                                                else()
+                            let $count-params := count($params)
+                            let $click := if($count-params gt 0)then "removeCategory('1','0');" else "addCategory('0');"
+                            return
+                                (<input id="add-button-0" type="button" value="{ if($count-params gt 0)then '&amp;' else '+' }" onClick="{ $click }"/>,
+                                for $param at $count-number in $params
+                                        return
+                                        (
+                                        let $selected-category := request:get-parameter($param, '')
+                                        let $selected-click := if($count-number != $count-params)then concat("removeCategory('", xs:integer($count-number)+1,"','", $count-number, "');") else concat("addCategory('", $count-number, "');")
+                                        return
+                                                (<select name="category-{$count-number}" id="select-category-{$count-number}">
+                                                {
+                                                let $categories := doc(concat(conf:param('annotation-db-base-uri'), 'webapp-data/Categories.xml'))//*:category
+                                                for $category in $categories
+                                                return
+                                                <option value="{ $category/text() }">
+                                                    { if($selected-category  = $category/text()) then attribute selected { 'selected' } else () }
+                                                    <xrx:i18n>
+                                        <xrx:key>{$category/text()}</xrx:key>
+                                        <xrx:default>{$category/text()}</xrx:default>
+                                    </xrx:i18n>
+                                </option>
+                                                }
+                                            </select>,
+                                        <input id="add-button-{$count-number}" type="button" value="{ if($count-number != $count-params)then '&amp;' else '+' }" onClick="{ $selected-click }"/>)
+                                        )
+                                   )
+                            }
+                        </div>
+                    </div>
+                    <div id="annotation-scope">
+                        <b>
+                            <xrx:i18n>
+                                <xrx:key>search-scope</xrx:key>
+                                <xrx:default>Search scope</xrx:default>
+                            </xrx:i18n>:
+                                    <span>&#160;</span>
+                        </b>
+                        <select name="scope">
+                            <option value="all">
+                                { if($search:scope = 'all') then attribute selected { 'selected' } else () }
+                                <xrx:i18n>
+                                    <xrx:key>all</xrx:key>
+                                    <xrx:default>all</xrx:default>
+                                </xrx:i18n>
+                            </option>
+                            <option value="keyword">
+                                { if($search:scope = 'keyword') then attribute selected { 'selected' } else () }
+                                <xrx:i18n>
+                                    <xrx:key>keyword</xrx:key>
+                                    <xrx:default>Keyword</xrx:default>
+                                </xrx:i18n>
+                            </option>
+                            <option value="transcription">
+                                { if($search:scope = 'transcription') then attribute selected { 'selected' } else () }
+                                <xrx:i18n>
+                                    <xrx:key>transcription</xrx:key>
+                                    <xrx:default>Transcription</xrx:default>
+                                </xrx:i18n>
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div id="input">
+                    {
+                    if(not(search:is-first-visit()) and $count = 0) then
+                          <div>
+                        <span>
+                            <xrx:i18n>
+                                <xrx:key>no-results-message</xrx:key>
+                                <xrx:default>No results were found for your search.</xrx:default>
+                            </xrx:i18n>
+                        </span>
+                    </div>
+                          else()
+                          }
+      		      <div id="search-trigger-div">
+                        <input class="search-field" type="text" name="q" value="{ $search:q }"/>
+                        <input class="search-trigger" type="submit" value="Submit"/>
+                    </div>
+                </div>
+            </form>
+      {
+      if($count gt 0) then
+      <div id="hit-info">
+                <xrx:i18n>
+                    <xrx:key>hits</xrx:key>
+                    <xrx:default>Hits</xrx:default>
+                </xrx:i18n>
+                <b>&#160;{ $start }&#160;</b>
+                <xrx:i18n>
+                    <xrx:key>to</xrx:key>
+                    <xrx:default>to</xrx:default>
+                </xrx:i18n>
+                <b>&#160;{ $stop }&#160;</b>
+                <xrx:i18n>
+                    <xrx:key>of</xrx:key>
+                    <xrx:default>of</xrx:default>
+                </xrx:i18n>
+                <b>&#160;{ $count }</b>
+            </div>
+      else()
+      }
+      { $select-block-div }
+      {
+      if($count gt 0) then
+        <div id="result">
+            {
+            let $query-string := request:get-query-string()
+            let $xslt := collection('/db/www')/xsl:stylesheet[@id='anno-tei2html']
+            for $annotation at $pos in $annotations[ position() = $start to $stop ]
+            let $annotation-expanded := util:expand($annotation)
+            let $collection := util:collection-name($annotation)
+            let $file := util:document-name($annotation)
+            let $document := doc(concat($collection, '/', $file))
+            let $object-uri := substring-after($document//atom:id/text(), 'annotation/')
+            let $tokens := tokenize($object-uri, '/')
+            let $register := xmldb:decode($tokens[1])
+            let $folio := xmldb:decode($tokens[2])
+            let $transcription := 
+                transform:transform($annotation-expanded//tei:span, $xslt, ())
+            let $keyword :=
+                transform:transform($annotation-expanded//tei:interp, $xslt, ())
+            return
+            (<div class="annotation">
+                    <div class="inner-annotation" style="float:left;">
+                        <div class="annotation-link">
+                            <b>
+                                <xrx:i18n>
+                                    <xrx:key>annotation</xrx:key>
+                                    <xrx:default>Annotation</xrx:default>
+                                </xrx:i18n>&#160;-&#160;&#160;&#160;&#160;</b>
+                            <b>
+                                <xrx:i18n>
+                                    <xrx:key>register</xrx:key>
+                                    <xrx:default>Register</xrx:default>
+                                </xrx:i18n>:&#160;</b>
+                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/register">{ $register }</a>
+                            <b>&#160;&#160;&#160;&#160;
+                            <xrx:i18n>
+                                    <xrx:key>folio</xrx:key>
+                                    <xrx:default>Folio</xrx:default>
+                                </xrx:i18n>:&#160;</b>
+                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/{ xmldb:decode($folio) }/folio?{$query-string}{if(not(contains($query-string, 'block=')))then concat('&amp;block=', $block) else ''}">{ $folio }</a>
+                        </div>
+                        <div class="informations">
+                            <b>
+                                <xrx:i18n>
+                                    <xrx:key>category</xrx:key>
+                                    <xrx:default>Category</xrx:default>
+                                </xrx:i18n>
+                            </b>
+                            <span>:&#160;<xrx:i18n>
+                                    <xrx:key>{ string($document//tei:surfaceGrp/@type) }</xrx:key>
+                                    <xrx:default>{ string($document//tei:surfaceGrp/@type) }</xrx:default>
+                                </xrx:i18n>
+                            </span>
+                            <br/>
+                            <b>
+                                <xrx:i18n>
+                                    <xrx:key>keyword</xrx:key>
+                                    <xrx:default>Keyword</xrx:default>
+                                </xrx:i18n>
+                            </b>
+                            <span>:&#160;{ $keyword }</span>
+                            <br/>
+                            <b>
+                                <xrx:i18n>
+                                    <xrx:key>transcription</xrx:key>
+                                    <xrx:default>Transcription</xrx:default>
+                                </xrx:i18n>
+                            </b>
+                            <span>:&#160;{ $transcription }</span>
+                            <br/>
+                            <b>
+                                <xrx:i18n>
+                                    <xrx:key>contributor</xrx:key>
+                                    <xrx:default>Contributor</xrx:default>
+                                </xrx:i18n>
+                            </b>
+                            <span>:&#160;{ user:firstname-name(xmldb:decode($document//tei:publicationStmt/tei:authority/text())) } ({ xmldb:decode($document//tei:publicationStmt/tei:authority/text())})</span>
+                        </div>
+                    </div>
+                    <div class="viewport">
+                        <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/{ xmldb:decode($folio) }/folio?{$query-string}{if(not(contains($query-string, 'block=')))then concat('&amp;block=', $block) else ''}">
+                            <img src="{ string($document//tei:graphic/@url)}" class="thumb" id="img{$pos}" onmouseover="showTooltip(event, '{$pos}')" onmousemove="showTooltip(event, '{$pos}')" onmouseout="hideTooltip(event, '{$pos}')"/>
+                        </a>
+                    		<div id="resultfields{$pos}">
+                    			{
+                    			let $surfaces := $document//tei:surface
+                    			for $surface at $index in $surfaces
+                    			return
+                    			<div id="anno{$pos}-{$index}" class="direct" style="left:{xs:integer($surface/@ulx)}px;top:{xs:integer($surface/@uly)}px;height:{xs:integer($surface/@lrx)}px;width:{xs:integer($surface/@lry)}px;" onmouseover="showTooltip(event, '{$pos}')" onmousemove="showTooltip(event, '{$pos}')"/>
+                    			}
+                    		</div>
+                    </div>
+                </div>,
+            <div class="tooltip" id="tool{$pos}">
+                    <img src="{ string($document//tei:graphic/@url)}" alt="Original image" class="toolimg" style="width:500px;" id="toolimg{$pos}"/>
+            				<div id="resulttoolfields{$pos}">
+			            		{
+			            		let $surfaces := $document//tei:surface
+			            		for $surface at $index in $surfaces
+			            		return
+			            		<div id="annotool{$pos}-{$index}" class="direct" style="left:{xs:integer($surface/@ulx)}px;top:{xs:integer($surface/@uly)}px;height:{xs:integer($surface/@lrx)}px;width:{xs:integer($surface/@lry)}px;" onmouseover="showTooltip(event, '{$pos}')" onmousemove="showTooltip(event, '{$pos}')"/>
+                    }
+			            	</div>
+			         				
+			      </div>)
+            }
+        </div>
+        else()
+        }
+        { $select-block-div }
+    </div>
+    }
+  </xrx:view>
+</xrx:widget>

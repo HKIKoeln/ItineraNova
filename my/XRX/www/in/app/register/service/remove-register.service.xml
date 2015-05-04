@@ -1,0 +1,32 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ead="urn:isbn:1-931666-22-9"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xrx:id>tag:itineranova.be,2011:/in/service/remove-register</xrx:id>  
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>remove-register</xrx:key>
+      <xrx:default>Remove register</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:body>
+  {
+    let $register := $data//*:removeregister/text()
+    let $collection-path := metadata:base-collection-path('register', $register, 'public')
+    let $remove := 
+      if($register != '') then xmldb:remove($collection-path)
+      else()
+    let $success := not(xmldb:collection-available($collection-path))
+    return
+    if($success) then
+    <xrx:response status="1"/>
+    else
+    <xrx:response status="-1">
+      <xrx:message>Register could not be removed.</xrx:message>
+      <xrx:icon>{ conf:param('request-root') }dialog-error.png</xrx:icon>
+    </xrx:response>
+  }
+  </xrx:body>
+</xrx:service>

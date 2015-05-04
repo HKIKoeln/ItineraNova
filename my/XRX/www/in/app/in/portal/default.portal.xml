@@ -1,0 +1,33 @@
+<xrx:portal xmlns:xf="http://www.w3.org/2002/xforms"
+	xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns="http://www.w3.org/1999/xhtml">
+	<xrx:id>tag:itineranova.be,2011:/in/portal/default</xrx:id>
+	<xrx:res>
+	  <xrx:include>
+	    <xrx:css>tag:itineranova.be,2011:/in/css/global</xrx:css>
+	  </xrx:include>
+		<xrx:css>
+			<style type="text/css">
+
+.last-update-text {{
+	color:rgb(100,100,100);
+	margin-top:30px;
+}}
+.border-top-light-grey {{
+	border-top:solid rgb(240,240,240) 1px;
+	padding-top:5px;
+}}
+
+      </style>
+    </xrx:css>
+	</xrx:res>
+	<xrx:view>
+		<div id="main">
+			<xrx:subwidget>tag:itineranova.be,2011:/in/widget/default-header</xrx:subwidget>
+      <xrx:subwidget>tag:itineranova.be,2011:/in/widget/left-menu</xrx:subwidget>
+			<div id="content">
+				<xrx:mainwidget/>
+			</div>
+		</div>
+	</xrx:view>
+</xrx:portal>

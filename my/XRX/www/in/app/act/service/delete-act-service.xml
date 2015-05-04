@@ -1,0 +1,17 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/delete-act</xrx:id>
+  <xrx:body>
+    {
+    let $act := $data//*:act/text()
+    let $register := $data//*:register/text()
+    
+    let $delete := 
+        atom:DELETE(
+            metadata:feed('act', $register, 'public'),
+            metadata:entryname('act', $act)
+        )
+    return
+    <xrx:response status="1"><xrx:message>Act { $act } successfully deleted.</xrx:message><xrx:icon>{ conf:param('request-root') }face-smile.png</xrx:icon></xrx:response>
+    }
+  </xrx:body>
+</xrx:service>

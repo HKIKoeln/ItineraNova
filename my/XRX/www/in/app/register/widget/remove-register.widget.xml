@@ -1,0 +1,115 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" 
+  xmlns:ev="http://www.w3.org/2001/xml-events" 
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/remove-register</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>remove-register</xrx:key>
+      <xrx:default>Remove register</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>true</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+  </xrx:res>
+  <xrx:model>
+  {
+    let $register := $xrx:tokenized-uri[1]
+    return
+    <xf:model id="mremove-register">
+      <xf:instance id="iremove-register">
+        <data xmlns="">
+          <removeregister>{ $register }</removeregister>
+        </data>
+      </xf:instance>
+      <xf:instance id="iresponse">
+        <xrx:reponse status="0">
+          <xrx:message/>
+          <xrx:icon>{ conf:param('request-root') }white32x32.png</xrx:icon>
+        </xrx:reponse>
+      </xf:instance>
+      <xf:submission id="sremove-register"
+        ref="instance('iremove-register')"
+        action="{ $xrx:localhost-request-base-url }service/?atomid=tag:itineranova.be,2011:/in/service/remove-register"
+        method="post"
+        replace="instance"
+        instance="iresponse"/>
+    </xf:model>
+  }
+  </xrx:model>
+  <xrx:view>
+  {
+    let $register := $xrx:tokenized-uri[1]
+    return
+    <div>
+      <div class="h2">
+			  <xrx:title>
+			    <xrx:i18n>
+			      <xrx:key>remove-register</xrx:key>
+			      <xrx:default>Remove register</xrx:default>
+			    </xrx:i18n>
+			  </xrx:title>
+			  <span>:&#160;{ $register }</span>
+      </div>
+      <xrx:auth>
+        <xrx:rules>
+          <xrx:rule>
+            <xrx:user/>
+            <xrx:role>archivist</xrx:role>
+          </xrx:rule>
+        </xrx:rules>
+        <xrx:true>
+          <div>
+            <span>Do you really want to remove this register and all its containing acts? </span>
+            <span>This can not be undone.</span>
+            <xf:group model="mremove-register">
+              <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/response-info-div</xrx:subwidget>
+	            <xf:trigger>
+	              <xf:label>
+	                <xrx:i18n>
+	                  <xrx:key>cancel</xrx:key>
+	                  <xrx:default>Cancel</xrx:default>
+	                </xrx:i18n>
+	              </xf:label>
+                <xf:action ev:event="DOMActivate">
+                  <xf:load show="replace" resource="{ register:link($register) }"/>
+                </xf:action>
+	            </xf:trigger>
+	            <xf:trigger>
+	              <xf:label>
+	                <xrx:i18n>
+	                  <xrx:key>remove</xrx:key>
+	                  <xrx:default>Remove</xrx:default>
+	                </xrx:i18n>
+	              </xf:label>
+                <xf:action ev:event="DOMActivate">
+                  <xf:send submission="sremove-register"/>
+                  <xf:recalculate/>
+                  <xf:load show="replace" resource="{ chamber:link('1') }" if="instance('iresponse')//@status = '1'"/>
+                </xf:action>
+	            </xf:trigger>
+	          </xf:group>
+          </div>
+        </xrx:true>
+        <xrx:false>
+          <div>
+	          <xrx:i18n>
+	            <xrx:key>protected-page-message</xrx:key>
+	            <xrx:default>Protected page. Please login first.</xrx:default>
+	          </xrx:i18n>
+          </div>
+        </xrx:false>
+      </xrx:auth>
+    </div>
+  }
+  </xrx:view>
+</xrx:widget>

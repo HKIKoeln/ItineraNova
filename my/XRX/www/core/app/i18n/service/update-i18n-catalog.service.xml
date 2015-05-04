@@ -1,0 +1,163 @@
+<xrx:service xmlns:i18n="http://www.monasterium.net/NS/i18n" xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:www.monasterium.net,2011:/core/service/update-i18n-catalog</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+  </xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:translateflag>false</xrx:translateflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:body>
+		{
+		let $language-keys := conf:param('languages')//xrx:lang/@key/string()
+	
+		(: 
+		  filter out catalog entries which 
+		  already exist in the catalogs 
+		:)
+		let $new-entries :=
+			for $catalog-entry in $xrx:db-base-collection//xrx:i18n
+			order by $catalog-entry/xrx:key
+			return
+			if($xrx:i18n-catalog//xrx:i18n[xrx:key=$catalog-entry/xrx:key/text()])
+			then ()
+			else $catalog-entry
+	
+		(: 
+		  omit entries which were found twice 
+		  or more in the project 
+		:)
+		let $omit-duplicate-entries :=
+			for $key in distinct-values($new-entries/xrx:key/text())
+			order by $key
+			return
+			($new-entries/self::xrx:i18n[xrx:key=$key])[1]
+	
+	  (: create entry for each new message :)
+		let $store-entries :=
+			for $sourcecode-i18n-message in $omit-duplicate-entries
+			for $language in $language-keys
+			let $feed := 
+			  concat(conf:param('xrx-i18n-atom-base-uri'), $language)
+			let $resource-name := 
+			  concat($sourcecode-i18n-message/xrx:key/text(), '.', $language, '.xml')
+			let $i18ncatalog-message :=
+				element { 'xrx:i18n' }{
+				    $sourcecode-i18n-message/xrx:key,
+				    <xrx:text/>,
+				    $sourcecode-i18n-message/xrx:default
+				}
+			let $entry :=
+      <atom:entry xmlns:atom="http://www.w3.org/2005/Atom">
+        <atom:id/>
+        <atom:title/>
+        <atom:published/>
+        <atom:updated/>
+        <atom:author>
+          <atom:email/>
+        </atom:author>
+        <app:control xmlns:app="http://www.w3.org/2007/app">
+          <app:draft>no</app:draft>
+        </app:control>
+        <atom:content type="application/xml" xml:lang="{ $language }">{ $i18ncatalog-message }</atom:content>
+      </atom:entry>
+	    
+	    let $post :=
+	      atom:POST(
+	        $feed,
+	        $resource-name,
+	        $entry
+	      )
+			return
+	    
+	    $entry
+	  
+	  
+	  
+	  (: mark non-active messages :)
+	  
+    let $non-active-entries :=
+      for $catalog-entry in $xrx:i18n-catalog//xrx:i18n/ancestor::atom:entry
+      order by $catalog-entry//xrx:key
+      return
+      if($xrx:db-base-collection//xrx:i18n[xrx:key=$catalog-entry//xrx:key/text()])
+      then ()
+      else $catalog-entry
+
+    (: 
+      omit entries which were found twice 
+      or more in the catalogs 
+    :)
+    let $omit-duplicate-entries2 :=
+      for $key in distinct-values($non-active-entries//xrx:key/text())
+      order by $key
+      return
+      ($non-active-entries//xrx:i18n[xrx:key=$key]/ancestor::atom:entry)[1]
+          
+    let $store-entries2 := 
+      for $non-active-entry in $omit-duplicate-entries2
+      for $language in $language-keys
+      let $feed := 
+        concat(conf:param('xrx-i18n-atom-base-uri'), $language)
+      let $resource-name := 
+        concat($non-active-entry//xrx:key/text(), '.', $language, '.xml')
+      let $updated-entry := i18n:message-mark-non-active($non-active-entry) 
+
+      let $post2 :=
+        atom:POST(
+          $feed,
+          $resource-name,
+          $updated-entry
+        )
+
+      return    
+      $updated-entry
+      	  
+		return
+		
+		<xrx:response>
+		  <xrx:updated>{ $store-entries }</xrx:updated>
+		  <xrx:nonactive>{ $store-entries2 }</xrx:nonactive>
+		</xrx:response>
+		
+		}
+	</xrx:body>
+</xrx:service>

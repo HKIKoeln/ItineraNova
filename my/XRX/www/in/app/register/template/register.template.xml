@@ -1,0 +1,42 @@
+<xrx:template xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/template/register</xrx:id>
+  <xrx:xml>
+		<atom:entry xmlns:vre="http://www.monasterium.net/NS/vre"
+		  xmlns:atom="http://www.w3.org/2005/Atom" 
+		  xmlns:app="http://www.w3.org/2007/app"
+		  xmlns:tei="http://www.tei-c.org/ns/1.0/">
+		  <atom:id />
+		  <atom:title />
+		  <atom:published />
+		  <atom:updated />
+		  <atom:author>
+		    <atom:email />
+		  </atom:author>
+		  <app:control>
+		    <app:draft>no</app:draft>
+		  </app:control>
+		  <atom:content type="application/xml">
+		    <ead:ead xmlns:ead="urn:isbn:1-931666-22-9">
+		      <ead:eadheader>
+		        <ead:eadid />
+		        <ead:filedesc>
+		          <ead:titlestmt>
+		            <ead:titleproper />
+		          </ead:titlestmt>
+		        </ead:filedesc>
+		      </ead:eadheader>
+		      <ead:archdesc level="otherlevel" otherlevel="register">
+		        <ead:did>
+		          <ead:unitid />
+		          <ead:unitdate />
+		          <ead:physloc type="chamber" />
+		          <ead:note />
+		        </ead:did>
+		        <ead:dsc>
+		        </ead:dsc>
+		      </ead:archdesc>
+		    </ead:ead>
+		  </atom:content>
+		</atom:entry>
+  </xrx:xml>
+</xrx:template>

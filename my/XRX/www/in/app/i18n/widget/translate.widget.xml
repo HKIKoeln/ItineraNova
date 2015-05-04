@@ -1,0 +1,7 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/translate</xrx:id>
+  <xrx:inherits>tag:www.monasterium.net,2011:/core/widget/translate</xrx:inherits>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+</xrx:widget>

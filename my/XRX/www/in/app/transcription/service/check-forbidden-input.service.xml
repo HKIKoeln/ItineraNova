@@ -1,0 +1,97 @@
+<xrx:service xmlns:o="http://www.monasterium.net/NS/o" xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/check-forbidden-input</xrx:id>
+  <xrx:body>
+    {
+    
+    let $debug-data := 
+      xmldb:store('/db/in-data/debug-insert-transcription', '00-check-data.txt', $data)
+    
+    let $text-replace-strikethrough := 
+      replace($data, '&lt;span[^&gt;]*text-decoration:line-through[^&lt;]*&gt;([^&lt;]*)&lt;/span&gt;', '&lt;span&gt;{$1}&lt;/span&gt;')
+    
+    let $parse-html := <p>{ util:parse-html($text-replace-strikethrough)//(*:BODY|*:body)/*[. != <o:p/>] }</p>
+    
+    let $text-dummy := string-join($parse-html//text(), '')
+    let $text-replace-spaces := replace($text-dummy, '&#160;', ' ')
+    let $text := replace($text-replace-spaces, '\n', ' ')
+    let $is-text-valid := not(matches($text, '([^a-zA-Z\s\[\]\(\)?/.½{}&lt;&gt;])'))
+    let $forbidden-characters := replace($text, '[a-zA-Z\s\[\]\(\)?/.½{}&lt;&gt;]', '')
+    let $forbidden-tags :=
+	    for $tag in $parse-html//*
+	    return
+	    if(
+	        (xs:string(node-name($tag)) eq 'p') or
+	        (xs:string(node-name($tag)) eq 's') or
+	        (xs:string(node-name($tag)) eq 'strike')) then
+	        ()
+	    else
+	        node-name($tag)
+    let $count-opening-round-bracket := string-length(replace($text, '[^(]', ''))
+    let $count-closing-round-bracket := string-length(replace($text, '[^)]', ''))
+    let $count-opening-square-bracket := string-length(replace($text, '[^\[]', ''))
+    let $count-closing-square-bracket := string-length(replace($text, '[^\]]', ''))
+    let $is-a-bracket-missing := 
+        if($count-opening-round-bracket != $count-closing-round-bracket or $count-opening-square-bracket != $count-closing-square-bracket) then 
+            true()
+        else 
+            false()
+            
+    (: check wellformedness of brackets :)
+    let $debug-pre-bracket := 
+      xmldb:store('/db/in-data/debug-insert-transcription', '00-pre-bracket.txt', $text)
+    
+    let $remainder := transcription:bracket-check($text)
+    let $bracket-strikethrough-order-error :=
+	    if(string-length($remainder) gt 0) then
+	    1
+	    else
+	    0
+       
+    
+    let $debug := 
+      xmldb:store('/db/in-data/debug-insert-transcription', '00-parse-html.xml', <test>{ $parse-html }</test>)
+    
+		return
+		if(not($is-text-valid)) then
+		<xrx:response status="0">
+			<xrx:message>
+				{
+				concat(
+				'Forbidden characters found: "',
+				$forbidden-characters,
+				'". Your text cannot be translated into TEI. ',
+				'Please remove these characters.')
+				}
+	    </xrx:message>
+			<xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon>
+		</xrx:response>
+		else if($is-a-bracket-missing) then
+		<xrx:response status="0">
+			<xrx:message>
+				There is either an opening or a closing bracket missing: "()[]". Each
+				opening
+				bracket must be followed by a closing one. Please check your brackets
+				and try again.
+	    </xrx:message>
+			<xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon>
+		</xrx:response>
+		else if($bracket-strikethrough-order-error eq 1) then
+		<xrx:response status="0">
+			<xrx:message>
+				There is a problem with the order of closing and opening brackets and or
+				strikethrough. Please make sure that all brackets are closed in the
+				right order and that
+				no opening or closing bracket is struck through without the
+				corresponding closing or
+				opening bracket being struck through by the same stroke as well.
+			</xrx:message>
+			<xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon>
+		</xrx:response>
+		else
+		<xrx:response status="1">
+			<xrx:message>Your text is valid and was transformed into TEI.</xrx:message>
+			<xrx:icon>{ conf:param('request-root') }face-smile.png</xrx:icon>
+		</xrx:response>
+    }
+  </xrx:body>
+</xrx:service>

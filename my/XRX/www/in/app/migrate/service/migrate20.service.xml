@@ -1,0 +1,95 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/migrate20</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:translateflag>false</xrx:translateflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:variables>
+    <xrx:variable>
+      <xrx:name>$atom-db-base-collection</xrx:name>
+      <xrx:expression>collection(conf:param('atom-db-base-uri'))</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$register-entries</xrx:name>
+      <xrx:expression>$atom-db-base-collection/atom:entry[.//ead:ead]</xrx:expression>
+    </xrx:variable>
+  </xrx:variables>
+  <xrx:body>
+  {
+    (: migrate registers :)
+    let $migrate-registers :=
+	    for $register-entry in $register-entries
+	    let $registerid := $register-entry//ead:archdesc/ead:did/ead:unitid/text()
+	    let $register-atomid := metadata:atomid('register', $registerid)
+	    let $updated-registerentry := migrate20:insert-atomid($register-entry, $register-atomid)
+	    let $register-feed := metadata:feed('register', $registerid, 'public')
+	    let $register-entryname := metadata:entryname('register', $registerid)
+	    let $register-db-base-collection := metadata:base-collection('register', $registerid, 'public')
+	    let $register-postsilent := atom:POSTSILENT($register-feed, $register-entryname, $updated-registerentry)
+	    
+	       (: migrate acts :)
+	       let $act-feed := metadata:feed('act', $registerid, 'public')
+	       let $old-register-db-base-collection := collection(concat(conf:param('data-db-base-uri'), $registerid))
+	       let $act-entries := $old-register-db-base-collection/atom:entry[not(.//ead:ead) and exists(./atom:content/ead:c/ead:did/ead:unitid/text())]
+	       let $migrate-acts := 
+	         for $act-entry in $act-entries
+	         let $actid := xmldb:encode($act-entry/atom:content/ead:c/ead:did/ead:unitid/text())
+	         let $act-atomid := metadata:atomid('act', ($registerid, $actid))
+	         let $updated-actentry := migrate20:insert-atomid($act-entry, $act-atomid)
+	         let $act-entryname := metadata:entryname('act', $actid)
+	         let $act-postsilent := atom:POSTSILENT($act-feed, $act-entryname, $updated-actentry)
+	         return
+	         $act-postsilent
+	       
+	    return
+	    $register-postsilent
+	  
+	  let $count-old-registers := count($register-entries)
+	  let $count-new-registers := count(metadata:base-collection('register', 'public')/atom:entry)
+	  
+	  let $count-old-acts := count($atom-db-base-collection/atom:entry[not(.//ead:ead) and exists(./atom:content/ead:c/ead:did/ead:unitid/text())])
+	  let $count-new-acts := count(metadata:base-collection('act', 'public')/atom:entry)
+	  
+	  let $transcription-draft-base-collection :=
+	    metadata:base-collection('transcription', 'draft')
+	  let $entries := $transcription-draft-base-collection/atom:entry
+	  let $migrate-draft-transcription-entrynames := 
+	    for $entry in $entries
+	    let $collection-path := util:collection-name($entry)
+	    let $entryname := util:document-name($entry)
+	    let $atomid := $entry/atom:id/text()
+	    let $objectid := metadata:objectid($atomid)
+	    let $newname := metadata:entryname('transcription', $objectid)
+	    let $rename := xmldb:rename($collection-path, $entryname, $newname)
+	    return
+	    <test>
+	      <entryname>{ $entryname }</entryname>
+	      <newname>{ $newname }</newname>
+	    </test>
+	  
+	  return
+	  <xrx:migration>
+	    <xrx:registers>
+	      <xrx:countold>{ $count-old-registers }</xrx:countold>
+	      <xrx:countnew>{ $count-new-registers }</xrx:countnew>
+	    </xrx:registers>
+	    <xrx:acts>
+	      <xrx:countold>{ $count-old-acts }</xrx:countold>
+	      <xrx:countnew>{ $count-new-acts }</xrx:countnew>
+	    </xrx:acts>
+	    { $migrate-draft-transcription-entrynames }
+	  </xrx:migration>
+  }
+  </xrx:body>
+</xrx:service>

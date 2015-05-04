@@ -1,0 +1,539 @@
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns:xf="http://www.w3.org/2002/xforms"
+  xmlns:ead="urn:isbn:1-931666-22-9"
+  xmlns:bfc="http://betterform.sourceforge.net/xforms/controls">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/indexing-form-main</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/fullscreen</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>true</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:js>
+      <script type="text/javascript" src="{ conf:param('request-root') }indexing.js" defer="defer"/>
+    </xrx:js>
+    <xrx:css>
+      <style type="text/css">
+      
+#dindexing-form-main{{
+  position:absolute;
+  top:45%;
+  margin:0;
+  padding:0;
+  width:100%;
+  height:105%;
+}}
+
+#dindexing-form{{
+  position:absolute;
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+}}
+
+#dact-navi{{
+  position:absolute;
+  right:0px;
+  z-index:10;
+}}
+
+.gotoinput .xfValue{{
+  padding:3px;
+  width:50px;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model>
+  {
+    (: request parameter :)
+    let $register := $xrx:tokenized-uri[1]
+    let $gotoact := request:get-parameter('gotoact', '')
+    let $actpos := request:get-parameter('actpos', '1')
+    
+    (: global indexes about acts :)
+    let $all-act-db-base-collection := metadata:base-collection('act', 'public')
+    let $add-positions := ()
+      (:distinct-values($all-act-db-base-collection//ead:c[@otherlevel='text']//ead:physfacet[.!=''][@type='position']/text()):)
+    let $act-types := ()
+      (:distinct-values(data($all-act-db-base-collection//ead:c[@otherlevel='text']/ead:did/ead:unittitle/@type)):)
+    
+    (: db base collections :)
+    let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+    let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+    
+    
+    return
+    <xf:model id="mindexing-form-main">
+      <xf:instance id="iact-navi">
+        <data xmlns="">
+          <baseuri>{ $xrx:localhost-request-base-url }embeddedwidget/</baseuri>
+          <embeddedwidget>atomid=tag:itineranova.be,2011:/in/widget/indexing-form</embeddedwidget>
+          <register>{ $register }</register>
+          <nav>0</nav>
+          <actpos>{ $actpos }</actpos>
+          <gotoact>{ $gotoact }</gotoact>
+          <newact/>
+          <renameact/>
+          <act/>
+          <actcount/>
+          <additionpos>0</additionpos>
+          <tabnum>1</tabnum>
+          <newaddition>false</newaddition>
+          <removeaddition>false</removeaddition>
+          <removeadditionlabel></removeadditionlabel>
+          <uri></uri>
+          <closeeditoruri></closeeditoruri>
+          <folio/>
+        </data>
+      </xf:instance>
+
+      <xf:instance id="iact-template">
+        { template:get('tag:itineranova.be,2011:/in/template/act') }
+      </xf:instance>
+
+      <xf:instance id="iadd-position">
+        <data xmlns="">
+        {
+          for $add-position in $add-positions
+          order by $add-position
+          return
+          <addposition>{ $add-position }</addposition>
+        }
+        </data>
+      </xf:instance>
+      
+      <xf:instance id="iact-type">
+        <data xmlns="">
+        {
+          for $act-type in $act-types
+          order by $act-type
+          return
+          <acttype>{ $act-type }</acttype>
+        }
+        </data>
+      </xf:instance>
+      
+      <xf:instance id="iindexed-aldermen">
+        <data xmlns="">
+					{
+					for $alderman-or-year in
+						(
+						  $register-db-base-collection//ead:ead//ead:indexentry/ead:namegrp/ead:title
+						  |
+						  $register-db-base-collection//ead:ead//ead:indexentry/ead:namegrp/ead:persname[text()]
+						)
+				  return
+				  if(xs:string(local-name($alderman-or-year)) = 'title') then
+				  <title>
+				    <label>--- Aldermen's Year: { $alderman-or-year/text() } ---</label>
+				    <value>{ $alderman-or-year/text() }</value>
+				  </title>
+				  else if($alderman-or-year[@role='mayor']) then
+				  <persname>
+				    <label>{ $alderman-or-year/text() } (Mayor)</label>
+				    <value>{ $alderman-or-year/@id/string() }</value>
+				    <ead:persname role="signer">
+              <ead:ptr>{ $alderman-or-year/@id/string() }</ead:ptr>
+            </ead:persname>
+				  </persname>
+				  else
+				  <persname>
+				    <label>{ $alderman-or-year/text() }</label>
+				    <value>{ $alderman-or-year/@id/string() }</value>
+            <ead:persname role="signer">
+              <ead:ptr>{ $alderman-or-year/@id/string() }</ead:ptr>
+            </ead:persname>
+				  </persname>
+					}
+        </data>
+      </xf:instance>
+
+      <xf:instance id="iuser">
+        <users xmlns="">
+          {
+          for $email in $user:db-base-collection//xrx:email/text()
+          let $firstname-name := user:firstname-name($email)
+          return
+          <user>
+	          <email>{ $email }</email>
+	          <firstnamename>{ $firstname-name }</firstnamename>
+	        </user>
+          }
+        </users>
+      </xf:instance>
+      
+      <xf:instance id="iresponse">
+        <xrx:response xmlns:xrx="http://www.monasterium.net/NS/xrx" status="0"/>
+      </xf:instance>
+      
+      <xf:submission id="snewact" ref="instance('iact-navi')" action="{ conf:param('request-root') }service/?atomid=tag:itineranova.be,2011:/in/service/new-act" method="post" replace="instance" instance="iresponse"/>
+      <xf:submission id="sdeleteact" ref="instance('iact-navi')" action="{ conf:param('request-root') }service/?atomid=tag:itineranova.be,2011:/in/service/delete-act" method="post" replace="instance" instance="iresponse"/>
+      <xf:submission id="srenameact" ref="instance('iact-navi')" action="{ conf:param('request-root') }service/?atomid=tag:itineranova.be,2011:/in/service/rename-act" method="post" replace="instance" instance="iresponse"/>
+      
+      <xf:action ev:event="etransfer-actinfo">
+        <xf:setvalue ref="instance('iact-navi')/nav" value="0"/>
+        <xf:setvalue ref="instance('iact-navi')/actpos" value="event('param1')"/>
+        <xf:setvalue ref="instance('iact-navi')/gotoact" value="event('param2')"/>
+        <xf:setvalue ref="instance('iact-navi')/act" value="event('param2')"/>
+        <xf:setvalue ref="instance('iact-navi')/actcount" value="event('pactcount')"/>
+      </xf:action>
+      
+      <xf:action ev:event="esettabnum">
+        <xf:setvalue ref="tabnum" value="event('ptabnum')"/>
+        <xf:refresh/>
+        <xf:recalculate/>
+        <xf:toggle case="cact" if="tabnum = '1'"/>
+        <xf:toggle case="cadd" if="tabnum != '1'"/>
+      </xf:action>
+      
+      <xf:bind id="bacturi" nodeset="uri" calculate="concat(../baseuri, '?', ../embeddedwidget, '&amp;register=', ../register, '&amp;actpos=', ../actpos, '&amp;gotoact=', ../gotoact, '&amp;folio=', ../folio, '&amp;newaddition=', ../newaddition, '&amp;removeaddition=', ../removeaddition, '&amp;additionpos=', ../additionpos)"/>
+      <xf:bind id="bactpos" nodeset="actpos" calculate="sum(. + ../nav)" relevant=". &gt; 0"/>
+      <xf:bind id="badditionname" nodeset="removeadditionlabel" calculate="concat('Remove Add. ', xs:string(../additionpos))"/>
+      <xf:bind id="badditionpos" nodeset="additionpos" type="xs:integer" calculate="../tabnum - 1"/>
+      <xf:bind id="bcloseeditoruri" nodeset="closeeditoruri" calculate="concat('{ conf:param('request-root') }', ../register, '/', ../act, '/act')"/>
+      
+    </xf:model>
+  }
+  </xrx:model>
+  <xrx:view>
+  {
+    (: request parameters :)
+    let $register := $xrx:tokenized-uri[1]
+    
+    (: register and act info :)
+    let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+    let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+    let $act-count := count($act-db-base-collection//ead:c[@otherlevel='textgroup'])
+      
+    return
+    <div id="dindexing-form-main">
+      <xf:group model="mindexing-form-main">
+	      <div id="dact-navi">
+          <xf:trigger class="close-editor-div">
+            <xf:label>Close Editor</xf:label>
+            <xf:action ev:event="DOMActivate">
+              <xf:recalculate/>
+              <xf:load show="replace">
+                <xf:resource value="closeeditoruri"/> 
+              </xf:load>
+            </xf:action>
+          </xf:trigger>
+	        <div style="position:relative;float:left;">
+		        <xf:switch>
+		          <xf:case id="cadd">
+			          <xf:trigger>
+			            <xf:label>
+			              <xf:output ref="removeadditionlabel"/>
+			            </xf:label>
+			            <xf:action ev:event="DOMActivate">
+			              <xf:send submission="ssave"/>
+			              <xf:setvalue ref="removeaddition" value="'true'"/>
+                    <xf:setvalue ref="gotoact" value="act"/>
+                    <xf:setvalue ref="folio" value="bf:instanceOfModel('miipmooviewport', 'ifolio')/folio"/>
+                    <xf:recalculate/>
+			              <xf:load show="embed" targetid="dindexing-form">
+			                <xf:resource value="uri"/> 
+			              </xf:load>
+			              <xf:setvalue ref="removeaddition" value="'false'"/>
+			            </xf:action>
+			          </xf:trigger>
+			        </xf:case>
+			          <div/>
+			        <xf:case id="cact">
+			        </xf:case>
+			      </xf:switch>
+			    </div>
+          <xf:trigger class="add-addition-div">
+            <xf:label>Add new Addition</xf:label>
+            <xf:action ev:event="DOMActivate">
+              <xf:send submission="ssave"/>
+              <xf:setvalue ref="newaddition" value="'true'"/>
+              <xf:setvalue ref="gotoact" value="act"/>
+              <xf:setvalue ref="folio" value="bf:instanceOfModel('miipmooviewport', 'ifolio')/folio"/>
+              <xf:recalculate/>
+              <xf:load show="embed" targetid="dindexing-form">
+                <xf:resource value="uri"/> 
+              </xf:load>
+              <xf:setvalue ref="newaddition" value="'false'"/>
+              <xf:send submission="ssave"/>
+            </xf:action>
+          </xf:trigger>
+          <xf:trigger>
+            <xf:label>Create new Act</xf:label>
+            <bfc:show dialog="new-act-dialog" ev:event="DOMActivate"/>
+          </xf:trigger>
+          <bfc:dialog id="new-act-dialog">
+            <xf:label>Create new Act</xf:label>
+            <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/response-info-div</xrx:subwidget>
+            <xf:switch>
+              <xf:case id="cnewact0">
+                <table>
+                  <tr>
+                    <td>
+                      <span>Enter name for the new act to create:&#160;</span><br/>
+                      <span style="color:red">'+' sign is not allowed!</span><br/>
+                      <xf:input ref="newact"/>
+                    </td>
+                  </tr>
+                </table>
+                <br/>
+                <br/>
+                <div id="dialog-buttons">
+                  <xf:trigger>
+                     <xf:label>
+                       <xrx:i18n>
+                         <xrx:key>cancel</xrx:key>
+                         <xrx:default>Cancel</xrx:default>
+                       </xrx:i18n>
+                     </xf:label>
+                     <xf:action ev:event="DOMActivate">
+                       <xf:delete nodeset="instance('iresponse')/*" at="1"/>
+                       <xf:delete nodeset="instance('iresponse')/*" at="2"/>
+                       <xf:setvalue ref="newact" value="''"/>
+                     </xf:action>
+                     <bfc:hide dialog="new-act-dialog" ev:event="DOMActivate"/>
+                  </xf:trigger>
+                  <xf:trigger>
+                    <xf:label>Create</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                      <xf:send submission="snewact" />
+                      <xf:toggle case="cnewact1" if="instance('iresponse')//@status = '1'"/>
+                    </xf:action>
+                  </xf:trigger>
+                </div>
+              </xf:case>
+              <xf:case id="cnewact1">
+                <div id="dialog-buttons">
+		              <xf:trigger>
+		                <xf:label>Ok</xf:label>
+		                <xf:action ev:event="DOMActivate">
+		                  <xf:setvalue ref="gotoact" value="../newact"/>
+		                  <xf:setvalue ref="nav" value="0"/>
+		                  <xf:setvalue ref="folio" value="bf:instanceOfModel('miipmooviewport', 'ifolio')/folio"/>
+		                  <xf:recalculate/>
+		                  <xf:load show="embed" targetid="dindexing-form">
+		                    <xf:resource value="uri"/> 
+		                  </xf:load>
+		                </xf:action>
+		                <bfc:hide dialog="new-act-dialog" ev:event="DOMActivate"></bfc:hide>
+		                <xf:toggle case="cnewact0"/>
+		                <xf:delete nodeset="instance('iresponse')/*" at="1"/>
+		                <xf:delete nodeset="instance('iresponse')/*" at="2"/>
+		                <xf:setvalue ref="newact" value="''"/>
+		              </xf:trigger>
+		            </div>
+              </xf:case>
+            </xf:switch>
+          </bfc:dialog>
+	        <xf:trigger ev:event="DOMActivate">
+	          <xf:label>
+	            <xf:output value="concat('Delete Act ', act)"/>
+	          </xf:label>
+	          <bfc:show dialog="delete-act-dialog" ev:event="DOMActivate"/>
+	        </xf:trigger>
+          <bfc:dialog id="delete-act-dialog">
+            <xf:label>Delete Act</xf:label>
+            <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/response-info-div</xrx:subwidget>
+            <xf:switch>
+              <xf:case id="cdeleteact0">
+                <span>Do you really want to delete&#160;</span>
+                <xf:output ref="act"/>
+                <span>?</span>
+                <br/>
+                <br/>
+                <div id="dialog-buttons">
+                  <xf:trigger>
+                     <xf:label>
+                       <xrx:i18n>
+                         <xrx:key>cancel</xrx:key>
+                         <xrx:default>Cancel</xrx:default>
+                       </xrx:i18n>
+                     </xf:label>
+                     <xf:action ev:event="DOMActivate">
+                       <xf:delete nodeset="instance('iresponse')/*" at="1"/>
+                       <xf:delete nodeset="instance('iresponse')/*" at="2"/>
+                     </xf:action>
+                     <bfc:hide dialog="delete-act-dialog" ev:event="DOMActivate"/>
+                  </xf:trigger>
+                  <xf:trigger>
+                    <xf:label>Delete</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                      <xf:send submission="sdeleteact" />
+                      <xf:toggle case="cdeleteact1" if="instance('iresponse')//@status = '1'"/>
+                    </xf:action>
+                  </xf:trigger>
+                </div>
+              </xf:case>
+              <xf:case id="cdeleteact1">
+                <div id="dialog-buttons">
+                  <xf:trigger>
+                    <xf:label>Ok</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                      <xf:setvalue ref="actpos" value="1"/>
+                      <xf:setvalue ref="nav" value="0"/>
+                      <xf:setvalue ref="gotoact" value="''"/>
+                      <xf:setvalue ref="folio" value="bf:instanceOfModel('miipmooviewport', 'ifolio')/folio"/>
+                      <xf:refresh/>
+                      <xf:recalculate/>
+                      <xf:load show="embed" targetid="dindexing-form">
+                        <xf:resource value="uri"/> 
+                      </xf:load>
+                    </xf:action>
+                    <bfc:hide dialog="delete-act-dialog" ev:event="DOMActivate"/>
+                    <xf:toggle case="cdeleteact0"/>
+                    <xf:delete nodeset="instance('iresponse')/*" at="1"/>
+                    <xf:delete nodeset="instance('iresponse')/*" at="2"/>
+                  </xf:trigger>
+                </div>
+              </xf:case>
+            </xf:switch>
+          </bfc:dialog>
+	        <xf:trigger>
+	          <xf:label>
+	            <xf:output value="concat('Rename Act ', act)"/>
+	          </xf:label>
+	          <bfc:show dialog="rename-act-dialog" ev:event="DOMActivate"/>
+	        </xf:trigger>
+          <bfc:dialog id="rename-act-dialog">
+            <xf:label>Rename Act</xf:label>
+            <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/response-info-div</xrx:subwidget>
+            <xf:switch>
+              <xf:case id="crenameact0">
+                <xf:output ref="act">
+                  <xf:label>New name for Act&#160;</xf:label>
+                </xf:output>
+                <span style="color:red">'+' sign is not allowed!</span><br/>
+                <xf:input ref="renameact"/>
+                <br/>
+                <br/>
+                <div id="dialog-buttons">
+                  <xf:trigger>
+                     <xf:label>
+                       <xrx:i18n>
+                         <xrx:key>cancel</xrx:key>
+                         <xrx:default>Cancel</xrx:default>
+                       </xrx:i18n>
+                     </xf:label>
+                     <xf:action ev:event="DOMActivate">
+                       <xf:delete nodeset="instance('iresponse')/*" at="1"/>
+                       <xf:delete nodeset="instance('iresponse')/*" at="2"/>
+                     </xf:action>
+                     <bfc:hide dialog="rename-act-dialog" ev:event="DOMActivate"/>
+                  </xf:trigger>
+                  <xf:trigger>
+                    <xf:label>Rename</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                      <xf:send submission="srenameact" />
+                      <xf:toggle case="crenameact1" if="instance('iresponse')//@status = '1'"/>
+                    </xf:action>
+                  </xf:trigger>
+                </div>
+              </xf:case>
+              <xf:case id="crenameact1">
+                <div id="dialog-buttons">
+                  <xf:trigger>
+                    <xf:label>Ok</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                      <xf:setvalue ref="gotoact" value="renameact"/>
+                      <xf:setvalue ref="nav" value="0"/>
+                      <xf:setvalue ref="folio" value="bf:instanceOfModel('miipmooviewport', 'ifolio')/folio"/>
+                      <xf:refresh/>
+                      <xf:recalculate/>
+                      <xf:load show="embed" targetid="dindexing-form">
+                        <xf:resource value="uri"/> 
+                      </xf:load>
+                    </xf:action>
+                    <bfc:hide dialog="rename-act-dialog" ev:event="DOMActivate"></bfc:hide>
+                    <xf:toggle case="crenameact0"/>
+                    <xf:delete nodeset="instance('iresponse')/*" at="1"/>
+                    <xf:delete nodeset="instance('iresponse')/*" at="2"/>
+                  </xf:trigger>
+                </div>
+              </xf:case>
+            </xf:switch>
+          </bfc:dialog>
+          <br/>
+          <!-- xf:trigger>
+            <xf:label>Preview</xf:label>
+            <xf:action ev:event="DOMActivate">
+              <xf:load show="new">
+                <xf:resource value="concat('{ conf:param('request-root') }browse/act/{ $register }/', act)"/>
+              </xf:load>
+            </xf:action>
+          </xf:trigger-->
+	        <xf:trigger id="first-act">
+	          <xf:label>|&lt;</xf:label>
+	          <xf:action ev:event="DOMActivate">
+	            <xf:setvalue ref="nav" value="0"/>
+	            <xf:setvalue ref="actpos" value="1"/>
+	            <xf:setvalue ref="gotoact" value="''"/>
+	            <xf:recalculate/>
+	            <xf:load show="embed" targetid="dindexing-form">
+	              <xf:resource value="uri"/> 
+	            </xf:load>
+	          </xf:action>
+	        </xf:trigger>
+	      {
+	        let $labels := ('-100', '-10', '-1', '+1', '+10', '+100')
+	        let $moves := ('-100', '-10', '-1', '1', '10', '100')
+	        for $move at $pos in $moves
+	        return
+	        <xf:trigger>
+	          <xf:label>{ $labels[$pos] }</xf:label>
+	          <xf:action ev:event="DOMActivate">
+	            <xf:setvalue ref="nav" value="xs:integer('{ $move }')" if="actpos + { $move } &gt; 0 and actpos + { $move } &lt;= actcount"/>
+              <xf:setvalue ref="gotoact" value="''"/>
+              <xf:setvalue ref="folio" value="bf:instanceOfModel('miipmooviewport', 'ifolio')/folio"/>
+	            <xf:recalculate/>
+	            <xf:load show="embed" targetid="dindexing-form">
+	              <xf:resource value="uri"/> 
+	            </xf:load>
+	            <xf:setvalue ref="nav" value="0"/>
+	          </xf:action>
+	        </xf:trigger>
+	      }
+	        <xf:trigger>
+	          <xf:label>&gt;|</xf:label>
+	          <xf:action ev:event="DOMActivate">
+	            <xf:setvalue ref="nav" value="0"/>
+	            <xf:setvalue ref="actpos" value="../actcount"/>
+              <xf:setvalue ref="gotoact" value="''"/>
+	            <xf:recalculate/>
+	            <xf:load show="embed" targetid="dindexing-form">
+	              <xf:resource value="uri"/> 
+	            </xf:load>
+	          </xf:action>
+	        </xf:trigger>
+          <xf:input class="gotoinput" ref="gotoact" />
+          <xf:trigger id="tgotoact">
+            <xf:label>Go!</xf:label>
+            <xf:action ev:event="DOMActivate">
+              <xf:recalculate/>
+              <xf:load show="embed" targetid="dindexing-form">
+                <xf:resource value="uri"/> 
+              </xf:load>
+            </xf:action>
+          </xf:trigger>
+	      </div>
+      </xf:group>
+      <div id="dindexing-form"/>
+    </div>
+  }
+  </xrx:view>
+</xrx:widget>

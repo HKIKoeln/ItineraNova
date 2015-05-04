@@ -1,0 +1,207 @@
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns:xf="http://www.w3.org/2002/xforms"
+  xmlns:bfc="http://betterform.sourceforge.net/xforms/controls">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/iipmooviewport</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/fullscreen</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>true</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+      <style type="text/css">
+
+#context-label1{{
+  position:absolute;
+  left:10px;
+  top:10px;
+  z-index:10;
+}}
+
+#context-label2{{
+  position:absolute;
+  left:11px;
+  top:11px;
+  z-index:11;
+}}
+
+#context-label1 *, #context-label1{{
+  font-size:14px;
+  font-weight:bold;
+}}
+
+#context-label2 *, #context-label2{{
+  font-size:14px;
+  color:white;
+  font-weight:bold;
+}}
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model/>
+  <xrx:view>
+  {
+    (: request parameters :)
+    let $register := request:get-parameter('register', '')
+    let $requested-pos := xs:integer(request:get-parameter('pos', '1'))
+    let $gotofolio := request:get-parameter('gotofolio', '')
+    let $mode := request:get-parameter('mode', '')
+    
+    (: db base collections :)
+    let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+    let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+    
+    (: register and folio info :)
+    let $folio-elements :=
+      $register-db-base-collection//ead:archdesc/ead:dao
+    let $folio-count :=
+      count($folio-elements)
+    let $possibly-folio-element :=
+      $register-db-base-collection//ead:archdesc/ead:dao[@xlink:title = $gotofolio]
+    let $folio-element :=
+      if($gotofolio != '' and $possibly-folio-element) then
+        $register-db-base-collection//ead:archdesc/ead:dao[@xlink:title = $gotofolio]
+      else
+        $register-db-base-collection//ead:archdesc/ead:dao[$requested-pos]
+    let $acts-exist := $act-db-base-collection//ead:c[@otherlevel='textgroup']
+        
+    (: now we know the folio and its position :)
+    let $folio :=
+      $folio-element/@xlink:title/string()
+    let $pos :=
+      if($gotofolio != '') then
+        index-of($folio-elements/@xlink:title, $folio-element/@xlink:title)
+      else
+        $requested-pos
+          
+    (: image info :)
+    let $image-server-base-url :=
+      conf:param('image-server-base-url')
+    let $image-url :=
+      $folio-element/@xlink:href/string()
+    let $image-path := 
+      translate(
+        substring-after($image-url, $image-server-base-url), 
+        '.jpg', 
+        '.tif'
+      )
+    
+    return
+    <div id="diipmooviewport">
+      <div style="display:none">
+		    <xf:model id="miipmooviewport">
+		      <xf:instance id="ifolio">
+		        <data xmlns="">
+		          <folio>{ $folio }</folio>
+		        </data>
+		      </xf:instance>
+		      
+		      <xf:action ev:event="xforms-ready">
+		        <xf:dispatch name="egetfolio" targetid="miipmooviewer">
+		          <xf:contextinfo name="param1" value="folio"/>
+		          <xf:contextinfo name="pgotofolio" value="'{ $folio }'"/>
+		          <xf:contextinfo name="ppos" value="'{ $pos }'"/>
+		          <xf:contextinfo name="pnav" value="0"/>
+		        </xf:dispatch>
+		        {
+		          if($mode = 'indexing' and $acts-exist) then
+			        <xf:dispatch name="egetfolio" targetid="edit-act-editor">
+			          <xf:contextinfo name="pfolio" value="folio"/>
+			        </xf:dispatch>
+			        else()
+			      }
+		      </xf:action>
+		      
+		    </xf:model>
+      </div>
+      <div id="context-label1">
+        <span>{ $register }</span>
+        <span>, </span>
+        <span>
+          <xrx:i18n>
+            <xrx:key>folio</xrx:key>
+            <xrx:default>Folio</xrx:default>
+          </xrx:i18n>
+          <span>:&#160;</span> 
+          <span>{ $folio }</span>
+        </span>
+        <!--div id="goto-folio-div">
+          <span class="goto-folio-input">
+            <xf:input ref="instance('goto')//folio" />
+          </span>
+          <xf:trigger>
+            <xf:label>Goto Folio</xf:label>
+            <xf:action ev:event="DOMActivate">
+              <xf:load show="replace">
+                <xf:resource
+                  value="concat('?folio=', replace(instance('goto')//folio, '°', ''))" />
+              </xf:load>
+            </xf:action>
+          </xf:trigger>
+        </div-->
+        <span>&#160;({ $pos }&#160;</span>
+        <xrx:i18n>
+          <xrx:key>of</xrx:key>
+          <xrx:default>of</xrx:default>
+        </xrx:i18n>
+        <span>&#160;{ $folio-count })</span>
+      </div>
+      <div id="context-label2">
+        <span>{ $register }</span>
+        <span>, </span>
+        <span>
+          <xrx:i18n>
+            <xrx:key>folio</xrx:key>
+            <xrx:default>Folio</xrx:default>
+          </xrx:i18n>
+          <span>:&#160;</span> 
+          <span>{ $folio }</span>
+        </span>
+        <!--div id="goto-folio-div">
+          <span class="goto-folio-input">
+            <xf:input ref="instance('goto')//folio" />
+          </span>
+          <xf:trigger>
+            <xf:label>Goto Folio</xf:label>
+            <xf:action ev:event="DOMActivate">
+              <xf:load show="replace">
+                <xf:resource
+                  value="concat('?folio=', replace(instance('goto')//folio, '°', ''))" />
+              </xf:load>
+            </xf:action>
+          </xf:trigger>
+        </div-->
+        <span>&#160;({ $pos }&#160;</span>
+        <xrx:i18n>
+          <xrx:key>of</xrx:key>
+          <xrx:default>of</xrx:default>
+        </xrx:i18n>
+        <span>&#160;{ $folio-count })</span>
+      </div>
+      <div id="targetframe" style="overflow:auto">
+        <img src="{ $image-url }"/>
+      </div>
+      <!--script type="text/javascript">
+        var server = '/iip/iipsrv.fcgi';
+        var images = '/storage/backup/srv/images/jpeg2000/{ $image-path }';
+        var credit = '';
+        iip = new IIP( "targetframe", {{image: images, server: server, credit: credit, zoom: 0, render: 'random', showNavButtons: true}} );
+      </script>
+      <div id="targetframe"/-->
+    </div>
+  }
+  </xrx:view>
+</xrx:widget>

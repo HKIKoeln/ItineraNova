@@ -1,0 +1,290 @@
+<xrx:widget xmlns:xrx="http://www.monasterium.net/NS/xrx"
+	xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/chamber</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>chamber</xrx:key>
+      <xrx:default>Chamber</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>false</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+	<xrx:res>
+    <xrx:css>
+		  <style type="text/css">
+		  
+#dbrowse{{
+  position:relative;
+  float:none;
+  width:780px;
+}} 		
+#dbrowse .chamber-head{{
+	font-size:110%;
+	margin-bottom:10px;
+}}
+#dbrowse .chamber-div{{
+  position:relative;  
+  float:left;
+  width:100%;
+}}
+#dbrowse .div-register{{
+  position:relative;
+  float:left;
+	width:24%;
+  background:rgb(250,250,250);
+  border:solid white 1px;
+}}
+#dbrowse .inner-div-register{{
+  margin:5px;
+}}
+#dbrowse .et-al{{
+  font-size:10px;
+}}
+#dbrowse .indexing-state{{
+  margin-bottom:2px;
+  width:80%;
+  position:relative;
+  float:left;
+}}
+#dbrowse .indexing-state-bar{{
+  background:#FEBC9F;
+  height:8px;
+}}
+#dbrowse .indexing-state-label{{
+  position:absolute;
+  top:-3px;
+  font-size:10px;
+  z-index:20;
+}}
+#dbrowse .chamber-heads{{
+  position:relative;
+  float:none;
+  width:780px;
+}} 
+#dbrowse .chamber-head{{
+  position:relative;
+  float:left;
+  text-align:center;
+  width:20%;
+}}
+#dbrowse .inner-chamber-head{{
+  position:relative;
+  float:left;
+  margin-top:20px;
+  margin-bottom:10px;
+  margin-left:15px;
+  color:grey;
+}}
+#dbrowse .chamber-head-a{{
+  font-size:120%;
+  font-weight:bold;
+}}
+.chamber-head a{{
+  text-decoration:none;
+  color:grey;
+}}
+.selected-chamber:before{{
+  content:"&#9658; "attr(id); color:grey;
+}}
+      </style>
+    </xrx:css>
+	</xrx:res>
+	<xrx:view>
+	  {
+	  (: request parameter :)
+	  let $chamberid := $xrx:tokenized-uri[1]
+	  
+    let $register-db-base-collection := metadata:base-collection('register', 'public')
+	  
+	  (: search for new registers :)
+	  let $new-registers := 
+	    if($chamberid = 'new') then
+	      $register-db-base-collection//ead:ead/ead:archdesc[not(.//ead:physloc[@type='chamber'][.!=''])]
+	    else()
+	  
+	  (: the registers of this chamber :)
+	  let $registers := 
+	    if($chamberid != 'new') then
+	      $register-db-base-collection//ead:ead/ead:archdesc[.//ead:physloc[@type='chamber']=$chamberid]
+	    else()  
+	    
+	  return 
+		<div id="dbrowse">
+			<div class="h2">
+			  <xrx:i18n>
+					<xrx:key>browse</xrx:key>
+					<xrx:default>Browse</xrx:default>
+				</xrx:i18n>
+			</div>
+			<xrx:auth>
+			  <xrx:rules>
+			    <xrx:rule>
+			      <xrx:user/>
+			      <xrx:role>archivist</xrx:role>
+			    </xrx:rule>
+			  </xrx:rules>
+			  <xrx:true>
+					<div id="my-functions">
+					  <div class="h3">
+					    <xrx:i18n>
+					      <xrx:key>my-functions</xrx:key>
+					      <xrx:default>MyFunctions</xrx:default>
+					    </xrx:i18n>
+					  </div>
+					  <div class="function-links">
+					    <div class="function-link">
+					      <a href="{ conf:param('request-root') }create-new-register">
+					        <span>‣&#160;</span>
+					        <xrx:i18n>
+					          <xrx:key>create-new-register</xrx:key>
+					          <xrx:default>Create new register</xrx:default>
+					        </xrx:i18n>
+					      </a>
+					    </div>
+					  </div>
+					</div>
+				</xrx:true>
+				<xrx:false>
+				  <span/>
+				</xrx:false>
+			</xrx:auth>
+			<div class="chamber-div">
+			  <div class="chamber-heads">
+				  {
+					for $chamber in ('1', '2', '3')
+					return
+					<div class="chamber-head"><div class="inner-chamber-head">
+					  <div class="{ if($chamber = $chamberid) then 'selected-chamber' else ''}">
+						  <a href="{ chamber:link($chamber) }" class="chamber-head-a">
+							  <xrx:i18n>
+									<xrx:key>chamber</xrx:key>
+									<xrx:default>Chamber</xrx:default>
+								</xrx:i18n>
+								<span>&#160;{ $chamber }</span>
+						  </a>
+						</div>
+					</div></div>
+					}
+			  </div>
+			  <xrx:auth>
+			    <xrx:rules>
+			      <xrx:rule>
+			        <xrx:user/>
+			        <xrx:role>archivist</xrx:role>
+			      </xrx:rule>
+			    </xrx:rules>
+			    <xrx:true>
+			      <div>
+		          <div class="chamber-head"><div class="inner-chamber-head">
+		            <div class="{ if('new' = $chamberid) then 'selected-chamber' else ''}">
+			            <a href="{ chamber:link('new') }" class="chamber-head-a">
+			              <xrx:i18n>
+			                <xrx:key>new-registers</xrx:key>
+			                <xrx:default>New Registers</xrx:default>
+			              </xrx:i18n>
+			            </a>
+			          </div>
+		          </div></div>
+		          <div class="chamber-div">
+		            {
+		            for $reg in $new-registers
+		            let $register-name := $reg//ead:unitid/text()
+		            order by $reg
+		            return
+		            <div class="div-register">
+		              <div class="inner-div-register">
+		                <a href="{ register:link($register-name) }">
+		                  <b>
+		                    <xrx:i18n>
+		                      <xrx:key>register</xrx:key>
+		                      <xrx:default>Register</xrx:default>
+		                    </xrx:i18n>
+		                    <span>&#160;{ $register-name }</span>
+		                  </b>
+		                </a>
+		              </div>
+		            </div>
+		            }
+		          </div>
+	          </div>
+			    </xrx:true>
+			    <xrx:false>
+			      <div class="chamber-head"><div class="inner-chamber-head">
+			        <a href="" class="chamber-head-a">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</a>
+			      </div></div>
+			    </xrx:false>
+			  </xrx:auth>
+				{
+				for $reg in $registers
+        let $register-name := $reg//ead:unitid/text()
+				let $act-base-collection := metadata:base-collection('act', $register-name, 'public')
+				let $act-count := 0 (:count($act-base-collection//ead:c[@otherlevel='textgroup']):)
+				let $act-indexing-state := $act-count div 40
+				let $transcription-count := 0
+				  (:count($act-base-collection//ead:c[@otherlevel='textgroup'][.//tei:p//text()]):)
+				let $transcription-indexing-state := $transcription-count div 40
+        let $years := $reg//ead:indexentry/ead:namegrp/ead:title/text()
+				order by $reg 
+				return
+				<div class="div-register">
+				  <div class="inner-div-register">
+						<a href="{ register:link($register-name) }">
+							<b>
+							  <xrx:i18n>
+									<xrx:key>register</xrx:key>
+									<xrx:default>Register</xrx:default>
+								</xrx:i18n>
+								<span>&#160;{ $register-name }</span>
+							</b>
+						</a>
+						<br />
+						<span>
+						  <xrx:i18n>
+								<xrx:key>aldermens-year</xrx:key>
+								<xrx:default>Aldermen's Year</xrx:default>
+							</xrx:i18n>
+							<span>:</span>
+						</span>
+						<span>
+						  {
+						  if(count($years) = 1) then 
+						    $years[1]
+						  else 
+						    <span class="et-al">
+						      <span>{ $years[1] }</span>
+						      <span>&#160;</span>
+						      <xrx:i18n>
+						        <xrx:key>et-al</xrx:key>
+						        <xrx:default>et al.</xrx:default>
+						      </xrx:i18n>
+						    </span>
+						  }
+						</span>
+						<br/>
+						<!--div style="width:100%">
+              <div title="{ $act-count } acts are indexed" class="act-indexing-state indexing-state">
+                <div class="indexing-state-label">A:&#160;{ $act-count }</div>
+	              <div class="indexing-state-bar" style="width:{ xs:string($act-indexing-state) }%"/>
+	            </div>
+	            <div title="{ $transcription-count } acts are transcribed" class="transcription-indexing-state indexing-state">
+                <div class="indexing-state-label">T:&#160;{ $transcription-count }</div>
+                <div class="indexing-state-bar" style="width:{ xs:string($transcription-indexing-state) }%"/>
+              </div>
+            </div-->
+						<br />
+					</div>
+				</div>
+				}
+			</div>
+		</div>
+		}
+	</xrx:view>
+</xrx:widget>

@@ -1,0 +1,56 @@
+<xrx:widget xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/last-update-info</xrx:id>
+  <xrx:title></xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal/>
+  <xrx:licence></xrx:licence>
+  <xrx:auth>
+    <xrx:group>guest</xrx:group>
+  </xrx:auth>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>false</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+      <style type="text/css">
+
+#dlast-update-info{{
+  color:rgb(100,100,100);
+  margin-top:30px;
+}}
+
+#dlast-update-info .grey-line{{
+  border-top:solid rgb(240,240,240) 1px;
+  padding-top:5px;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:view>
+    {
+    let $htdoc-entry := htdoc:get($xrx:resolver/xrx:atomid/text())
+    let $author := htdoc:author($htdoc-entry)
+    let $updated := htdoc:updated($htdoc-entry)
+    return
+    <div id="dlast-update-info">
+        <span class="grey-line">
+            <xrx:i18n>
+              <xrx:key>last-update</xrx:key>
+              <xrx:default>Last update</xrx:default>
+            </xrx:i18n>
+            <span>:&#160;{ $updated }&#160;</span>
+            <xrx:i18n>
+              <xrx:key>by</xrx:key> 
+              <xrx:default>by</xrx:default>
+            </xrx:i18n>
+            <span>&#160;{ $author }</span>
+        </span>
+    </div>
+    }
+  </xrx:view>
+</xrx:widget>

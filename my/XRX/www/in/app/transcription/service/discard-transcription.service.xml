@@ -1,0 +1,63 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/discard-transcription</xrx:id>
+  <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:translateflag>false</xrx:translateflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:variables>
+    <xrx:variable>
+	    <xrx:name>$register</xrx:name>
+	    <xrx:expression>$data//*:register/text()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$act</xrx:name>
+      <xrx:expression>$data//*:act/text()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$scope</xrx:name>
+      <xrx:expression>$data//*:scope/text()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$comment</xrx:name>
+      <xrx:expression>$data//*:comment/text()</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$metadata-scope</xrx:name>
+      <xrx:expression>request:get-parameter('metadatascope', 'private')</xrx:expression>
+    </xrx:variable>
+    <xrx:variable>
+      <xrx:name>$atomid</xrx:name>
+      <xrx:expression>metadata:atomid($transcription:metadata-object-type, ($register, $act))</xrx:expression>
+    </xrx:variable>
+  </xrx:variables>
+  <xrx:body>
+  {
+    let $reject := revision:reject($atomid, $scope, $comment)
+    
+    return
+    
+    <xrx:response>{ $reject }</xrx:response>
+  }
+  </xrx:body>
+</xrx:service>

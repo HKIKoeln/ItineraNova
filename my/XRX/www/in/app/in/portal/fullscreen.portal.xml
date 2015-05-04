@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:portal xmlns="http://www.w3.org/1999/xhtml" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xrx:id>tag:itineranova.be,2011:/in/portal/fullscreen</xrx:id>
+    <xrx:res>
+        <xrx:css>
+            <style type="text/css">
+
+body{{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:transparent;
+}}
+
+#debug-pane, img.debug-icon{{
+  display:none;
+}}
+
+.dijitToasterContent{{
+  height:50px;
+  font-weight:bold;
+  background:#8EA384;
+  no-repeat 3% 7px;
+  color:#666666;
+  width:100%;
+  margin:0px;
+  padding:0px;
+  text-align:center;
+  border-color:#E1EFDB !important;
+}}
+
+	    </style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:view>
+        <div id="main">
+            <div id="content">
+                <xrx:mainwidget/>
+            </div>
+            <script type="text/javascript">
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3064654-2']);
+_gaq.push(['_trackPageview']);
+
+(function() {{
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+}})();
+
+          </script>
+        </div>
+    </xrx:view>
+</xrx:portal>

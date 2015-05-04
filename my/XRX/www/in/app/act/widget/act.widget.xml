@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/act</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key>act</xrx:key>
+            <xrx:default>Act</xrx:default>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+    <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+    <xrx:licence/>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:xformsflag>false</xrx:xformsflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:res>
+        <xrx:css>
+            <style type="text/css">
+
+#act-select{{
+  display:none;
+	position:absolute;
+}}
+
+#act-navigation{{
+  position:absolute;
+  right:10px;
+  text-align:right;
+}}
+
+#act-navigation .xfValue{{
+  width:100px;
+  height:30px;
+}}
+
+#act-navigation .xfValue *{{
+  font-size:25px;
+}}
+
+#context-label{{
+	position:absolute;
+	top:-24px;
+}}
+
+#thumbnails{{
+	float:right;
+	margin:10px;
+}}
+
+#thumbnail{{
+	padding:10px;
+}}
+
+#act{{
+	position:relative;
+	float:left;
+	overflow:hidden;
+	background:rgb(240,240,240);
+	min-height:250px;
+	width:670px;
+	border-bottom:solid white 5px;
+}}
+
+#inner-act{{
+  margin:10px;
+}}
+
+.header-small-caps{{
+	font-weight:bold;
+	font-variant:small-caps;
+	font-size:120%;
+}}
+
+#goto-input-div .xfValue{{
+	width: 7em;
+}}
+
+#my-functions .function-links{{
+  width:670px;
+}}
+
+.last-update-text{{
+  width:500px;
+}}
+
+#act .transcription{{
+  line-height:1.4em;
+}}
+
+.act-input{{
+  width:70px;
+}}
+
+.abstract, .version-link{{
+  position:relative;
+  float:left;
+  width:100%;
+}}
+
+      </style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:model>
+	{
+	  let $act := $xrx:tokenized-uri[last()]
+	  let $register := $xrx:tokenized-uri[last() - 1]
+	  
+	  return
+		<xf:model id="mbrowse-act">
+            <xf:instance id="session">
+                <data xmlns="">
+                    <act>{ $act }</act>
+                    <register>{ $register }</register>
+                </data>
+            </xf:instance>
+        </xf:model>
+	}
+	</xrx:model>
+    <xrx:view>
+	{
+	  (: request parameters :)
+	  let $register := $xrx:tokenized-uri[1]
+    let $register-decoded := xmldb:decode($register)
+    let $only-transcription :=
+      $xrx:tokenized-uri[last()] = 'transcription'
+    
+    (: base collections :)
+    let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+    let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+
+    (: next/last navigation :)
+    let $act-unitids :=
+      for $act-unitid in
+        (
+          if($only-transcription) then
+            $act-db-base-collection//ead:c[@otherlevel='textgroup'][.//tei:body//text()]/ead:did/ead:unitid/text()
+          else
+            $act-db-base-collection//ead:c[@otherlevel='textgroup']/ead:did/ead:unitid/text()
+        )
+      
+      let $act-tmp :=
+        if(contains($act-unitid,'-')) then 
+          substring-before($act-unitid, '-') 
+        else if(contains($act-unitid,',')) then 
+          substring-before($act-unitid, ',') 
+        else $act-unitid 
+      
+      let $folio-num := 
+        if(contains($act-tmp, '.')) then
+          substring-before(substring-after($act-tmp,'°'), '.') 
+        else substring-after($act-tmp, '°') 
+      
+      let $act-num :=
+        if(contains($act-tmp,'.')) then 
+          if(string-length(substring-after($act-tmp, '.')) = 1) then
+            concat('0',(substring-after($act-tmp, '.'))) 
+          else substring-after($act-tmp, '.') 
+        else '00' 
+      
+      let $page := 
+        if(contains($act-tmp, 'R')) then 
+          '0' 
+        else
+          '1' 
+      
+      let $orderstring := 
+        replace(concat($folio-num, $page, $act-num), '\D', '') 
+      
+      order by xs:integer($orderstring)
+      
+      return
+      $act-unitid 
+    
+    let $act-count :=
+      count($act-unitids)
+    
+    let $search-act := 
+      if($search:register != '') then
+        util:eval(search:query-string('transcription'))
+      else ()
+    
+    let $act :=
+      if(count($search-act) = 1) then $search-act/ead:did/ead:unitid/text()
+      else if(count($search-act) gt 1) then 
+        response:redirect-to(xs:anyURI(concat(conf:param('request-root'), 'search?act=', $search:act, '&amp;register=', $search:register, '&amp;page=', $search:page)))
+      else if($xrx:tokenized-uri[2] = '*') then $act-unitids[1]
+      else $xrx:tokenized-uri[2]
+     
+    let $act-decoded := xmldb:decode($act)
+    
+    let $previous-pos-next :=
+      for $act-unitid at $pos in $act-unitids
+      return
+      if($act-unitid = $act-decoded and $pos = 1) then
+      ($act-decoded, '1', $act-unitids[$pos + 1])
+      else if($act-unitid = $act-decoded and $pos = $act-count) then
+      ($act-unitids[$pos - 1], xs:string($act-count), $act-decoded)
+      else if($act-unitid = $act-decoded) then
+      ($act-unitids[$pos - 1], xs:string($pos), $act-unitids[$pos + 1])
+      else()
+    
+    let $next-link :=
+      concat(conf:param('request-root'), $register, '/', $previous-pos-next[1], '/', $xrx:tokenized-uri[last()])
+    let $previous-link :=
+      concat(conf:param('request-root'), $register, '/', $previous-pos-next[3], '/', $xrx:tokenized-uri[last()])
+    
+    (: act info :)
+    let $atomid := metadata:atomid('act', ($register, $act))
+    let $entry := $act-db-base-collection//atom:id[.=$atomid]/parent::atom:entry
+    let $a := $entry//ead:c[@otherlevel='textgroup']
+
+    let $entry-updated := 
+      substring-before($entry/atom:updated/text(), 'T')
+    let $entry-author :=
+      $entry/atom:author/atom:email/text()
+    
+    (: transcription info :)
+    let $istranscribed := act:istranscribed($entry)
+    let $transcription-author := transcription:author($entry)
+    
+    (: user info :)
+    let $istranscriber := $transcription-author eq $xrx:user-id
+    let $isarchivist := auth:matches(<xrx:rule>
+            <xrx:user/>
+            <xrx:role>archivist</xrx:role>
+        </xrx:rule>)
+
+    (: revision info :)
+    let $transcription-atomid := replace($atomid, '/act/', '/transcription/')
+    
+    (: transcription saved by the actual user? :)
+    let $transcription-user-db-base-collection := 
+      metadata:base-collection('transcription', $register, 'private')
+    let $transcription-in-use-self :=
+      $transcription-user-db-base-collection//atom:id[.=$transcription-atomid]/parent::atom:entry
+    let $is-in-private-scope := exists($transcription-in-use-self)
+      
+    (: act is actually moderated? :)
+    let $transcription-draft-db-base-collection :=
+      metadata:base-collection('transcription', $register, 'draft')
+    let $transcription-draft :=
+      $transcription-draft-db-base-collection//atom:id[.=$transcription-atomid]/root(.)/atom:entry
+    let $is-in-draft-scope := exists($transcription-draft)
+          
+    (: start or continue transcription link :)
+    let $start-transcription-link-base := 
+      concat(conf:param('request-root'), 'service/?atomid=tag:itineranova.be,2011:/in/service/start-transcription&amp;register=', $register, '&amp;act=', $act)
+    let $continue-transcription-link-base := 
+      concat(conf:param('request-root'), $register, '/', $act, '/')
+    
+    let $transcribe-link := 
+    (: 
+      if the act is actually transcribed by
+      the actual user we continue editing in
+      the private scope
+    :)
+    if($is-in-private-scope = true()) then
+    <div class="function-link">
+            <a href="{ $continue-transcription-link-base }transcribe">
+                <span>‣&#160;</span>
+                <xrx:i18n>
+                    <xrx:key>continue-transcription</xrx:key>
+                    <xrx:default>Continue Transcription</xrx:default>
+                </xrx:i18n>
+            </a>
+        </div>
+    (:
+      if the act is actually moderated and the
+      actual user has the role archivist we 
+      continue editing / contributing in draft
+      scope
+    :)
+    else if(($is-in-draft-scope = true()) and ($isarchivist = true())) then
+    <div class="function-link">
+            <a href="{ $continue-transcription-link-base }contribute">
+                <span>‣&#160;</span>
+                <xrx:i18n>
+                    <xrx:key>moderate-transcription</xrx:key>
+                    <xrx:default>Moderate Transcription</xrx:default>
+                </xrx:i18n>
+            </a>
+        </div>
+    (:
+      if the act is actually moderated and the
+      actual user does not have the role archivist 
+      we give a message 'actually moderated'
+    :)
+    else if(($is-in-draft-scope = true()) and ($isarchivist = false())) then
+    <div class="function-link">
+            <xrx:i18n>
+                <xrx:key>transcription-actually-moderated-message</xrx:key>
+                <xrx:default>This transcription is actually moderated.</xrx:default>
+            </xrx:i18n>
+        </div>
+    (: 
+      if no transcription exists yet we start
+      transcribing in the private space. The
+      actual user is the author of the 
+      transcription, thus we use mode transcribe
+    :)
+    else if(not($istranscribed)) then
+    <div class="function-link">
+            <a href="{ $start-transcription-link-base }&amp;mode=transcribe">
+                <span>‣&#160;</span>
+                <xrx:i18n>
+                    <xrx:key>transcribe</xrx:key>
+                    <xrx:default>Transcribe</xrx:default>
+                </xrx:i18n>
+            </a>
+        </div>
+    (:
+      if a transcription exists and the actual
+      user is the author of this transcription
+      we start transcribing in the private 
+      space too and thus use mode transcribe
+    :)
+    else if($istranscriber) then
+    <div class="function-link">
+            <a href="{ $start-transcription-link-base }&amp;mode=transcribe">
+                <span>‣&#160;</span>
+                <xrx:i18n>
+                    <xrx:key>revise-my-transcription</xrx:key>
+                    <xrx:default>Revise my transcription</xrx:default>
+                </xrx:i18n>
+            </a>
+        </div>
+    (:
+      if a transcription already exists and the
+      actual user is not identical with the 
+      author but is an user with role archivist
+      we start transcribing or better contributing
+      in the draft scope and thus use mode contribute
+    :)
+    else if($isarchivist) then
+    <div class="function-link">
+            <a href="{ $start-transcription-link-base }&amp;mode=contribute">
+                <span>‣&#160;</span>
+                <xrx:i18n>
+                    <xrx:key>revise-transcription-as-archivist</xrx:key>
+                    <xrx:default>Revise transcription as archivist (Contribute)</xrx:default>
+                </xrx:i18n>
+            </a>
+        </div>
+    else ()
+    
+	  return
+		<div>
+            <div id="context-label">
+                <span>{ $register }</span>
+                <span>, </span>
+                <span>
+                    <xrx:i18n>
+                        <xrx:key>act</xrx:key>
+                        <xrx:default>Act</xrx:default>
+                    </xrx:i18n>
+                    <span>:&#160;{ $act-decoded }</span>
+                </span>
+                <span>
+                    <span>&#160;({ $previous-pos-next[2] }&#160;</span>
+                    <xrx:i18n>
+                        <xrx:key>of</xrx:key>
+                        <xrx:default>of</xrx:default>
+                    </xrx:i18n>
+                    <span>&#160;{ $act-count })</span>
+                </span>
+            </div>
+            <div id="act-navigation">
+                <div>
+          {
+		      if(not($only-transcription)) then
+	        <form name="search-form" method="get">
+                        <span>
+                            <xrx:i18n>
+                                <xrx:key>search-act</xrx:key>
+                                <xrx:default>Search Act</xrx:default>
+                            </xrx:i18n>
+                            <span>:&#160;</span>
+                        </span>
+                        <select name="page">
+              {
+              for $p in ('', 'R', 'V')
+              return
+              <option value="{ $p }">{ if($search:page = $p) then attribute selected { 'selected' } else () }{ $p }{ if($p) then '°' else '' }</option>
+              }
+	          </select>
+                        <input class="act-input" name="act" value="{ $search:act }"/>
+                        <input type="hidden" name="register" value="{ $register }"/>
+                        <input type="submit" value="Go"/>
+                    </form>
+	        else()
+	        }
+	      </div>
+                <div>
+                    <a href="{ $next-link }">
+                        <xrx:i18n>
+                            <xrx:key>previous</xrx:key>
+                            <xrx:default>previous</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                    <span>&#160;|&#160;</span>
+                    <a href="{ $previous-link }">
+                        <xrx:i18n>
+                            <xrx:key>next</xrx:key>
+                            <xrx:default>next</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+	      {
+	        if($only-transcription) then
+	        <div>
+                    <span>(</span>
+                    <xrx:i18n>
+                        <xrx:key>only-transcribed-acts</xrx:key>
+                        <xrx:default>only transcribed acts</xrx:default>
+                    </xrx:i18n>
+                    <span>)</span>
+                </div>
+	        else()
+	      }
+		  </div>
+            <div id="dact">
+                <div class="h2">
+                    <xrx:i18n>
+                        <xrx:key>act</xrx:key>
+                        <xrx:default>Act</xrx:default>
+                    </xrx:i18n>
+                    <span>&#160;{ $act-decoded }&#160;&#160;</span>
+                </div>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:dbgroup>atom</xrx:dbgroup>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div id="my-functions">
+                            <div class="h3">
+                                <xrx:i18n>
+                                    <xrx:key>my-functions</xrx:key>
+                                    <xrx:default>MyFunctions</xrx:default>
+                                </xrx:i18n>
+                            </div>
+                            <div class="function-links">
+                                <xrx:auth>
+                                    <xrx:rules>
+                                        <xrx:rule>
+                                            <xrx:user/>
+                                            <xrx:role>archivist</xrx:role>
+                                        </xrx:rule>
+                                    </xrx:rules>
+                                    <xrx:true>
+                                        <div class="function-link">
+                                            <a href="{ conf:param('request-root') }{ $register }/indexing?gotoact={ $act }&amp;actpos={ $previous-pos-next[2] }">
+                                                <span>‣&#160;</span>
+                                                <xrx:i18n>
+                                                    <xrx:key>indexing</xrx:key>
+                                                    <xrx:default>Indexing</xrx:default>
+                                                </xrx:i18n>
+                                            </a>
+                                        </div>
+                                    </xrx:true>
+                                    <xrx:false>
+                                        <span/>
+                                    </xrx:false>
+                                </xrx:auth>
+							  { $transcribe-link }
+					      <div class="function-link">&#160;</div>
+                            </div>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <span/>
+                    </xrx:false>
+                </xrx:auth>
+                <div class="act-addition-container">
+                    <div class="abstract">{ $a/ead:did/ead:abstract/text() }</div>
+				  {
+				  for $text at $pos in $a//ead:c[@otherlevel='text']
+				  let $unitid := $text/ead:did/ead:unitid/text()
+				  let $physfacet-position := $text//ead:physfacet[@type='position']/text()
+				  let $type := data($text/ead:did/ead:unittitle/@type)
+				  let $date := data($text/ead:did/ead:unitdate/@normal)
+          let $year := substring($date, 1, 4)
+          let $month := substring($date, 5, 2)
+          let $day := substring($date, 7)
+          let $formatted := concat($year, '-', $month, '-', $day)
+          let $abstract := $text/ead:did/ead:unittitle/text()
+					return
+					<div id="act">
+                        <div id="inner-act">
+                            <div>
+                                <span class="unitid">{ $unitid }</span>
+                                <span>
+							  { 
+							  if($physfacet-position and $pos != 1) then 
+							    concat(' [',$physfacet-position, ']') 
+							  else()
+							  }
+							</span>
+                                <br/>
+							{
+							if($type) then
+							<span>
+                                    <xrx:i18n>
+                                        <xrx:key>type</xrx:key>
+                                        <xrx:default>Type</xrx:default>
+                                    </xrx:i18n>
+                                    <span>:&#160;{ $type }</span>
+                                </span>
+							else()
+							}
+							{
+							if($abstract) then
+							<span>, {$abstract}</span>
+							else()
+							}
+							{
+							if($date) then
+							<div>
+                                    <xrx:i18n>
+                                        <xrx:key>date</xrx:key>
+                                        <xrx:default>Date</xrx:default>
+                                    </xrx:i18n>
+                                    <span>:&#160;{ $formatted }</span>
+                                </div>
+							else()
+							}
+							{
+							if(data($text/ead:did//ead:language/@langcode) != '') then
+							<div>
+								{
+								if(count($text/ead:did//ead:language/@langcode) gt 1) then
+								<span>
+                                        <xrx:i18n>
+                                            <xrx:key>languages</xrx:key>
+                                            <xrx:default>Languages</xrx:default>
+                                        </xrx:i18n>
+                                        <span>:</span>
+                                    </span>
+								else
+								<span>
+                                        <xrx:i18n>
+                                            <xrx:key>language</xrx:key>
+                                            <xrx:default>Language</xrx:default>
+                                        </xrx:i18n>
+                                        <span>:&#160;</span>
+                                    </span>
+								}
+								{
+								for $l at $pos in data($text/ead:did//ead:language/@langcode)
+								return
+								if(doc('/db/www/in/res/additional-webapp-data/Languages.xml')//*:key[matches(.,$l)])
+								then
+								<span>{
+									doc('/db/www/in/res/additional-webapp-data/Languages.xml')//*:key[matches(.,$l)]/../*:value
+									}{ if($pos lt count($text/ead:did//ead:language/@langcode)) then
+									',' else () }</span>
+								else
+								<span>{ $l }</span>
+								}
+							</div>
+							else()
+							}
+						</div>
+                            <div id="thumbnails">
+							{
+							for $folio in $text/ead:dao[@xpointer != '']
+							order by $folio/@xpointer
+							return
+							<div id="thumbnail">
+                  <a href="{ folio:link(($register, data($folio/@xpointer))) }" title="{ data($folio/@xpointer) }">
+                  <!--
+									{
+									let $image-server-base-uri := 'http://itineranova.be/images/'
+									let $iip-server-base-uri := '/iip/iipsrv.fcgi'
+									let $image-element := $register-db-base-collection//ead:dao[@xlink:title=data($folio/@xpointer)]
+									let $image-url := data($image-element/@xlink:href)
+									let $image-path := 
+									  translate(substring-after($image-url,$image-server-base-uri), '.jpg', '.tif')
+									let $fif := concat('?FIF=/storage/backup/srv/images/jpeg2000/', $image-path)
+									let $q := '&amp;SDS=0,90&amp;CNT=1.0&amp;WID=87.5&amp;QLT=99&amp;CVT=jpeg'
+									let $src := concat($iip-server-base-uri, $fif, $q)
+									return
+									<img alt="{ data($folio/@xpointer) }" src="{ $src }"/>
+									}
+									-->
+                  <span>
+                      <xrx:i18n>
+                          <xrx:key>folio</xrx:key>
+                          <xrx:default>Folio</xrx:default>
+                      </xrx:i18n>
+                      <span>&#160;{ data($folio/@xpointer) }</span>
+                  </span>
+								</a>
+                                    <br/>
+                                </div>
+							}
+						</div>
+						{
+						let $transcription-element := $text//tei:body/tei:p
+						return
+						if($transcription-element/text() != '') then
+						
+						(: transcription updated :)
+						let $transcription-updated := 
+						  substring-before($text//atom:entry/atom:updated/text(),'T')
+						
+						(: transcription author :)
+						let $transcription-author :=
+						  $text//atom:entry/atom:author/atom:email/text()
+						
+						(: transcription contributors :)
+            let $contributors := $text//atom:contributor/atom:email/text()
+            
+            (: transcription moderator :)
+            let $moderator := $text//*:moderator/*:email/text()
+            
+            
+            let $xsl := collection('/db/www')/xsl:stylesheet[@id='in-tei2html']
+            
+						return
+						<div>
+                                <h3>
+                                    <xrx:i18n>
+                                        <xrx:key>transcription</xrx:key>
+                                        <xrx:default>Transcription</xrx:default>
+                                    </xrx:i18n>
+                                </h3>
+                                <span>{ $transcription-updated }</span>
+                                <span>
+                                    <span>&#160;</span>
+                                    <xrx:i18n>
+                                        <xrx:key>by</xrx:key>
+                                        <xrx:default>by</xrx:default>
+                                    </xrx:i18n>
+                                    <span>&#160;</span>
+                                </span>
+                                <span>{ user:firstname-name($transcription-author) }</span>
+                                <div class="transcription">{ transform:transform($transcription-element, $xsl, ()) }</div>
+                                <div class="last-update-text">
+                                    <span>
+                                        <xrx:i18n>
+                                            <xrx:key>contributors</xrx:key>
+                                            <xrx:default>Contributors</xrx:default>
+                                        </xrx:i18n>
+                                        <span>:&#160;</span>
+                                    </span>
+								{
+								for $contributor at $pos in $contributors
+								return
+								(
+								user:firstname-name($contributor),
+								if($pos != count($contributors)) then ',' else ''
+								)
+								}
+								<div>
+                                        <span>
+                                            <xrx:i18n>
+                                                <xrx:key>moderated-by</xrx:key>
+                                                <xrx:default>Moderated by</xrx:default>
+                                            </xrx:i18n>
+                                            <span>:&#160;</span>
+                                        </span>
+                                        <span>{ user:firstname-name($moderator) }</span>
+                                    </div>
+                                </div>
+                            </div>
+						else()
+						}
+						{
+						let $signer-elements := $text//ead:persname[@role='signer']
+						let $signer-exists := 
+						  if(exists($signer-elements/text()) or exists($signer-elements/ead:ptr/text())) then true() 
+						  else false() 
+						return
+						if($signer-exists) then
+						<div>
+                                <h3>
+                                    <xrx:i18n>
+                                        <xrx:key>signer</xrx:key>
+                                        <xrx:default>Signer</xrx:default>
+                                    </xrx:i18n>
+                                </h3>
+                                <ul>
+								{
+								for $signer in $signer-elements
+								return
+								if($signer/ead:ptr/text()) then
+								<li>{ $register-db-base-collection//ead:persname[@id=$signer/ead:ptr/text()]/text() }</li>
+								else if($signer/text()) then
+								<li>{ $signer/text() }</li>
+								else ()
+								}
+							</ul>
+                            </div>
+						else()
+						}
+					</div>
+                    </div>
+					}
+					<div class="last-update-text">
+                        <span class="border-top-light-grey">
+                            <xrx:i18n>
+                                <xrx:key>last-update</xrx:key>
+                                <xrx:default>Last update</xrx:default>
+                            </xrx:i18n>
+                            <span>:&#160;{ $entry-updated }&#160;</span>
+                            <xrx:i18n>
+                                <xrx:default>by</xrx:default>
+                                <xrx:key>by</xrx:key>
+                            </xrx:i18n>
+                            <span>&#160;{ user:firstname-name($entry-author) }</span>
+                        </span>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+  }
+	</xrx:view>
+</xrx:widget>

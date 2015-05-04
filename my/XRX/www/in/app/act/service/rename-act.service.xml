@@ -1,0 +1,66 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/rename-act</xrx:id>
+  <xrx:body>
+    {
+    let $old-act := $data//*:act/text()
+    let $new-act := $data//*:renameact/text()
+    let $register := $data//*:register/text()
+    
+    (: atom info :)
+    let $new-atomid := metadata:atomid('act', ($register, $new-act))
+    let $old-atomid := metadata:atomid('act', ($register, $old-act))
+    
+    (: act already exists? :)
+    let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+    let $new-act-already-exists := exists($act-db-base-collection//atom:id[.=$new-atomid])
+    
+    (: act is actually transcribed? :)
+    let $actually-transcribed := act:actually-transcribed($old-atomid, $user:db-base-collection, metadata:base-collection('transcription', 'draft'))
+    
+    (: insert Atom ID :)
+    let $changeid :=
+        if(not($new-act-already-exists) and $new-act != '') then
+            upd:replace-element-content(
+                $act-db-base-collection/atom:entry/atom:id[.=$old-atomid],
+                text{ $new-atomid })
+        else ()
+    
+    let $changeunitid :=
+        if(not($new-act-already-exists) and $new-act != '') then
+            upd:replace-element-content(
+                $changeid/atom:content/ead:c/ead:did/ead:unitid,
+                text{ $new-act })
+        else ()
+    
+    (: save updated document :)    
+    let $saveidchanges :=
+        if(not($new-act-already-exists) and $new-act != '' and not($actually-transcribed)) then
+            atom:PUT(
+                metadata:feed('act', $register, 'public'),
+                metadata:entryname('act', $old-act),
+                $changeunitid)
+        else ()
+        
+    (: rename database resource :)    
+    let $rename := 
+        if(not($new-act-already-exists) and $new-act != '' and not($actually-transcribed)) then 
+            xmldb:rename(
+                metadata:base-collection-path('act', $register, 'public'),
+                metadata:entryname('act', $old-act),
+                metadata:entryname('act', $new-act))
+        else ()  
+    
+    return
+    if(not($new-act != '')) then
+    <xrx:response status="0"><xrx:message>Requested name empty.</xrx:message><xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon></xrx:response>
+    else if($actually-transcribed) then
+    <xrx:response status="0"><xrx:message>Act is actually transcribed and cannot be renamed.</xrx:message><xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon></xrx:response>
+    else if($new-act-already-exists) then
+    <xrx:response status="0"><xrx:message>An act with the requested name already exists.</xrx:message><xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon></xrx:response>
+    else if($rename eq ()) then
+    <xrx:response status="-1"><xrx:message>An error occured.</xrx:message><xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon></xrx:response>
+    else
+    <xrx:response status="1"><xrx:message>Act { $old-act } successfully renamed to { $new-act }.</xrx:message><xrx:icon>{ conf:param('request-root') }face-smile.png</xrx:icon></xrx:response>
+    }
+  </xrx:body>
+</xrx:service>

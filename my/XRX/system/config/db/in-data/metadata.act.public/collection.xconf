@@ -1,0 +1,47 @@
+<collection xmlns="http://exist-db.org/collection-config/1.0"> 
+    <index xmlns:tei="http://www.tei-c.org/ns/1.0/" 
+      xmlns:ead="urn:isbn:1-931666-22-9" 
+      xmlns:atom="http://www.w3.org/2005/Atom"
+      xmlns:app="http://www.w3.org/2007/app"
+      xmlns:vre="http://www.monasterium.net/NS/vre"> 
+        <fulltext default="none" attributes="no"/>
+        
+        <lucene>
+        
+            <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+            
+            <text match="//atom:content/ead:c"/>
+            <text match="//atom:content/ead:c/ead:did/ead:unitid"/>
+            <text match="//ead:namegrp/ead:persname"/>
+            
+            <inline qname="tei:del"/>
+            <inline qname="tei:add"/>
+            <inline qname="tei:ex"/>
+            <inline qname="tei:unclear"/>
+            <inline qname="tei:rend"/>
+            <inline qname="tei:abbr"/>
+            
+            <ignore qname="atom:email"/>
+            <ignore qname="atom:published"/>
+            <ignore qname="atom:updated"/>
+            <ignore qname="app:draft"/>
+            <ignore qname="vre:email"/>
+            
+        </lucene>
+
+        <create qname="atom:id" type="xs:string"/>        
+        <create qname="atom:content" type="xs:string"/>
+        <create qname="ead:c" type="xs:string"/>
+        <create qname="ead:did" type="xs:string"/>
+        <create qname="ead:unitid" type="xs:string"/>
+        <create qname="ead:unitdate" type="xs:string"/>
+        <create qname="@normal" type="xs:string"/>
+        <create qname="@otherlevel" type="xs:string"/>
+        
+        <create qname="ead:archdesc" type="xs:string"/>
+        <create qname="ead:physloc" type="xs:string"/>
+        <create qname="@type" type="xs:string"/>
+        
+    </index> 
+
+</collection>

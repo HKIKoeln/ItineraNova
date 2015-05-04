@@ -1,0 +1,444 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms"
+	xmlns:xrx="http://www.monasterium.net/NS/xrx" 
+	xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns="http://www.w3.org/1999/xhtml">
+	<xrx:id>tag:www.monasterium.net,2011:/core/widget/translate</xrx:id>
+	<xrx:title>
+	 <xrx:i18n>
+	   <xrx:key>translate</xrx:key>
+	   <xrx:default>Translate</xrx:default>
+	 </xrx:i18n>
+	</xrx:title>
+	<xrx:subtitle/>
+	<xrx:description/>
+	<xrx:portal/>
+	<xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+	<xrx:licence>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+	</xrx:licence>
+  <xrx:res>
+    <xrx:js>
+      <script type="text/javascript">
+dojo.subscribe("/xf/ready", function(){{ fluxProcessor.skipshutdown=true; }});
+      </script>
+    </xrx:js>
+    <xrx:css>
+      <style type="text/css">
+
+#dtranslate{{
+  position:relative;
+  float:left;
+  margin:10px;
+  margin-right:40px;
+}}
+
+#dtranslate .save-trigger-div{{
+  float:right;
+}}
+
+#dtranslate .light-grey{{
+  color:rgb(120,120,120);
+}}
+    
+.desktop-left-menu{{
+  position:absolute;
+  left:-150px;
+  margin:15px;
+}}
+
+.right{{
+  text-align:right;
+}}
+
+#translate *{{
+  line-height:1.5em;
+}}
+
+#input .xfValue {{
+  padding:7px;
+  width:740px;
+}}
+
+#dupdate-i18n-catalog{{
+  position:relative;
+  float:left;
+  margin-top:100px;
+  background:rgb(220,220,220);
+}}
+
+#dinner-update-i18n-catalog{{
+  position:relative;
+  float:left;
+  margin:20px;
+  background:rgb(220,220,220);
+}}
+      
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>true</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+	<xrx:model>
+	  {
+	  (: 
+	    the language to translate is either
+	    the second URI token or the default
+	    language configured in conf.xml
+	  :)
+		let $lang-to-translate :=
+		  if($xrx:tokenized-uri[2] != '') then 
+		    $xrx:tokenized-uri[2] else 
+		    conf:param('default-lang')
+		
+		(: all messages ordered by key :)
+		let $messages :=
+		  for $message in $i18n:db-base-collection//xrx:i18n[@activeflag!='false' or not(@activeflag)]
+		  order by $message/xrx:key
+		  return
+		  $message
+		
+		(: message to translate :)
+		let $message-to-translate :=
+		  request:get-parameter('key', xs:string($messages[1]/xrx:key/text()))
+		  	
+		let $action-feed := 
+		  concat(conf:param('xrx-i18n-atom-base-uri'),$lang-to-translate,'/',$message-to-translate,'.',$lang-to-translate,'.xml')
+		
+		return
+		<xf:model id="mtranslate">
+			<xf:instance id="entry"
+				src="{ $xrx:localhost-request-base-url }atom/GET{ $action-feed }" />
+		  <xf:instance id="ilang-to-translate">
+		    <data xmlns="">
+		      <lang>{ $lang-to-translate }</lang>
+		    </data>
+		  </xf:instance>
+		  <xf:instance id="iupdate-i18n-catalog">
+		    <data xmlns=""/>
+		  </xf:instance>
+			<xf:submission id="ssave" ref="instance('entry')"
+				action="{ $xrx:localhost-request-base-url }atom/PUT{ $action-feed }" 
+				method="post"
+				replace="none">
+				<xf:action ev:event="xforms-submit-done">
+					<xf:message level="ephemeral">Entry successfully saved.</xf:message>
+				</xf:action>
+			</xf:submission>
+			<xf:submission id="ssavecontinue" ref="instance('entry')"
+				action="{ $xrx:localhost-request-base-url }atom/PUT{ $action-feed }" 
+				method="post"
+				replace="none">
+			</xf:submission>
+			<xf:submission id="supdate-i18n-catalog"
+			  action="{ $xrx:localhost-request-base-url }service/?atomid=tag:www.monasterium.net,2011:/core/service/update-i18n-catalog"
+			  method="post"
+			  replace="instance"
+			  instance="iupdate-i18n-catalog"/>
+			<xf:bind id="blang-to-translate" nodeset="instance('ilang-to-translate')/lang"/>
+		</xf:model>
+    }
+	</xrx:model>
+	<xrx:view>
+	  <div>
+	    <div class="h2">
+	      <xrx:i18n>
+	        <xrx:key>translations</xrx:key>
+	        <xrx:default>Translations</xrx:default>
+	      </xrx:i18n>
+	      <span>&#160;&#160;</span>
+	    </div>
+		  <xrx:auth>
+		    <xrx:rules>
+		      <xrx:rule>
+		        <xrx:user/>
+		        <xrx:role>translator</xrx:role>
+		      </xrx:rule>
+		    </xrx:rules>
+		    <xrx:true>
+					<xf:group model="mtranslate">
+						{
+			        
+						let $lang-to-translate :=
+						  if($xrx:tokenized-uri[2] != '') then $xrx:tokenized-uri[2] else conf:param('default-lang')
+						
+						let $messages :=
+							for $message in collection(concat(conf:param('xrx-i18n-db-base-uri'),$lang-to-translate))//xrx:i18n[@activeflag!='false' or not(@activeflag)]
+							order by $message/xrx:key
+							return
+							$message
+						
+						let $message-to-translate :=
+						  request:get-parameter('key', xs:string($messages[2]/xrx:key/text()))
+						
+						let $message := i18n:message($message-to-translate,$lang-to-translate)
+						
+						let $count := count($messages)
+						
+						
+						let $next-and-previous :=
+							for $m at $pos in $messages
+							return
+							if(util:document-id($message) = util:document-id($m) and $pos = 1) then
+							($m, $messages[$pos + 1])
+							else if(util:document-id($message) = util:document-id($m) and $pos =
+							$count) then
+							($messages[$pos - 1], $m)
+							else if(util:document-id($message) = util:document-id($m)) then
+							($messages[$pos - 1], $messages[$pos + 1])
+							else()
+						
+						let $pos :=
+							for $m at $p in $messages
+							return
+							if(util:document-id($message) = util:document-id($m)) then $p
+							else()
+					
+						return
+						<div id="dtranslate">
+							<div class="save-trigger-div">
+			          <xf:trigger>
+			            <xf:label>
+			              <xrx:i18n>
+			                <xrx:key>save</xrx:key>
+			                <xrx:default>Save</xrx:default>
+			              </xrx:i18n>
+			            </xf:label>
+                  <xf:action ev:event="DOMActivate">
+                    <xf:send submission="ssave" />
+                    <script type="text/javascript">
+                      fluxProcessor.skipshutdown=true;
+                    </script>
+                  </xf:action>
+			          </xf:trigger>
+							</div>
+							<center>
+								<span>
+									<span>{ $pos }&#160;</span>
+									<xrx:i18n>
+									  <xrx:key>of</xrx:key>
+									  <xrx:default>of</xrx:default>
+									</xrx:i18n>
+									<span>&#160;{ $count }</span>
+								</span>
+							</center>
+			        <br />
+							<div class="larger">
+								<div>
+									<xrx:i18n>
+									  <xrx:key>message-to-translate</xrx:key>
+									  <xrx:default>Message to translate</xrx:default>
+									</xrx:i18n>
+									<span>:&#160;{ $message-to-translate }</span>
+								</div>
+								<div>
+									<xrx:i18n>
+									  <xrx:key>default-translation</xrx:key>
+									  <xrx:default>Default translation</xrx:default>
+									</xrx:i18n>
+									<span>:&#160;{ i18n:default-value($message-to-translate) }</span>
+								</div>
+							</div>
+							<br />
+							<div class="right">
+				        <xf:select1 bind="blang-to-translate">
+				          <xf:label>
+				            <xrx:i18n>
+				              <xrx:key>choose-a-language</xrx:key>
+				              <xrx:default>Choose a language</xrx:default>
+				            </xrx:i18n>
+				            <span>:</span>
+				          </xf:label>
+				          {
+				          for $lang in conf:param('languages')//xrx:lang
+				          let $name := $lang/@name/string()
+				          let $key := $lang/@key/string()
+				          return
+				          <xf:item>
+				           <xf:label>{ $name }</xf:label>
+				           <xf:value>{ $key }</xf:value>
+				          </xf:item>
+				          }
+			            <xf:action ev:event="xforms-value-changed">
+			              <xf:load show="replace">
+			               <xf:resource value="concat('{ conf:param('request-root') }translate/', instance('ilang-to-translate')/lang, '/?key={ $message-to-translate }')"/>
+			              </xf:load> 
+			            </xf:action>
+				        </xf:select1>
+				      </div>
+			        <div class="right">
+			          <a
+			            href="{ conf:param('request-root') }translate/{ $lang-to-translate }/?key={ $next-and-previous[1]/xrx:key/text() }">
+			            <span>&lt;</span>
+			            <xrx:i18n>
+			              <xrx:key>previous-message</xrx:key>
+			              <xrx:default>Previous Message</xrx:default>
+			            </xrx:i18n>
+			          </a>
+			          <span>&#160;&#160;</span>
+			          <a
+			            href="{ conf:param('request-root') }translate/{ $lang-to-translate }/?key={ $next-and-previous[2]/xrx:key/text() }">
+			            <xrx:i18n>
+			              <xrx:key>next-message</xrx:key>
+			              <xrx:default>Next Message</xrx:default>
+			            </xrx:i18n>
+			            <span>&gt;</span>
+			          </a>
+			        </div>
+			        <xf:group>
+			          <xf:textarea mediatype="dojo" ref="instance('entry')//xrx:text" id="input">
+			            <xf:label>{ conf:param('languages')//xrx:lang[@key=$lang-to-translate]/@name/string() }:&#160;</xf:label>
+                  <xf:action ev:event="xforms-value-changed">
+                    <script type="text/javascript">
+                      fluxProcessor.skipshutdown=false;
+                    </script>
+                  </xf:action>
+			          </xf:textarea>
+			        </xf:group>
+							<br />
+							<div class="right">
+			          <xf:trigger>
+			            <xf:label>
+			              <xrx:i18n>
+			                <xrx:key>save</xrx:key>
+			                <xrx:default>Save</xrx:default>
+			              </xrx:i18n>
+			            </xf:label>
+			            <xf:action ev:event="DOMActivate">
+			              <xf:send submission="ssave" />
+			              <script type="text/javascript">
+			                fluxProcessor.skipshutdown=true;
+			              </script>
+			            </xf:action>
+			          </xf:trigger>
+								<xf:trigger>
+									<xf:label>
+										<xrx:i18n>
+										  <xrx:key>save-and-continue</xrx:key>
+										  <xrx:default>Save and continue</xrx:default>
+										</xrx:i18n>
+									</xf:label>
+									<xf:action ev:event="DOMActivate">
+										<xf:send submission="ssavecontinue" />
+						        <xf:action ev:event="xforms-submit-done">
+						          <xf:load
+						            resource="{ conf:param('request-root') }translate/{ $lang-to-translate }/?key={ $next-and-previous[2]/xrx:key/text() }"
+						            show="replace" />
+						        </xf:action>
+									</xf:action>
+								</xf:trigger>
+							</div>
+							<div>
+								<b>
+									<xrx:i18n>
+									  <xrx:key>translations-for-other-languages</xrx:key>
+										<xrx:default>Translations for other languages</xrx:default>
+								  </xrx:i18n>
+								</b>
+								<span>:</span>
+							</div>
+							{
+							for $language in conf:param('languages')//xrx:lang
+							let $translation := i18n:value($message-to-translate, $language/@key/string())
+							return
+							<div>
+							  <span class="{ if($language/@key/string() = $lang-to-translate) then 'light-grey' else() }">
+				          <span>{ if($translation != '') then $translation else '-' }</span>
+				          <span>&#160;({ $language/@name/string() })&#160;</span>
+			          </span>
+			          {
+			          if($language/@key/string() != $lang-to-translate) then
+								<a
+									href="{ conf:param('request-root') }translate/{ $language/@key/string() }/?key={ $message-to-translate }">
+									<span>[</span>
+									<xrx:i18n>
+									  <xrx:key>translate</xrx:key>
+									  <xrx:default>translate</xrx:default>
+									</xrx:i18n>
+									<span>]</span>
+								</a>
+								else()
+								}
+							</div>
+							}
+						</div>
+						}
+						<xrx:auth>
+						  <xrx:rules>
+						    <xrx:rule>
+						      <xrx:user/>
+						      <xrx:dbgroup>dba</xrx:dbgroup>
+						    </xrx:rule>
+						  </xrx:rules>
+						  <xrx:true>
+								<div id="dupdate-i18n-catalog">
+								  <div id="dinner-update-i18n-catalog">
+									  <span>
+									    <xrx:i18n>
+									      <xrx:key>update-all-i18n-catalogs</xrx:key>
+									      <xrx:default>Update all i18n catalogs</xrx:default>
+									    </xrx:i18n>
+									    <span>&#160;</span>
+									  </span>
+									  <xf:trigger>
+									    <xf:label>
+									      <xrx:i18n>
+									        <xrx:key>update-now</xrx:key>
+									        <xrx:default>Update now</xrx:default>
+									      </xrx:i18n>
+									    </xf:label>
+									    <xf:action ev:event="DOMActivate">
+									      <xf:send submission="supdate-i18n-catalog"/>
+									    </xf:action>
+									  </xf:trigger>
+									</div>
+								</div>
+							</xrx:true>
+							<xrx:false>
+							  <span/>
+							</xrx:false>
+						</xrx:auth>
+					</xf:group>
+			  </xrx:true>
+		    <xrx:false>
+		      <span>
+		        <xrx:i18n>
+		          <xrx:key>protected-page-message</xrx:key>
+		          <xrx:default>Protected page.</xrx:default>
+		        </xrx:i18n>
+		      </span>
+		    </xrx:false>
+			</xrx:auth>
+		</div>
+	</xrx:view>
+</xrx:widget>

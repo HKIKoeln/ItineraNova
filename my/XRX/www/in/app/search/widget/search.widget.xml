@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:tei="http://www.tei-c.org/ns/1.0/" xmlns:xrx="http://www.monasterium.net/NS/xrx">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/search</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key>transcription-search</xrx:key>
+            <xrx:default>Transcription Search</xrx:default>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+    <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:xformsflag>false</xrx:xformsflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:res>
+        <xrx:css>
+            <style type="text/css">
+
+#dsearch .select-block{{
+  position:relative;
+  float:left;
+  width:100%;
+}}
+
+#dsearch .search-field{{
+  padding:10px;
+  width:350px;
+}}
+
+#dsearch .search-trigger{{
+  padding:10px;
+}}
+
+#hit-info{{
+  position:relative;
+  float:left;
+  width:100%;
+  margin-top:110px;
+}}
+
+#result{{
+  position:relative;
+  float:left;
+  width:100%;
+}}
+
+#result .act{{
+  background:rgb(240,240,240);
+  width:760px;
+}}
+
+#result .inner-act{{
+  margin:10px;
+  width:100%;
+}}
+
+#result .date{{
+  margin-bottom:10px;
+}}
+
+#result .act-link *{{
+  font-size:15px;
+}}
+      
+#dsearch .block-navi-link{{
+  position:relative;
+  float:left;
+  margin:5px;
+  font-weight:bold;
+  font-size:1.1em;
+}}
+
+#dsearch a:link, #dsearch a:visited{{
+  text-decoration:none;
+}}
+
+#result .transcription{{
+  width:740px;
+}}
+
+#confine-search{{
+  position:absolute;
+  right:30px;
+  text-align:right;
+  z-index:9999;
+}}
+
+      </style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:view>
+  {
+    (: db base collections :)
+    let $register-db-base-collection := metadata:base-collection('register', 'public') 
+    
+    (: 
+      evaluate the search query string
+      if this is not the first visit of
+      the user
+    :)
+    let $acts := 
+      if(not(search:is-first-visit())) then 
+        util:eval(search:query-string('transcription'))
+      else ()
+      
+    (: count the hits :)
+    let $count := count($acts)
+
+    (: hit navigation :)
+    let $block := xs:integer(request:get-parameter('block', '1'))
+    let $acts-per-block := 30
+    let $start := $block*$acts-per-block - $acts-per-block + 1
+    let $stop := 
+     if(($start + $acts-per-block - 1) lt $count) then $start + $acts-per-block - 1
+     else $count
+    let $blocks-count := xs:integer(ceiling($count div $acts-per-block))
+
+    (: select block div :)
+    let $select-block-div :=
+    <div class="select-block">
+      {
+      let $block-link := 
+        string-join(
+        for $param in request:get-parameter-names()
+        return
+        if(not(matches($param, '(block|null)'))) then
+          concat('&amp;', $param, '=', request:get-parameter($param, ''))
+        else ''
+        , ''
+        )
+      for $block-pos in (1 to $blocks-count)
+      return
+      <div class="block-navi-link">
+                <a href="?null={ $block-link }&amp;block={$block-pos}">
+        { if($block-pos != $block) then xs:string($block-pos) else <b style="background-color:#EF6A2F;color:white">{ xs:string($block-pos) }</b>}
+        </a>
+                <span>&#160;</span>
+            </div>
+      }
+    </div>
+                
+    return
+    <div id="dsearch">
+            <div class="h2">
+                <xrx:i18n>
+                    <xrx:key>search</xrx:key>
+                    <xrx:default>Search</xrx:default>
+                </xrx:i18n>
+            </div>
+            <!--div class="h2">
+                <xrx:i18n>
+                    <xrx:key>transcription-search</xrx:key>
+                    <xrx:default>Transcription Search</xrx:default>
+                </xrx:i18n>
+            </div-->
+            <form name="search-form" method="get">
+                <div id="confine-search">
+                    <div>
+                        <b>
+                            <xrx:i18n>
+                                <xrx:key>register</xrx:key>
+                                <xrx:default>Register</xrx:default>
+                            </xrx:i18n>
+                        </b>
+                        <select name="register">
+                            <option value="">
+                                <xrx:i18n>
+                                    <xrx:key>all</xrx:key>
+                                    <xrx:default>all</xrx:default>
+                                </xrx:i18n>
+                            </option>
+              {
+              for $ead in $register-db-base-collection//ead:ead
+              let $reg := $ead//ead:archdesc/ead:did/ead:unitid/text()
+              order by $reg
+              return
+              <option value="{ $reg }">{ if($search:register = $reg) then attribute selected { 'selected' } else () }{ $reg }</option> 
+              }
+            </select>
+                    </div>
+                    <div>
+                        <b>
+                            <xrx:i18n>
+                                <xrx:key>act</xrx:key>
+                                <xrx:default>Act</xrx:default>
+                            </xrx:i18n>
+                        </b>
+                        <select name="page">
+              {
+              for $p in ('', 'R', 'V')
+              return
+              <option value="{ $p }">{ if($search:page = $p) then attribute selected { 'selected' } else () }{ $p }{ if($p) then '°' else '' }</option>
+              }
+            </select>
+                        <input class="act-input" name="act" value="{ $search:act }"/>
+                    </div>
+                    <div>
+                        <div>
+                            <b>
+                                <xrx:i18n>
+                                    <xrx:key>period</xrx:key>
+                                    <xrx:default>Period</xrx:default>
+                                </xrx:i18n>
+                                <span>&#160;</span>
+                            </b>
+                            <xrx:i18n>
+                                <xrx:key>from</xrx:key>
+                                <xrx:default>from</xrx:default>
+                            </xrx:i18n>
+                            <span>:&#160;</span>
+                            <input name="from" type="text" value="{ $search:from }"/>
+                        </div>
+                        <div>
+                            <xrx:i18n>
+                                <xrx:key>to</xrx:key>
+                                <xrx:default>to</xrx:default>
+                            </xrx:i18n>
+                            <span>:&#160;</span>
+                            <input name="to" type="text" value="{ $search:to }"/>
+                        </div>
+                    </div>
+                </div>
+                <div id="input">
+                    
+          {
+          if(not(search:is-first-visit()) and $count = 0) then
+          <div>
+                        <span>
+                            <xrx:i18n>
+                                <xrx:key>no-results-message</xrx:key>
+                                <xrx:default>No results were found for your search.</xrx:default>
+                            </xrx:i18n>
+                        </span>
+                    </div>
+          else()
+          }
+		      <div id="search-trigger-div">
+                        <input class="search-field" type="text" name="q" value="{ $search:q }"/>
+                        <input class="search-trigger" type="submit" value="Submit"/>
+                    </div>
+                </div>
+            </form>
+      {
+      if($count gt 0) then
+      <div id="hit-info">
+                <xrx:i18n>
+                    <xrx:key>hits</xrx:key>
+                    <xrx:default>Hits</xrx:default>
+                </xrx:i18n>
+                <b>&#160;{ $start }&#160;</b>
+                <xrx:i18n>
+                    <xrx:key>to</xrx:key>
+                    <xrx:default>to</xrx:default>
+                </xrx:i18n>
+                <b>&#160;{ $stop }&#160;</b>
+                <xrx:i18n>
+                    <xrx:key>of</xrx:key>
+                    <xrx:default>of</xrx:default>
+                </xrx:i18n>
+                <b>&#160;{ $count }</b>
+            </div>
+      else()
+      }
+      { $select-block-div }
+      {
+      if($count gt 0) then
+      <div id="result">
+	      {
+	      let $xslt := 
+	       collection('/db/www')/xsl:stylesheet[@id='in-tei2html']
+        for $act at $pos in $acts[ position() = $start to $stop ]
+        let $act-expanded := util:expand($act)
+        let $db-collection-uri := replace(util:collection-name($act), '.act.', '.register.')
+        let $db-collection := collection($db-collection-uri)
+        let $register := $db-collection//ead:archdesc/ead:did/ead:unitid/text()
+        let $unitid := $act/ead:did/ead:unitid/text()
+        let $unitdate := string-join($act//ead:unitdate/@normal[string()!='']/string(), ', ')
+        let $link := act:link(($register, $unitid))
+        let $transcription := 
+          <div id="transcription">
+	          {
+	          for $text in $act-expanded//tei:body
+	          return
+	          transform:transform($text, $xslt, ())
+	          }
+          </div>
+        let $matched-aldermen :=
+          $act-expanded//ead:persname[@role='signer'][exist:match] 
+        return
+        <div class="act">
+                    <div class="inner-act">
+                        <div class="act-link">
+                            <a href="{ $link }">
+                                <xrx:i18n>
+                                    <xrx:key>act</xrx:key>
+                                    <xrx:default>Act</xrx:default>
+                                </xrx:i18n>
+                                <span>:&#160;{ $unitid }</span>
+                                <span>&#160;({ $register })</span>
+                            </a>
+                        </div>
+                        <div class="date">
+                            <xrx:i18n>
+                                <xrx:key>date</xrx:key>
+                                <xrx:default>Date</xrx:default>
+                            </xrx:i18n>
+                            <span>:&#160;{ $unitdate }</span>
+                        </div>
+                        <div class="transcription">{ $transcription }</div>
+            {
+            if($matched-aldermen) then
+            <div class="matched-aldermen">
+                            <span>
+                                <xrx:i18n>
+                                    <xrx:key>aldermen</xrx:key>
+                                    <xrx:default>Aldermen</xrx:default>
+                                </xrx:i18n>
+                                <span>:&#160;</span>
+                            </span>
+	            {
+	            for $alderman in $matched-aldermen
+	            return
+	            <span class="highlight">{ $alderman//text() }</span>
+	            }
+            </div>
+            else()
+            }
+            <div>
+                            <a href="{ $link }">
+                                <span>[</span>
+                                <xrx:i18n>
+                                    <xrx:key>more</xrx:key>
+                                    <xrx:default>more</xrx:default>
+                                </xrx:i18n>
+                                <span>]</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+        }
+	    </div>
+      else()
+      }
+      { $select-block-div }
+    </div>
+    }
+  </xrx:view>
+</xrx:widget>

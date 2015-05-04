@@ -1,0 +1,720 @@
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns:xf="http://www.w3.org/2002/xforms">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/indexing-form</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/empty</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>true</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+      <style type="text/css">
+
+#indicator{{
+  width:300px;
+  height:300px;
+  background:red;
+}}
+
+#tab-container{{
+  position:absolute;
+  width:100%;
+}}
+
+#tab-container .button-right{{
+  text-align:right;
+}}
+
+#tab-container .form-item-div{{
+  postition:relative;
+  float:left;
+  width:30%;
+}}
+
+#tab-container .inner-form-item-div{{
+  margin:15px;
+}}
+
+#dact-contextinfo{{
+  position:absolute;
+  margin:12px;
+  padding:0;
+}}
+
+#dact-contextinfo *, #dact-contextinfo{{
+  font-size:14px;
+  font-weight:bold;
+}}
+
+.last-update-text{{
+  position:relative;
+  float:left;
+}}
+
+.textarea{{
+  height:200px;
+}}
+
+/*
+*
+* overwrite dijit defaults
+*
+*/
+
+.dijitTabContainer, .dijitContentPane{{
+  position:absolute;
+  width:100%;
+  height:100%;
+  margin:0px;
+  padding:0px;
+}}
+
+.dijitTitlePaneContentOuter, .dijitTitlePaneContentInner, .dijitTabPaneWrapper{{
+  position:relative;
+  float:left;
+  width:100%;
+  margin:0;
+  padding:0;
+}}
+
+.dijitTabContainer{{
+  margin-top:40px;
+}}
+
+/*
+*
+* Cutn'Paste Editor
+*
+*/
+.dijitToolbar{{
+  display:none;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model>
+  </xrx:model>
+  <xrx:view>
+  {
+    (: template to create new acts or additions :)
+    let $act-template :=
+      template:get('tag:itineranova.be,2011:/in/template/act')
+
+    (: db base collection for the actual register :)
+    let $register-db-base-collection := metadata:base-collection('register', $indexing:register, 'public')
+    let $act-db-base-collection := metadata:base-collection('act', $indexing:register, 'public')
+    
+    (: get sorted list of act elements :)
+    let $act-elements :=
+      act:sorted-elements($act-db-base-collection//ead:c[@otherlevel='textgroup'])
+      
+    let $act-element-help :=
+      if($act-elements) then
+        indexing:act-element($act-elements)
+      else()
+    let $act-entry-help :=
+      $act-element-help/root(.)/atom:entry
+     
+    let $new-addition-num :=
+      count($act-element-help//ead:c[@otherlevel='text'])
+          
+    let $act-element :=
+      if($indexing:removeaddition-flag) then
+        indexing:remove-addition($act-entry-help)//ead:c[@otherlevel='textgroup']
+        
+      else if($indexing:newaddition-flag) then
+	      let $addition-name :=
+	        concat('Add. ', xs:string($new-addition-num))
+	      let $update-act-name :=
+	        upd:replace-element-content($act-template//ead:c[@otherlevel='text']/ead:did/ead:unitid, text{ $addition-name })//ead:c[@otherlevel='text']
+	      let $insert-addition :=
+	        upd:insert-after(($act-element-help//ead:c[@otherlevel='text'])[last()], $update-act-name)//ead:c[@otherlevel='textgroup']
+	      return
+	      $insert-addition
+	    
+      else $act-element-help
+    
+    let $act-count := count($act-elements)
+        
+    let $witness-elements :=
+      $act-element//ead:c[@otherlevel='text']
+    
+    (: now we know the act and its position :)  
+    let $act := $act-element/ead:did/ead:unitid/text()
+    
+    let $pos := 
+      if($act-elements) then
+        indexing:actpos($act-elements, $act-element-help)
+      else()
+    
+    let $entry := $act-element/root(.)/atom:entry
+    
+    let $init-tabpos :=
+      if($indexing:newaddition-flag) then xs:string($new-addition-num + 1)
+      else if($indexing:removeaddition-flag) then xs:string($indexing:additionpos + 1)
+      else xs:string(1)
+    
+    let $folio := request:get-parameter('folio', '')
+    
+    let $put-url := 
+      if($act) then concat($xrx:localhost-request-base-url, 'atom/PUT', metadata:feed('act', $indexing:register, 'public'), '/', metadata:entryname('act', $act)) else ''
+    
+    return
+    if($act-elements) then
+    <div id="dindexing-form">
+      <div style="display:none">
+        <xf:model id="edit-act-editor">
+		      <xf:instance id="act">{ $entry }</xf:instance>
+		      <xf:instance id="session">
+		        <data xmlns="">
+		          <act>{ $act }</act>
+		          <new-act />
+		          <folio>{ $folio }</folio>
+		        </data>
+		      </xf:instance>
+		      <xf:instance id="certainty">
+		        <data xmlns="">
+		          <value>exactly</value>
+		          <value>approximately</value>
+		          <value>probably but not certain</value>
+		          <value>between</value>
+		          <value>before</value>
+		          <value>after</value>
+		        </data>
+		      </xf:instance>
+		      <xf:instance id="languages">
+		        <languages xmlns="">
+		          <lang>dut</lang>
+		          <lang>lat</lang>
+		          <lang>fra</lang>
+		          <lang>deu</lang>
+		        </languages>
+		      </xf:instance>
+		      <xf:instance id="acttypes">
+		        <types xmlns="">
+		          <type>confiscation</type>
+		          <type>loan</type>
+		          <type>will</type>
+		          <type>sale</type>
+		          <type>promise</type>
+		          <type>other</type>
+		        </types>
+		      </xf:instance>
+					<xf:instance id="icut-paste-fields">
+						<data xmlns="">
+						  <checkfield/>
+							{
+							for $witness-element at $pos in $witness-elements
+							return
+							<field id="field-{ $pos }"/>
+							}
+						</data>
+					</xf:instance>
+					
+					<xf:instance id="iresponse">
+					  <xrx:response xmlns:xrx="http://www.monasterium.net/NS/xrx" status=""/>
+					</xf:instance>
+					
+					<xf:instance id="transcriptions">
+						<data xmlns="">
+							<success status="" />
+							{
+							for $witness-element at $pos in $witness-elements
+							return
+							<transcription id="transcription-{ $pos }">
+								<tei:body xmlns:tei="http://www.tei-c.org/ns/1.0/">
+									<tei:p />
+								</tei:body>
+							</transcription>
+							}
+						</data>
+					</xf:instance>
+					
+          <xf:submission id="sprocess" ref="instance('icut-paste-fields')"
+            action="{ $xrx:localhost-request-base-url }service/?atomid=tag:itineranova.be,2011:/in/service/transcription-text-to-tei" 
+            method="post"
+            replace="instance" 
+            instance="transcriptions">
+          </xf:submission>
+		      
+		      <xf:submission id="ssave" ref="instance('act')"
+		        action="{ $put-url }"
+		        method="post" replace="none">
+		        <xf:action ev:event="xforms-submit-done">
+		          <xf:message level="ephemeral">Entry successfully saved.</xf:message>
+		        </xf:action>
+		      </xf:submission>
+		      
+          <xf:submission id="scheck-forbidden-input" ref="instance('icut-paste-fields')" 
+            action="{ $xrx:localhost-request-base-url }service/?atomid=tag:itineranova.be,2011:/in/service/check-forbidden-input" 
+            method="post" 
+            replace="instance" 
+            instance="iresponse">
+          </xf:submission>
+      
+          <xf:action ev:event="egetfolio">
+            <xf:setvalue ref="instance('session')/folio" value="event('pfolio')"/>
+          </xf:action>
+                    
+		      <xf:action ev:event="xforms-ready">
+		        <xf:dispatch name="etransfer-actinfo" targetid="mindexing-form-main">
+		          <xf:contextinfo name="param1" value="'{ $pos }'"/>
+		          <xf:contextinfo name="param2" value="'{ $act }'"/>
+		          <xf:contextinfo name="pactcount" value="'{ $act-count }'"/>
+		        </xf:dispatch>
+			      <script type="text/javascript">
+			        fluxProcessor.dispatchEvent('t-tabcase{ $init-tabpos }');
+			      </script>
+		      </xf:action>
+		      
+		    </xf:model>
+		  </div>
+      <div id="dact-contextinfo">
+        <span>{ $indexing:register }</span>
+        <span>, </span>
+        <span>
+          <xrx:i18n>
+            <xrx:key>act</xrx:key>
+            <xrx:default>Act</xrx:default>
+          </xrx:i18n>
+          <span>:&#160;</span> 
+          <span>{ $act }</span>
+        </span>
+        <span>&#160;({ $pos }&#160;</span>
+        <xrx:i18n>
+          <xrx:key>of</xrx:key>
+          <xrx:default>of</xrx:default>
+        </xrx:i18n>
+        <span>&#160;{ $act-count })</span>
+      </div>
+      <xf:group model="edit-act-editor">
+        {
+        if(not($act-element)) then
+        <span id="no-act-warning">
+          <span>No Acts available yet. Please create a new one first.</span>
+        </span>
+        else()
+        }
+        <div style="display:none;">
+          {
+          for $witness at $num in $witness-elements
+          return
+          <xf:trigger id="t-tabcase{ $num }">
+            <xf:label>
+              <xf:value
+                ref="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:unitid" />
+            </xf:label>
+            <xf:action ev:event="DOMActivate">
+	            <xf:dispatch name="esettabnum" targetid="mindexing-form-main">
+	              <xf:contextinfo name="ptabnum" value="xs:integer('{ $num }')"/>
+	            </xf:dispatch>
+              <xf:toggle case="tabcase{ $num }" />
+            </xf:action>
+          </xf:trigger>
+          }
+        </div>
+        <xf:switch appearance="dijit:TabContainer" id="tab-container">
+          {
+          for $witness at $num in $witness-elements
+          let $witness-unitid := $witness/ead:did/ead:unitid/text()
+          return
+          <xf:case class="tabcase" id="tabcase{ $num }">
+            <xf:label>
+              <span>{ $witness-unitid }</span>
+              <span>&#160;</span>
+              <span>{ if($num = 1) then $act else() }</span>
+            </xf:label>
+            <div class="button-right">
+              <xf:trigger ev:event="DOMActivate">
+                <xf:label>Save</xf:label>
+                <xf:send submission="ssave" />
+              </xf:trigger>
+            </div>
+            <div class="form-item-div" id="language-div">
+              <div class="inner-form-item-div">
+               <h3>
+                 <xrx:i18n>
+                   <xrx:key>language</xrx:key>
+                   <xrx:default>Language</xrx:default>
+                 </xrx:i18n>
+               </h3>
+               <xf:repeat id="language-repeat-{ $num }"
+                 nodeset="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:langmaterial/ead:language"
+                 appearance="compact">
+                  <xf:select1 ref="@langcode">
+                    <xf:itemset nodeset="instance('languages')//lang">
+                      <xf:label ref="." />
+                      <xf:value ref="." />
+                    </xf:itemset>
+                  </xf:select1>
+                  <xf:trigger>
+                    <xf:label>-</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                      <xf:delete
+                        nodeset="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:langmaterial/ead:language[index('language-repeat-{ $num }')]"
+                        if="index('language-repeat-{ $num }') != 1" />
+                    </xf:action>
+                  </xf:trigger>
+               </xf:repeat>
+               <xf:trigger>
+                 <xf:label>Add Language</xf:label>
+                 <xf:action ev:event="DOMActivate">
+                   <xf:insert origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//ead:language"
+                     nodeset="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:langmaterial/ead:language"
+                     at="last()" position="after" />
+                 </xf:action>
+               </xf:trigger>                   
+               <h3>
+                 <xrx:i18n>
+                   <xrx:key>type-of-act</xrx:key>
+                   <xrx:default>Type of Act</xrx:default>
+                 </xrx:i18n>
+               </h3>
+                <div>
+                  <xf:select1 selection="open" ref="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:unittitle/@type">
+                    <xf:itemset nodeset="bf:instanceOfModel('mindexing-form-main', 'iact-type')/acttype">
+                      <xf:label ref="."/>
+                      <xf:value ref="."/>
+                    </xf:itemset>
+                  </xf:select1>
+                  <br />
+                  <xf:textarea
+                    ref="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:unittitle"
+                    mediatype="dojo">
+                    <xf:label>Further Specification:</xf:label>
+                  </xf:textarea>
+                </div>
+                {
+                if($num != 1) then
+                <div>
+                  <h3>
+                    <xf:label>Position of Addition</xf:label>
+                  </h3>
+                  <xf:select1 selection="open" ref="//ead:c[@otherlevel='text'][{ $num }]//ead:physfacet[@type='position']">
+                    <xf:itemset nodeset="bf:instanceOfModel('mindexing-form-main', 'iadd-position')/addposition">
+                      <xf:label ref="."/>
+                      <xf:value ref="."/>
+                    </xf:itemset>
+                  </xf:select1>
+                </div>
+                else()
+                }            
+              {
+               if($act) then
+               <div>
+                 <h3>
+                   <span>Abstract (related to Act and all its Additions)</span>
+                 </h3>
+                 <div>
+                   <xf:textarea
+                     ref="//ead:c[@otherlevel='textgroup']/ead:did/ead:abstract"
+                     mediatype="dojo" />
+                 </div>
+               </div>
+               else ()
+               }
+             </div>
+            </div>
+            <div class="form-item-div" id="signer-div">
+              <div class="inner-form-item-div">
+                <h3>Signer (not indexed)</h3>
+                <xf:repeat id="free-persname-repeat-{ $num }"
+                  nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:persname[@role='signer'][not(ead:ptr)]"
+                  appearance="compact">
+                  <xf:input ref="."/>
+                  <xf:trigger>
+                    <xf:label>-</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                      <xf:delete
+                        nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:persname[@role='signer'][not(ead:ptr)][index('persname-repeat-{ $num }')]" />
+                    </xf:action>
+                  </xf:trigger>
+                </xf:repeat>
+                <xf:trigger>
+                  <xf:label>Add a Signer</xf:label>
+                  <xf:action ev:event="DOMActivate">
+                    <xf:insert
+                      origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//ead:persname[@role='signer'][not(ead:ptr)][1]/self::element()"
+                      nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:persname[@role='signer']"
+                      at="last()" 
+                      position="after" />                      
+                  </xf:action>
+                </xf:trigger>
+               <h3>Signer (indexed)</h3>
+               <div>
+                 <xf:repeat id="persname-repeat-{ $num }"
+                   nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:persname[@role='signer'][ead:ptr]"
+                   appearance="compact">
+                   <xf:select1 ref="ead:ptr">
+                     <xf:itemset nodeset="bf:instanceOfModel('mindexing-form-main', 'iindexed-aldermen')/*">
+                       <xf:label ref="label"/>
+                       <xf:value ref="value"/>
+                     </xf:itemset>
+                   </xf:select1>
+                   <xf:trigger>
+                     <xf:label>-</xf:label>
+                     <xf:action ev:event="DOMActivate">
+                       <xf:delete if="index('persname-repeat-{ $num }') != 1"
+                         nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:persname[@role='signer'][ead:ptr][index('persname-repeat-{ $num }')]" />
+                     </xf:action>
+                   </xf:trigger>
+                 </xf:repeat>
+                 <xf:trigger>
+                   <xf:label>Add a Signer</xf:label>
+                   <xf:action ev:event="DOMActivate">
+                     <xf:insert
+                       origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//ead:persname[@role='signer'][ead:ptr][1]"
+                       nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:persname[@role='signer']"
+                       at="last()" 
+                       position="after" />
+                   </xf:action>
+                 </xf:trigger>
+                 <xf:trigger>
+                   <xf:label>Select all</xf:label>
+                   <xf:action>
+                     <xf:delete nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:persname[@role='signer'][ead:ptr]"/>
+                     <xf:insert origin="bf:instanceOfModel('mindexing-form-main', 'iindexed-aldermen')//ead:persname"
+                       nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:origination"
+                       at="1" />
+                   </xf:action>
+                 </xf:trigger>
+               </div>
+             </div>
+            </div>
+            <div class="form-item-div" id="folios-div">
+              <div class="inner-form-item-div">
+                <h3>
+                  <xrx:i18n>
+                    <xrx:key>date</xrx:key>
+                    <xrx:default>Date</xrx:default>
+                  </xrx:i18n>
+                </h3>
+                <div>
+                  <xf:input ref="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:unitdate/@normal"
+                    class="date-input" />
+                  <xf:select1 ref="//ead:c[@otherlevel='text'][{ $num }]/ead:did/ead:unitdate/@certainty"
+                    class="date-select">
+                    <xf:itemset nodeset="instance('certainty')//value">
+                      <xf:label ref="." />
+                      <xf:value ref="." />
+                    </xf:itemset>
+                  </xf:select1>
+                </div>
+               <h3>
+                 <xrx:i18n>
+                   <xrx:key>folios</xrx:key>
+                   <xrx:default>Folios</xrx:default>
+                 </xrx:i18n>
+               </h3>
+               <div>
+                <xf:repeat id="folio-repeat-{ $num }"
+                  nodeset="//ead:c[@otherlevel='text'][{ $num }]/ead:dao[@xpointer]"
+                   appearance="compact">
+                   <xf:output value="@xpointer" />
+                   <xf:trigger>
+                       <xf:label>-</xf:label>
+                       <xf:action ev:event="DOMActivate">
+                         <xf:delete
+                           nodeset="//ead:c[@otherlevel='text'][{ $num }]/ead:dao[@xpointer][index('folio-repeat-{ $num }')]" />
+                       </xf:action>
+                     </xf:trigger>
+                </xf:repeat>
+                <xf:trigger>
+                  <xf:label>
+                    <xf:output value="concat('Link folio ', instance('session')/folio)"/>
+                  </xf:label>
+                  <xf:action ev:event="DOMActivate">
+                    <xf:insert
+                      origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//ead:c[@otherlevel='text']/ead:dao[1]"
+                      nodeset="//ead:c[@otherlevel='text'][{ $num }]//ead:dao[@xpointer]" 
+                      at="last()"
+                      postition="after" if="exists(//ead:c[@otherlevel='text'][{ $num }]//ead:dao[@xpointer])"/>
+                      <xf:insert
+                        origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//ead:c[@otherlevel='text']/ead:dao[1]"
+                        nodeset="//ead:c[@otherlevel='text'][{ $num }]/ead:did" 
+                        at="1"
+                        postition="after" 
+                        if="not(exists(//ead:c[@otherlevel='text'][{ $num }]//ead:dao[@xpointer]))"/>
+                    <xf:setvalue
+                      ref="//ead:c[@otherlevel='text'][{ $num }]/ead:dao[@xpointer][last()]/@xpointer"
+                      value="instance('session')/folio" />
+                  </xf:action>
+                </xf:trigger>
+               </div>
+             </div>
+            </div>
+            <div class="form-item-div" id="transcription-div">
+              <div class="inner-form-item-div">
+                <h3>Insert Transcription (Cut&amp;Paste from Word)</h3>
+                <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/response-info-div</xrx:subwidget>
+                <div style="display:none">
+                  <xf:trigger id="talready-inserted-{ $num }">
+                    <xf:action ev:event="DOMActivate">
+                      <xf:toggle case="case-already-inserted-{ $num }"/>
+                    </xf:action>
+                  </xf:trigger>
+                </div>
+                {
+                if($witness//tei:body/tei:p/node()) then
+                <script type="text/javascript">
+                  fluxProcessor.dispatchEvent('talready-inserted-{ $num }');
+                </script>
+                else()
+                }
+                <xf:switch class="dialog-content">
+                  <xf:case id="case-user-input-{ $num }">
+                    <xf:textarea class="textarea"
+                      ref="instance('icut-paste-fields')/field[@id='field-{ xs:string($num) }']"
+                      mediatype="text/html" />                        
+                    <xf:trigger>
+                      <xf:label>Start</xf:label>
+                      <xf:action ev:event="DOMActivate">
+                        <xf:send submission="scheck-forbidden-input"/>
+                        <xf:toggle case="case-forbidden-input-{ $num }" if="instance('iresponse')//@status = '0'"/>
+                        <xf:send submission="sprocess" if="instance('iresponse')//@status = '1'"/>
+                        <xf:recalculate/>
+                        <xf:refresh/>
+                        <xf:insert
+                          origin="instance('transcriptions')//transcription[@id='transcription-{ $num }']//tei:body"
+                          nodeset="instance('act')//ead:c[@otherlevel='text']//tei:text/tei:body"
+                          at="{ $num }" 
+                          position="after" 
+                          if="exists(instance('transcriptions')//transcription[@id='transcription-{ $num }']//tei:body/tei:p/child::*) and instance('iresponse')//@status = '1'"/>
+                        <xf:delete
+                          nodeset="instance('act')//ead:c[@otherlevel='text'][{ $num }]//tei:text/tei:body[1]"
+                          if="exists(instance('transcriptions')//transcription[@id='transcription-{ $num }']//tei:body/tei:p/child::*) and instance('iresponse')//@status = '1'"/>
+                        <xf:setvalue ref="instance('act')//ead:c[@otherlevel='text'][{ $num }]//vre:moderator/vre:email" value="'{ $xrx:user-id }'" if="instance('iresponse')//@status = '1'"/>,
+                        <xf:setvalue ref="instance('act')//ead:c[@otherlevel='text'][{ $num }]//atom:entry/atom:updated" value="current-dateTime()" if="instance('iresponse')//@status = '1'"/>,
+                        <xf:setvalue ref="instance('act')//ead:c[@otherlevel='text'][{ $num }]//atom:entry/atom:published" value="current-dateTime()" if="instance('iresponse')//@status = '1'"/>
+                        <xf:send submission="ssave" if="instance('iresponse')//@status = '1'"/>
+                        <xf:toggle case="case-already-inserted-{ $num }" if="instance('iresponse')//@status = '1'"/>
+                      </xf:action>
+                    </xf:trigger>
+                  </xf:case>
+                  <xf:case id="case-already-inserted-{ $num }">
+                    <span>A transcription is inserted.</span>
+                    <xf:trigger>
+                      <xf:label>Delete transcription</xf:label>
+                      <xf:action ev:event="DOMActivate">
+                        <xf:insert origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//tei:text[1]"
+                          nodeset="instance('act')//ead:c[@otherlevel='text'][{ $num }]//tei:teiHeader"
+                          position="after"
+                          at="1"/>
+                        <xf:delete nodeset="instance('act')//ead:c[@otherlevel='text'][{ $num }]//tei:text[2]"/>
+                        <xf:delete nodeset="instance('act')//ead:c[@otherlevel='text'][{ $num }]//tei:encodingDesc"/>
+                        <xf:toggle case="case-user-input-{ $num }"/>
+                      </xf:action>
+                    </xf:trigger>
+                  </xf:case>
+									<xf:case id="case-forbidden-input-{ $num }">
+										<xf:trigger>
+											<xf:label>Try again.</xf:label>
+											<xf:action ev:event="DOMActivate">
+												<xf:setvalue ref="instance('iresponse')//xrx:response/@status" value="''" />
+												<xf:recalculate />
+												<xf:toggle case="case-user-input-{ $num }" />
+											</xf:action>
+										</xf:trigger>
+								  </xf:case>
+                  <xf:case id="case-busy-{ $num }">
+                    <div class="busy-info-div">
+                      <xrx:i18n>
+                        <xrx:key>on-transform-message</xrx:key>
+                        <xrx:default>Transforming text to TEI. Please wait ...</xrx:default>
+                      </xrx:i18n>
+                      <img src="/bfResources/images/indicator.gif"/>
+                    </div>
+                  </xf:case>
+		            </xf:switch>
+		            <div>
+	                <xf:select1 ref="//ead:c[@otherlevel='text'][{ $num }]//atom:entry/atom:author/atom:email">
+	                  <xf:label>Author:</xf:label>
+	                  <xf:itemset nodeset="bf:instanceOfModel('mindexing-form-main', 'iuser')/user">
+	                    <xf:label ref="firstnamename"/>
+	                    <xf:value ref="email"/>
+	                  </xf:itemset>
+	                </xf:select1>
+	                <div>Contributors:</div>
+	                <div>
+		                <xf:repeat id="contributor-repeat-{ $num }" 
+		                  nodeset="//ead:c[@otherlevel='text'][{ $num }]//atom:entry//atom:contributor"
+		                  appearance="compact">
+		                  <xf:select1 ref="atom:email">
+		                    <xf:itemset nodeset="bf:instanceOfModel('mindexing-form-main', 'iuser')/user">
+		                      <xf:label ref="firstnamename"/>
+		                      <xf:value ref="email"/>
+		                    </xf:itemset>
+		                  </xf:select1>
+		                  <xf:trigger>
+		                    <xf:label>-</xf:label>
+		                    <xf:action ev:event="DOMActivate">
+		                      <xf:delete
+		                        nodeset="//ead:c[@otherlevel='text'][{ $num }]//atom:entry//atom:contributor[index('contributor-repeat-{ $num }')]" />
+		                    </xf:action>
+		                  </xf:trigger>
+		                </xf:repeat>
+		              </div>
+		              <div>
+		                <xf:trigger>
+		                  <xf:label>Add a Contributor</xf:label>
+		                  <xf:action ev:event="DOMActivate">
+		                    <xf:insert origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//atom:entry//atom:contributor[1]"
+		                      nodeset="instance('act')//ead:c[@otherlevel='text'][{ $num }]//atom:entry//atom:contributor"
+		                      at="last()" 
+		                      position="after"
+		                      if="exists(//ead:c[@otherlevel='text'][{ $num }]//atom:entry//atom:contributor)" />
+		                    <xf:insert origin="bf:instanceOfModel('mindexing-form-main', 'iact-template')//atom:entry//atom:contributor[1]"
+		                      nodeset="instance('act')//ead:c[@otherlevel='text'][{ $num }]//atom:entry//atom:author"
+		                      at="last()" 
+		                      position="after"
+		                      if="not(exists(//ead:c[@otherlevel='text'][{ $num }]//atom:entry//atom:contributor))" />
+		                  </xf:action>
+		                </xf:trigger>
+		              </div>
+	              </div>
+              </div>
+            </div>
+          </xf:case>
+          }
+	        {
+	        let $last-update := substring-before($entry/atom:entry/atom:updated/text(), 'T')
+	        let $email := $entry/atom:email/text()
+	        let $firstname-name := user:firstname-name($email)
+	        return
+	        <div class="last-update-text">
+	          <span class="border-top-light-grey">
+	            <xrx:i18n>
+	              <xrx:key>last-update</xrx:key>
+	              <xrx:default>Last update</xrx:default>
+	            </xrx:i18n>
+	            <span>:&#160;{ $last-update }&#160;</span>
+	            <xrx:i18n>
+	              <xrx:key>by</xrx:key>
+	              <xrx:default>by</xrx:default>
+	            </xrx:i18n>
+	            <span>&#160;{ $firstname-name }</span>
+	          </span>
+	        </div>
+	        }
+        </xf:switch>
+      </xf:group>
+    </div>
+    else
+    <div>No Acts available yet. Please create a new one first.</div>
+  }
+  </xrx:view>
+</xrx:widget>

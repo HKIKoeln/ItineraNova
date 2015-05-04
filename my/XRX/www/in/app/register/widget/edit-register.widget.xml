@@ -1,0 +1,223 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xrx="http://www.monasterium.net/NS/xrx"
+	xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/edit-register</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>edit-register</xrx:key>
+      <xrx:default>Edit register</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>true</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+	<xrx:res>
+	  <xrx:css>
+			<style type="text/css">
+
+#dedit-register .note, #dedit-register .note .xfValue{{
+  width:750px;
+}}
+#tab-container{{
+	height:700px;
+	width:750px;
+}}
+#tab-container .t-delete-year{{
+	float:right;
+}}
+#t-add{{
+	position:absolute;
+	right:40px;
+	z-index:9999;
+}}
+.case-input .xfValue{{
+  padding:5px;
+  width:300px;
+}}
+.top-save-button{{
+  position:absolute;
+  right:40px;
+}}
+
+	    </style>
+    </xrx:css>
+	</xrx:res>
+	<xrx:model>
+	{
+	  let $register := $xrx:tokenized-uri[1]
+	  return
+		<xf:model id="medit-register">
+			<xf:instance id="ead"
+				src="{ $xrx:localhost-request-base-url }atom/GET/metadata.register.public/{ $register }/{ $register }.register.xml" />
+		  <xf:instance id="tmp">
+		    <data xmlns=""/>
+		  </xf:instance>
+			<xf:submission id="ssave" ref="instance('ead')"
+				action="{ $xrx:localhost-request-base-url }atom/PUT/metadata.register.public/{ $register }/{ $register }.register.xml"
+				method="post" replace="none">
+				<xf:action ev:event="xforms-submit-done">
+					<xf:message level="ephemeral">Your changes have been successfully saved.</xf:message>
+				</xf:action>
+			</xf:submission>
+			<xf:submission id="snew-pers-indexentry" 
+			  ref="instance('ead')"
+				action="{ $xrx:localhost-request-base-url }service/?atomid=tag:itineranova.be,2011:/in/service/new-pers-indexentry" 
+				method="post"
+				replace="instance" 
+				instance="tmp">
+				<xf:action ev:event="xforms-submit-done">
+					<xf:message level="ephemeral">New Indexentry created and inserted. OK.</xf:message>
+				</xf:action>
+			</xf:submission>
+		</xf:model>
+	}
+	</xrx:model>
+	<xrx:view>
+	{
+	  let $register := $xrx:tokenized-uri[1]
+	  let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+	  return
+		<div>
+			<div class="h2">
+				Edit Register { $register }
+			</div>
+			<xrx:auth>
+			  <xrx:rules>
+			    <xrx:rule>
+			      <xrx:user/>
+			      <xrx:role>archivist</xrx:role>
+			    </xrx:rule>
+			  </xrx:rules>
+			  <xrx:true>
+			    <xf:group model="medit-register">
+						<div class="top-save-button">
+				      <xf:trigger>
+				        <xf:label>Save</xf:label>
+				        <xf:action ev:event="DOMActivate">
+				          <xf:send submission="ssave" />
+				          <xf:load show="replace" resource="{ request:get-url() }" />
+				        </xf:action>
+				      </xf:trigger>
+				    </div>
+				    <br/>
+				    <div id="dedit-register">
+							<xf:select1 ref="//ead:archdesc/ead:did/ead:physloc" appearance="full">
+								<xf:label>{ $register } belongs to Chamber: </xf:label>
+								<xf:item>
+									<xf:label>1&#160;&#160;&#160;</xf:label>
+									<xf:value>1</xf:value>
+								</xf:item>
+								<xf:item>
+									<xf:label>2&#160;&#160;&#160;</xf:label>
+									<xf:value>2</xf:value>
+								</xf:item>
+								<xf:item>
+									<xf:label>3&#160;&#160;&#160;</xf:label>
+									<xf:value>3</xf:value>
+								</xf:item>
+							</xf:select1>
+							<br />
+							<xf:textarea class="note" ref="//ead:archdesc/ead:did/ead:note"
+								mediatype="dojo">
+								<xf:label>Notes: </xf:label>
+							</xf:textarea>
+							<xf:group>
+								<h3>Aldermen's Year</h3>
+								<div style="display:none;">
+									{
+									for $indexentry at $num in $register-db-base-collection//ead:ead/ead:archdesc/ead:index/ead:indexentry
+									return
+									<xf:trigger id="t-tabcase{$num}">
+										<xf:label>
+											<xf:value
+												ref="//ead:ead/ead:archdesc/ead:index/ead:indexentry[{ $num }]//ead:title"/>
+										</xf:label>
+										<xf:toggle case="tabcase{ $num }" />
+									</xf:trigger>
+									}
+								</div>
+								<xf:trigger id="t-add">
+			            <xf:label>Add another Year</xf:label>
+			            <xf:action ev:event="DOMActivate">
+			              <xf:send submission="snew-pers-indexentry" />
+			              <xf:insert
+			                origin="instance('tmp')"
+			                nodeset="//ead:ead/ead:archdesc/ead:index/ead:indexentry" at="last()"
+			                position="after" />
+			              <xf:send submission="ssave" />
+			              <xf:load show="replace" resource="{ request:get-url() }" />
+			            </xf:action>
+			          </xf:trigger>
+								<xf:switch appearance="dijit:TabContainer" id="tab-container">
+									{
+									for $indexentry at $num in $register-db-base-collection//ead:ead/ead:archdesc/ead:index/ead:indexentry
+									return
+									<xf:case id="tabcase{ $num }">
+										{ if($num = xs:integer(request:get-parameter('tab', '1'))) then
+										attribute selected { 'true' } else ()}
+										<xf:label>
+											<xf:value
+												ref="//ead:ead/ead:archdesc/ead:index/ead:indexentry[{ $num }]//ead:title"
+												incremental="true" />
+										</xf:label>
+										{
+										if($num != 1) then
+										<xf:trigger class="t-delete-year">
+											<xf:label>Delete this Year</xf:label>
+											<xf:action ev:event="DOMActivate">
+												<xf:delete nodeset="//ead:archdesc/ead:index/ead:indexentry[{ $num }]" />
+												<xf:message level="ephemeral">Indexentry deleted. OK.</xf:message>
+												<xf:send submission="ssave" />
+												<xf:load show="replace" resource="{ request:get-url() }" />
+											</xf:action>
+										</xf:trigger>
+										else()
+										}
+										<xf:input
+											ref="//ead:ead/ead:archdesc/ead:index/ead:indexentry[{ $num }]//ead:title"
+											incremental="true" class="case-input">
+											<xf:label>Aldermen's Year:</xf:label>
+										</xf:input>
+										<xf:repeat
+											nodeset="//ead:ead/ead:archdesc/ead:index/ead:indexentry[{ $num }]//ead:persname[@role='alderman']"
+											appearance="compact">
+											<xf:input ref="." class="case-input">
+												<xf:label>Alderman:</xf:label>
+											</xf:input>
+										</xf:repeat>
+										<xf:repeat
+											nodeset="//ead:ead/ead:archdesc/ead:index/ead:indexentry[{ $num }]//ead:persname[@role='mayor']"
+											appearance="compact">
+											<xf:input ref="." class="case-input">
+												<xf:label>Mayor:</xf:label>
+											</xf:input>
+										</xf:repeat>
+									</xf:case>
+									}
+								</xf:switch>
+							</xf:group>
+						</div>
+						<xf:trigger>
+							<xf:label>Save</xf:label>
+							<xf:action ev:event="DOMActivate">
+								<xf:send submission="ssave" />
+								<xf:load show="replace" resource="{ request:get-url() }" />
+							</xf:action>
+						</xf:trigger>
+				  </xf:group>
+			  </xrx:true>
+			  <xrx:false>
+			    <span>Protected page. Please login first.</span>
+			  </xrx:false>
+			</xrx:auth>
+		</div>
+	}
+	</xrx:view>
+</xrx:widget>

@@ -1,0 +1,114 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ead="urn:isbn:1-931666-22-9"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xrx:id>tag:itineranova.be,2011:/in/service/create-new-register</xrx:id>  
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>create-new-register</xrx:key>
+      <xrx:default>Create new register</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:body>
+	{
+	(:
+		initialization parameters
+		(should be moved to conf.xml)
+	:)
+
+  (: the register's name :)
+	let $register :=
+	  $data//*:new-register/text()
+	
+	(: get the template :)
+	let $template := template:get('tag:itineranova.be,2011:/in/template/register')
+	
+	(: update the template with the name of the register :)
+	let $insert-unitid :=
+	  upd:replace-element-content(
+	   $template//ead:archdesc//ead:unitid, 
+	   text { $register }
+	   )
+
+  let $indexentry :=
+  <ead:index>
+		<ead:indexentry xmlns:ead="urn:isbn:1-931666-22-9">
+		  <ead:namegrp>
+		    <ead:title />
+		    <ead:persname id="pers-{ $register }-01" role="alderman" />
+		    <ead:persname id="pers-{ $register }-02" role="alderman" />
+		    <ead:persname id="pers-{ $register }-03" role="alderman" />
+		    <ead:persname id="pers-{ $register }-04" role="alderman" />
+		    <ead:persname id="pers-{ $register }-05" role="alderman" />
+		    <ead:persname id="pers-{ $register }-06" role="alderman" />
+		    <ead:persname id="pers-{ $register }-07" role="alderman" />
+		    <ead:persname id="pers-{ $register }-08" role="alderman" />
+		    <ead:persname id="pers-{ $register }-09" role="alderman" />
+		    <ead:persname id="pers-{ $register }-10" role="alderman" />
+		    <ead:persname id="pers-{ $register }-11" role="alderman" />
+		    <ead:persname id="pers-{ $register }-12" role="alderman" />
+		    <ead:persname id="pers-{ $register }-13" role="alderman" />
+		    <ead:persname id="pers-{ $register }-14" role="alderman" />
+		    <ead:persname id="pers-{ $register }-15" role="alderman" />
+		    <ead:persname id="pers-{ $register }-16" role="mayor" />
+		    <ead:persname id="pers-{ $register }-17" role="mayor" />
+		    <ead:persname id="pers-{ $register }-18" role="mayor" />
+		    <ead:persname id="pers-{ $register }-19" role="mayor" />
+		    <ead:persname id="pers-{ $register }-20" role="mayor" />
+		  </ead:namegrp>
+		</ead:indexentry>
+  </ead:index>
+	
+	(: get the image names :)
+	let $http-names :=
+	  for $name in httpclient:get(xs:anyURI(concat('http://localhost/images/', $register)), true(), ())//*:a/text()
+	  return
+	  if(ends-with($name, '.jpg') and not(contains($name, 'target') or contains($name,'TARGET'))) then $name 
+	  else()
+	
+	(: create the ead:dao elements :)
+	let $dao-elements :=
+	  for $name in $http-names
+	  let $num := replace(substring-after($name, '_'), '[^\d]', '')
+	  let $clean := substring-before(substring-after($name, '_'), '.jpg')
+	  let $prefix :=
+	    if(matches($clean, '(^e|^b)')) then substring($clean, 1, 1)
+	    else ''
+	  let $suffix :=
+	    if(matches($clean, '[a-zA-Z]+$')) then substring-after($clean, $num)
+	    else ''
+	  let $folio :=
+	    if((xs:integer($num) mod 2) = 0) then 
+	      concat($prefix, xs:string(xs:integer($num) div 2), $suffix, 'V°')
+	    else 
+	      concat($prefix, xs:string(floor((xs:integer($num) div 2) + 1)),$suffix, 'R°')
+	      
+	  return
+		<ead:dao
+			xlink:href="{ concat(conf:param('image-server-base-url'), $register, '/', $name) }"
+			xlink:title="{ $folio }" />
+  
+  (: insert the dao elements :)
+	let $ead := 
+	  upd:insert-after(
+	    $insert-unitid//ead:archdesc/ead:did,
+	    ($indexentry, $dao-elements)
+	  )
+	
+	(: the DB feed where the new register shall be posted :)
+	let $feed := metadata:feed('register', $register, 'public')
+	
+	(: the resource name of the new register :)
+	let $entry-name := metadata:entryname('register', $register)
+	
+	let $post := atom:POST($feed, $entry-name, $ead)
+	
+	return
+
+	$post
+	
+	}
+	</xrx:body>
+</xrx:service>

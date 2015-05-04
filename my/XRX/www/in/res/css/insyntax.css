@@ -1,0 +1,75 @@
+#ui-transcriptionEditor .CodeMirror {
+  line-height:1.3em;
+  font-family:"Trebuchet MS", regular, sans-serif;
+  font-size:36px;
+}
+
+#ui-transcriptionEditor .CodeMirror-scroll {
+  overflow:auto;
+  height:90%;
+  /* This is needed to prevent an IE[67] bug where the scrolled content
+     is visible outside of the scrolling box. */
+  position: relative;
+}
+
+.activeline{
+	background:#DCF5EF !important;
+}
+
+.cm-s-default span.linebreak,
+span.cm-linebreak{
+  color:burlywood;
+}
+
+.cm-s-default span.pagebreak,
+span.cm-pagebreak {
+  color:maroon;
+}
+
+.cm-s-default span.superscriptstart,
+.cm-s-default span.superscriptin,
+.cm-s-default span.superscriptend,
+span.cm-superscript{
+  color:#2C8536;
+}
+
+.cm-s-default span.glyphstart,
+.cm-s-default span.glyphin,
+.cm-s-default span.glyphend,
+span.cm-glyph{
+  color:#577EEB;
+}
+
+.cm-s-default span.strikestart,
+.cm-s-default span.strikein,
+.cm-s-default span.strikeend,
+span.cm-strikethrough{
+	filter:alpha(opacity=50);
+	-moz-opacity:0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+}
+
+.cm-s-default span.strikein{
+  text-decoration: line-through;
+}
+
+.cm-s-default span.error,
+span.cm-error{
+	color:red;
+	border-bottom:2px dotted red;
+}
+
+.cm-s-default span.unsureend, 
+span.cm-unsure{
+  color:orange;
+  border-bottom:solid orange 2px;
+}
+
+.cm-s-default span.unsurestart{
+	border-bottom:none;
+}
+
+.cm-s-default span.unsurein{
+  border-bottom:solid orange 2px;
+}

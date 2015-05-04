@@ -1,0 +1,103 @@
+<xrx:template xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/template/act</xrx:id>
+	<xrx:xml>	
+	  <atom:entry xmlns:vre="http://www.monasterium.net/NS/vre"
+			xmlns:atom="http://www.w3.org/2005/Atom" 
+			xmlns:app="http://www.w3.org/2007/app"
+			xmlns:tei="http://www.tei-c.org/ns/1.0/">
+			<atom:id />
+			<atom:title />
+			<atom:published />
+			<atom:updated />
+			<atom:author>
+				<atom:email />
+			</atom:author>
+			<app:control>
+				<app:draft>no</app:draft>
+			</app:control>
+			<atom:content type="application/xml">
+				<ead:c xmlns:ead="urn:isbn:1-931666-22-9" level="otherlevel" otherlevel="textgroup">
+					<ead:did>
+						<ead:unitid>new</ead:unitid>
+						<ead:abstract />
+					</ead:did>
+					<ead:dsc>
+						<ead:c level="otherlevel" otherlevel="text">
+							<ead:did>
+								<ead:unitid>Act</ead:unitid>
+								<ead:unitdate normal="" certainty="" />
+								<ead:langmaterial>
+									<ead:language langcode="" />
+								</ead:langmaterial>
+								<ead:unittitle type="" />
+								<ead:physdesc>
+									<ead:physfacet type="position" />
+								</ead:physdesc>
+								<ead:origination>
+									<ead:persname role="signer">
+										<ead:ptr/>
+									</ead:persname>
+									<ead:persname role="signer"/>
+								</ead:origination>
+							</ead:did>
+							<ead:dao xpointer="" />
+							<ead:dao>
+								<atom:entry id="text">
+									<atom:published />
+									<atom:updated />
+									<atom:author>
+										<atom:email />
+									</atom:author>
+									<atom:contributor>
+										<atom:email />
+									</atom:contributor>
+									<vre:moderator>
+										<vre:email />
+									</vre:moderator>
+									<app:control>
+										<app:draft>no</app:draft>
+									</app:control>
+									<atom:content type="application/xml">
+										<tei:TEI>
+											<tei:teiHeader>
+												<tei:fileDesc>
+													<tei:titleStmt>
+														<tei:title />
+													</tei:titleStmt>
+													<tei:editionStmt>
+														<tei:p />
+													</tei:editionStmt>
+													<tei:extent />
+													<tei:publicationStmt>
+														<tei:p />
+													</tei:publicationStmt>
+													<tei:seriesStmt>
+														<tei:p />
+													</tei:seriesStmt>
+													<tei:notesStmt>
+														<tei:note />
+													</tei:notesStmt>
+													<tei:sourceDesc>
+														<tei:p />
+													</tei:sourceDesc>
+												</tei:fileDesc>
+												<tei:revisionDesc>
+													<tei:change />
+												</tei:revisionDesc>
+											</tei:teiHeader>
+											<tei:text>
+												<tei:body>
+													<tei:p />
+												</tei:body>
+											</tei:text>
+										</tei:TEI>
+									</atom:content>
+								</atom:entry>
+							</ead:dao>
+						</ead:c>
+					</ead:dsc>
+				</ead:c>
+			</atom:content>
+		</atom:entry>
+  </xrx:xml>
+</xrx:template>

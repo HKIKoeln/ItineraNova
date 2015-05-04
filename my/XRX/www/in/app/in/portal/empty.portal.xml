@@ -1,0 +1,11 @@
+<xrx:portal xmlns:xf="http://www.w3.org/2002/xforms"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/portal/empty</xrx:id>
+  <xrx:res>
+  </xrx:res>
+  <xrx:view>
+    <div>
+      <xrx:mainwidget/>
+    </div>
+  </xrx:view>
+</xrx:portal>

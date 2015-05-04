@@ -1,0 +1,60 @@
+<xrx:widget xmlns:xrx="http://www.monasterium.net/NS/xrx"
+	xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/list-of-images</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>list-of-images</xrx:key>
+      <xrx:default>List of images</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>false</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+	<xrx:res>
+	  <xrx:css>
+			<style type="text/css">
+			
+#img-list-frame {{
+	width:100%;
+	height:900px;
+	margin:0px;
+	padding:0px;
+	border:none;
+}}
+	            
+	    </style>
+    </xrx:css>
+	</xrx:res>
+	<xrx:view>
+	  <div>
+	    <xrx:auth>
+	      <xrx:rules>
+	        <xrx:rule>
+	          <xrx:user/>
+	          <xrx:dbgroup>atom</xrx:dbgroup>
+	        </xrx:rule>
+	      </xrx:rules>
+	      <xrx:true>
+					<div>
+						<iframe id="img-list-frame" src="http://itineranova.be/images/" />
+					</div>
+				</xrx:true>
+				<xrx:false>
+				  <span>
+				    <xrx:i18n>
+				      <xrx:key>protected-page-message</xrx:key>
+				      <xrx:default>Protected page. Please login first.</xrx:default>
+				    </xrx:i18n>
+				  </span>
+				</xrx:false>
+		  </xrx:auth>
+		</div>
+	</xrx:view>
+</xrx:widget>

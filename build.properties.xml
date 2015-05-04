@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @author: Jochen Graf -->
+<XRX>
+	<!-- ################################ XRX Project Settings ################################ -->
+	<!-- $XRX.project-name -->
+	<project-name>in</project-name>
+	<!-- $XRX.password the password which is used for all security critical 
+		functions by the XRX environment. It is also the admin password to login 
+		into the eXist Database administration tools do not commit into SVN!!! -->
+	<password></password>
+
+
+	<!-- ################################ Java Settings ################################ -->
+	<java>
+		<initmemory>64</initmemory>
+		<maxmemory>2048</maxmemory>
+	</java>
+
+
+	<!-- ################################ eXist Settings ################################ -->
+	<exist>
+		<cache-size>128</cache-size>
+		<!-- if there are very large collections in your database, more than 5000 
+			documents per collection, you can try to increase this parameter slightly 
+			for better performance -->
+		<collection-cache>128</collection-cache>
+		<backup-cron-trigger>0 0 22 * * ?</backup-cron-trigger>
+		<revision>15554</revision>
+	</exist>
+
+	<!-- ################################ Jetty Settings ################################ -->
+	<jetty>
+		<port>8181</port>
+	</jetty>
+</XRX>

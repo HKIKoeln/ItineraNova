@@ -1,0 +1,8 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/transcription-text-to-tei</xrx:id>
+  <xrx:body>
+  {
+    transcription:text2tei($data)
+  }
+  </xrx:body>
+</xrx:service>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+    <xrx:id>tag:itineranova.be,2011:/in/service/resend-request</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key/>
+            <xrx:default/>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>andre.streicher@uni-koeln.de</xrx:author>
+    <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+  </xrx:licence>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:translateflag>false</xrx:translateflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:variables>
+        <xrx:variable>
+            <xrx:name>$user</xrx:name>
+            <xrx:expression>xmldb:encode(request:get-parameter("user","0"))</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$moderator</xrx:name>
+            <xrx:expression>doc(xmldb:encode-uri(concat(conf:param('xrx-user-db-base-uri'), xmldb:decode($user), ".xml")))//*:moderator/text()</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$registerid</xrx:name>
+            <xrx:expression>request:get-parameter("registerid","0")</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$folio</xrx:name>
+            <xrx:expression>request:get-parameter("folio","0")</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$anno-id</xrx:name>
+            <xrx:expression>xmldb:encode(request:get-parameter("id","0"))</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$file-name</xrx:name>
+            <xrx:expression>concat(translate($anno-id, '.', '_'), '.xml')</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$annotation-path</xrx:name>
+            <xrx:expression>concat(conf:param('xrx-user-db-base-uri'), xmldb:decode($user), '/metadata.annotation.private/', xmldb:decode($registerid), '/', xmldb:decode($folio), '/')</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$old-annotation</xrx:name>
+            <xrx:expression>doc(xmldb:encode-uri(concat($annotation-path, $file-name)))//atom:entry</xrx:expression>
+        </xrx:variable>
+        <xrx:variable>
+            <xrx:name>$xslt</xrx:name>
+            <xrx:expression>collection('/db/www')/xsl:stylesheet[@id='anno-tei2html']</xrx:expression>
+        </xrx:variable>
+    </xrx:variables>
+    <xrx:emails>
+        <xrx:email>
+            <xrx:key>resend-annotation-email</xrx:key>
+            <mail>
+                <from>{ xs:string(conf:param('mail-service-address')) }</from>
+                <to>{ xmldb:decode($moderator) }</to>
+                <cc>{ xmldb:decode($user) }</cc>
+                <bcc/>
+                <subject>Itinera Nova - Annotation Service</subject>
+                <message>
+                    <text>
+                        
+                        Itinera Nova - Annotation Service. You have receive an annotation- request.
+                        
+                        Register: { xmldb:decode($registerid) }
+                        Folio: { xmldb:decode($folio) }
+                        User: { user:firstname-name(xmldb:decode($user)) } ({ xmldb:decode($user) })
+                        Annotation: - Category: { xs:string($old-annotation//*:surfaceGrp/@*:type) }
+                                    - Keyword: {transform:transform($old-annotation//*:facsimile/*:surfaceGrp/*:interp[@type='keyword'], $xslt, ())}
+                                    - Transcription: {transform:transform($old-annotation//*:facsimile/*:surfaceGrp/*:span[@type='transcription'], $xslt, ())}
+                        
+                        You are receiving this email because you are a user of Itinera Nova.
+                        
+                    </text>
+                </message>
+            </mail>
+        </xrx:email>
+    </xrx:emails>
+    <xrx:body>
+	  {
+	  (: atom post parameters :)
+	  let $atom-annotation-path := concat(conf:param('xrx-user-atom-base-uri'), xmldb:decode($user), '/metadata.annotation.private/', xmldb:decode($registerid), '/', xmldb:decode($folio), '/')
+	  let $moderator := doc(xmldb:encode-uri(concat(conf:param('xrx-user-db-base-uri'), xmldb:decode($user), ".xml")))//*:moderator/text()
+	  let $moderator-path :=xmldb:encode-uri(concat(conf:param('xrx-user-atom-base-uri'), $moderator, '/metadata.annotation.request/', xmldb:decode($registerid), '/', xmldb:decode($folio), '/'))
+	  
+	  (: create annotation :)
+	  let $annotation := annotation:resend-request($data, $old-annotation)
+	  
+	  (: atom post :)
+	  let $save-annotation := atom:POST(xmldb:encode-uri($atom-annotation-path), $file-name, $annotation)
+	  let $save-moderator-annotation := atom:POST($moderator-path, $file-name, $annotation)
+	  
+	  (: send mail:)
+	  let $sendmail :=
+        <xrx:sendmail>
+            <xrx:key>resend-annotation-email</xrx:key>
+        </xrx:sendmail>
+        
+	  return
+        <response>{ string("done") }</response>
+	  }
+	</xrx:body>
+</xrx:service>

@@ -1,0 +1,874 @@
+<?xml version="1.0"?>
+<!-- @author: Jochen Graf -->
+<!-- TODO: ask if collection exists when removing project in deploy-my-xrx -->
+<project name="XRX" default="deploy-my-xrx" basedir=".">
+
+	<xmlproperty file="build.properties.xml" 
+	 semanticAttributes="true" 
+	 keepRoot="true"
+	 includeSemanticAttribute="true"/>
+	
+	<property name="build-scripts-home" value="build" />
+	<property name="db-files" value="../${XRX.project-name}.eXist-A-data"/>
+	<property name="exist-home" value="localhost"/>
+	
+  <property name="betterform-home" value="betterFORM"/>
+  <property name="my-betterform-src" value="my/betterFORM"/>
+
+  <property name="codemirror-home" value="CodeMirror"/>
+  <property name="my-codemirror-src" value="my/CodeMirror"/>
+
+  <property name="jssaxparser-home" value="jssaxparser/jssaxparser"/>
+
+  <property name="jquery-home" value="jQuery"/>
+  <property name="my-jquery-src" value="my/jQuery"/>
+    
+	<property name="exist-jar" value="${build-scripts-home}/eXist-setup-1.4.1dev-rev13702.jar" />
+	<property name="jetty-home" value="${exist-home}/tools/jetty" />
+	<property name="wrapper-home" value="${exist-home}/tools/wrapper" />
+	<property name="webinf-home" value="${exist-home}/webapp/WEB-INF" />
+	<property name="my-exist" value="my/eXist" />
+	<property name="my-exist-extensions-src" value="my/eXist/extensions/modules/src" />
+  <property name="my-exist-src" value="my/eXist/src" />
+  <property name="my-exist-lib" value="my/eXist/lib" />
+	<property name="my-exist-webapp" value="my/eXist/webapp"/>
+	<property name="my-betterform-src" value="my/betterFORM" />
+	<property name="my-applet-src" value="my/Applet" />
+	<property name="my-xrx-src" value="my/XRX" />
+	<property name="xrx-lib-request-root" value="/lib" />
+	<property name="xrx-lib-db-root" value="xmldb:exist:///db/lib" />
+	<property name="xrx-main-db-root" value="xmldb:exist:///db/www" />
+	<property name="tmp-home" value="tmp" />
+	<property name="lib-home" value="lib" />
+	
+	<property name="keystore.alias" value="exist" />
+	<property name="keystore.file" value="${exist-home}/key.store" />
+	<property name="keystore.password" value="secret" />
+
+	<path id="classpath-exist-a-core">
+		<fileset dir="${exist-home}/lib/core">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${exist-home}/lib/optional">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${exist-home}/lib/endorsed">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${exist-home}/lib/cocoon">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${exist-home}/lib/user">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${exist-home}/lib/extensions">
+			<include name="*.jar" />
+		</fileset>
+
+		<fileset dir="${exist-home}/extensions">
+			<include name="**/lib/*.jar" />
+		</fileset>
+		<fileset dir="${exist-home}/tools/ant/lib">
+			<include name="*.jar" />
+		</fileset>
+
+		<pathelement path="${exist-home}/exist.jar" />
+		<pathelement path="${exist-home}/exist-optional.jar" />
+
+		<pathelement path="${exist-home}/start.jar" />
+		<!--pathelement path="${exist-home}/${java.class.path}" / -->
+	</path>
+
+	<path id="classpath-exist-a-jetty">
+		<fileset dir="${jetty-home}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="sign-applet" description="Sign Applet.">
+
+		<signjar alias="${keystore.alias}" storepass="${keystore.password}" keystore="${keystore.file}">
+			<fileset dir="${tmp-home}">
+				<include name="*.jar" />
+			</fileset>
+		</signjar>
+
+	</target>
+
+  <target name="echo-properties">
+    <echoproperties/>
+  </target>
+
+  <!-- 
+  #
+  # jssaxparser
+  #
+   -->
+  <target name="install-jssaxparser">
+  
+    <echo message="-------------------------" />
+    <echo message="Install jssaxparser" />
+    <echo message="-------------------------" />
+
+    <antcall target="download-jssaxparser"/>
+    <antcall target="deploy-jssaxparser"/>
+    
+  </target>
+
+  <target name="download-jssaxparser"
+    description="Download jssaxparser">
+
+    <echo message="-------------------------" />
+    <echo message="Download jssaxparser (http://jssaxparser.googlecode.com/svn/trunk/)" />
+    <echo message="-------------------------" />
+    <exec executable="svn">
+      <arg line=" checkout http://jssaxparser.googlecode.com/svn/trunk/ jssaxparser"/>
+    </exec>  
+    
+  </target>
+  
+  <target name="deploy-jssaxparser">
+
+    <echo message="-------------------------" />
+    <echo message="Deploy jssaxparser" />
+    <echo message="-------------------------" />
+  
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+
+    <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib" 
+      collection="jssaxparser"
+      user="admin"
+      password="${XRX.password}"/>
+    <sleep seconds="2"/>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib/jssaxparser"
+      createsubcollections="true" 
+      createcollection="true" 
+      user="admin"
+      password="${XRX.password}">
+      <fileset dir="${jssaxparser-home}"/>
+    </xdb:store>    
+  
+  </target>
+
+  <!-- 
+  #
+  # jQuery
+  #
+   -->
+  <target name="install-jquery">
+    <echo message="-------------------------" />
+    <echo message="Install jQuery (including jQuery UI)" />
+    <echo message="-------------------------" />
+    <antcall target="deploy-jquery"/>
+  </target>
+
+  <target name="deploy-jquery">
+    <echo message="-------------------------" />
+    <echo message="Deploy jQuery" />
+    <echo message="-------------------------" />
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+    <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib" 
+      collection="jQuery"
+      user="admin"
+      password="${XRX.password}"/>
+    <sleep seconds="2"/>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib/jQuery"
+      createsubcollections="true" 
+      createcollection="true" 
+      user="admin"
+      password="${XRX.password}">
+      <fileset dir="${jquery-home}">
+        <include name="*.*"/>
+        <include name="ui/**"/>
+        <include name="themes/**"/>
+        <include name="external/**"/>
+      </fileset>
+    </xdb:store>
+  </target>
+
+  <target name="download-jquery" description="Download jQuery">
+    <echo message="-------------------------" />
+    <echo message="Download jQuery (https://github.com/jquery/jquery-ui.git)" />
+    <echo message="-------------------------" />
+    <exec executable="git">
+      <arg line="clone https://github.com/jquery/jquery-ui.git jQuery"/>
+    </exec>  
+    <exec executable="git" dir="./jQuery">
+      <arg line="checkout 1.9.0-beta.1"/>
+    </exec>
+  </target>
+  
+  <target name="deploy-my-jquery">
+    <antcall target="deploy-jquery"/>
+    <echo message="-------------------------" />
+    <echo message="Deploy My jQuery" />
+    <echo message="-------------------------" />
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib/jQuery"
+      createsubcollections="true" 
+      createcollection="true" 
+      user="admin"
+      password="${XRX.password}">
+      <fileset dir="${my-jquery-src}"/>
+    </xdb:store>
+  </target>
+
+  <!-- 
+  #
+  # CodeMirror
+  #
+   -->
+
+  <target name="install-codemirror">
+  
+    <echo message="-------------------------" />
+    <echo message="Install CodeMirror" />
+    <echo message="-------------------------" />
+
+    <antcall target="deploy-my-codemirror"/>
+    
+  </target>
+
+  <target name="deploy-codemirror">
+
+    <echo message="-------------------------" />
+    <echo message="Deploy CodeMirror" />
+    <echo message="-------------------------" />
+  
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+
+    <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib" 
+      collection="CodeMirror"
+      user="admin"
+      password="${XRX.password}"/>
+    <sleep seconds="2"/>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib/CodeMirror"
+      createsubcollections="true" 
+      createcollection="true" 
+      user="admin"
+      password="${XRX.password}">
+      <fileset dir="${codemirror-home}">
+        <include name="lib/**"/>
+        <include name="mode/**"/>
+        <include name="keymap/**"/>
+        <include name="theme/**"/>
+        <not>
+          <filename name="**/*.html"/>
+        </not>
+      </fileset>
+    </xdb:store>    
+  
+  </target>
+
+  <target name="download-codemirror"
+    description="Download CodeMirror2">
+
+    <echo message="-------------------------" />
+    <echo message="Download CodeMirror2 (http://marijnhaverbeke.nl/git/codemirror2)" />
+    <echo message="-------------------------" />
+    <exec executable="git">
+      <arg line=" clone http://marijnhaverbeke.nl/git/codemirror2 CodeMirror"/>
+    </exec>  
+    
+  </target>
+  
+  <target name="patch-codemirror">
+  
+    <echo message="-------------------------" />
+    <echo message="Patch CodeMirror" />
+    <echo message="-------------------------" />
+  
+    <copy todir="${codemirror-home}" overwrite="true">
+      <fileset dir="${my-codemirror-src}">
+        <include name="web/**"/>
+        <include name="resource/**"/>
+        <include name="core/**"/>
+      </fileset>
+    </copy>    
+  </target>
+
+  <target name="deploy-my-codemirror">
+
+    <antcall target="deploy-codemirror"/>
+    
+    <echo message="-------------------------" />
+    <echo message="Deploy My CodeMirror" />
+    <echo message="-------------------------" />
+  
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/lib/CodeMirror"
+      createsubcollections="true" 
+      createcollection="true" 
+      user="admin"
+      password="${XRX.password}">
+      <fileset dir="${my-codemirror-src}"/>
+    </xdb:store>    
+  
+  </target>  
+    
+  <!-- 
+  #
+  # betterFORM
+  #
+   -->
+
+  <target name="install-betterform"
+    description="Complete betterFORM installation">
+
+    <echo message="-------------------------" />
+    <echo message="Download and configure betterFORM" />
+    <echo message="-------------------------" />
+    <delete failonerror="false">
+      <fileset dir="${betterform-home}" />
+    </delete>
+    <antcall target="download-betterform" />
+    <antcall target="configure-betterform" />
+    <echo message="-------------------------" />
+    <echo message="Patch betterFORM code project, compile it and deploy it to the eXist-A localhost" />
+    <echo message="-------------------------" />
+    <antcall target="patch-my-betterform" />
+    <antcall target="deploy-my-betterform" />
+    
+
+  </target>
+  
+  <target name="download-betterform" description="Download betterFORM">
+    <echo message="-------------------------" />
+    <echo message="Download betterFORM (https://github.com/betterFORM/betterFORM.git)" />
+    <echo message="-------------------------" />
+    <exec executable="git">
+      <arg line=" clone https://github.com/betterFORM/betterFORM.git betterFORM"/>
+    </exec>  
+  </target>
+  
+  <target name="configure-betterform">
+  
+    <echo message="-------------------------" />
+    <echo message="Configure betterFORM" />
+    <echo message="-------------------------" />
+
+    <echo message="# build.properties.xml" />
+    <copy file="${betterform-home}/build.properties.xml" tofile="${betterform-home}/build.properties.xml.original" />
+    <xslt in="${betterform-home}/build.properties.xml.original" style="${build-scripts-home}/build.properties.xsl"
+      out="${betterform-home}/build.properties.xml">
+      <param name="exist-absolute-path" expression="${basedir}/${exist-home}" />
+    </xslt>
+    
+  </target>
+  
+  <target name="patch-my-betterform" description="Patch the local betterFORM project with your betterFORM code">
+
+    <echo message="-------------------------" />
+    <echo message="Patch betterFORM" />
+    <echo message="-------------------------" />
+  
+    <copy todir="${betterform-home}" overwrite="true">
+      <fileset dir="${my-betterform-src}">
+        <include name="web/**"/>
+        <include name="resource/**"/>
+        <include name="core/**"/>
+      </fileset>
+    </copy>    
+  
+  </target>
+  
+  
+  <target name="deploy-my-betterform" description="Deploy your betterFORM code into the local eXist installation as a single jar-file">
+
+    <echo message="-------------------------" />
+    <echo message="Deploy your betterFORM code into the local eXist installation as a single jar-file" />
+    <echo message="-------------------------" />
+    
+    <antcall target="patch-my-betterform"/>  
+    <ant antfile="build-dojo.xml" dir="${betterform-home}/resource" target="build-dojo"/>
+    <ant antfile="build-XRX.xml" dir="${betterform-home}/XRX" target="update-betterFORM"/>
+    <antcall target="restart-exist"/>
+  	
+  	<echo message="-------------------------" />
+  	<echo message="Deploy your betterFORM code into my eXist extentions as a single jar-file" />
+  	<echo message="-------------------------" />
+  	<copy file="localhost/extensions/betterform/main/lib/betterform.jar" tofile="my/eXist/extensions/betterform/main/lib/betterform.jar" overwrite="true"/>
+    
+  </target>
+  
+  <target name="deploy-my-betterform-exploded" description="Deploy an exploded version of your betterFORM code into eXist that allows to debug JavaScript">
+  
+    <echo message="-------------------------" />
+    <echo message="Deploy an exploded version of your betterFORM code into eXist that allows to debug JavaScript" />
+    <echo message="-------------------------" />
+    
+    <antcall target="patch-my-betterform"/>      
+    <ant antfile="build-XRX.xml" dir="${betterform-home}/XRX" target="update-betterFORM-exploded"/>
+  	
+  	
+  </target>
+
+  <target name="deploy-db-vdu-editor"
+    description="Deploys all collection.xconf files. Reindex collections after calling this!">
+
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+
+    <echo message="-------------------------" />
+    <echo message="Deploying files for vdu editor" />
+    <echo message="-------------------------" />
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/system/config"
+      createsubcollections="true" createcollection="true" user="admin"
+      password="${XRX.password}">
+      <fileset dir="${my-xrx-src}/editor" />
+    </xdb:store>
+
+  </target>
+
+  <!-- 
+  #
+  # eXist
+  #
+   -->
+    
+	<target name="install-exist"
+		description="Installs the actual eXist release shipped with this eXist-A version.">
+
+		<echo message="-------------------------" />
+		<echo message="Downloading eXist from SVN (http://svn.code.sf.net/p/exist/code/stable/eXist-1.4.x)" />
+		<echo message="-------------------------" />
+		<delete failonerror="false">
+			<fileset dir="${exist-home}" />
+		</delete>
+		<exec executable="svn">
+		  <arg line="co http://svn.code.sf.net/p/exist/code/stable/eXist-1.4.x localhost"/>
+		</exec>
+		<antcall target="deploy-my-exist" />
+		<antcall target="deploy-my-exist-webapp" />
+		<antcall target="configure-localhost" />
+
+	</target>
+
+  <target name="deploy-my-exist-webapp" description="Copies webapp directory">
+    <copy todir="${exist-home}/webapp" overwrite="true">
+      <fileset dir="${my-exist-webapp}"/>
+    </copy>
+  </target>
+
+	<target name="deploy-my-exist"
+		description="Integrates and compiles your Java Source into the localhost.">
+
+		<echo message="-------------------------" />
+		<echo message="Preparing eXist/A Source" />
+		<echo message="-------------------------" />
+		<copy todir="${exist-home}/extensions/modules/src" overwrite="true">
+			<fileset dir="${my-exist-extensions-src}" />
+		</copy>
+		<copy todir="${exist-home}/lib/user">
+			<fileset dir="lib">
+				<include name="*.jar" />
+				<include name="*.zip" />
+			</fileset>
+		</copy>   
+    <copy todir="${exist-home}/src" overwrite="true">
+      <fileset dir="${my-exist-src}" />
+    </copy>
+    <copy todir="${exist-home}/lib" overwrite="true">
+      <fileset dir="${my-exist-lib}" />
+    </copy>
+		<copy tofile="localhost/extensions/betterform/main/lib/betterform.jar" file="my/eXist/extensions/betterform/main/lib/betterform.jar" overwrite="true"/>
+    
+		<echo message="-------------------------" />
+		<echo message="Compiling eXist/A" />
+		<echo message="-------------------------" />
+		<!-- building eXist -->
+		<exec executable="${exist-home}/build.sh">
+			<arg line="-f ${exist-home}/build.xml" />
+		</exec>
+		<!-- unsign all eXist *.jar -->
+		<exec executable="${exist-home}/build.sh">
+			<arg line="-f ${exist-home}/build/scripts/jarsigner.xml jnlp-unsign-all" />
+		</exec>
+		<!-- sign all eXist *.jar -->
+		<exec executable="${exist-home}/build.sh">
+			<arg line="-f ${exist-home}/build/scripts/jarsigner.xml" />
+		</exec>
+
+	</target>
+
+  <target name="start-exist" 
+    description="Start eXist (Jetty)">
+    <echo message="-------------------------" />
+    <echo message="Starting eXist" />
+    <echo message="-------------------------" />
+    <exec executable="${exist-home}/tools/wrapper/bin/exist.sh">
+      <arg value="start"/>
+    </exec>
+    <sleep seconds="20"/>
+  </target>
+  
+  <target name="shutdown-exist"
+    description="Shutdown eXist (Jetty)">
+    <echo message="-------------------------" />
+    <echo message="Shutdown eXist" />
+    <echo message="-------------------------" />
+    <exec executable="${exist-home}/tools/wrapper/bin/exist.sh">
+      <arg value="stop"/>
+    </exec>
+    <sleep seconds="20"/>
+  </target>
+  
+  <target name="restart-exist"
+    description="Shutdown eXist (Jetty)">
+    <echo message="-------------------------" />
+    <echo message="Shutdown eXist" />
+    <echo message="-------------------------" />
+    <exec executable="${exist-home}/tools/wrapper/bin/exist.sh">
+      <arg value="restart"/>
+    </exec>
+    <sleep seconds="20"/>
+  </target>
+
+  <!-- 
+  #
+  # EditMOM Applet
+  #
+   -->
+   
+	<target name="compile-mom-applet" description="Compiles Monasterium's Applet EditMOM.">
+		<!-- Compile MOMApplet. This is just a quick hack to automate the signing 
+			and deploying process for Monasterium's Editor EditMOM. Do not use this for 
+			your own Applet. -->
+		<echo message="-------------------------" />
+		<echo message="Compiling and Signing Applet" />
+		<echo message="-------------------------" />
+		<mkdir dir="${tmp-home}/net/monasterium/momResources" />
+		<copy todir="${tmp-home}/net/monasterium/momResources" overwrite="true">
+			<fileset dir="${my-applet-src}/net/monasterium/momResources">
+				<include name="*.properties" />
+			</fileset>
+		</copy>
+		<copydir src="${my-applet-src}" dest="${tmp-home}" includes="**/*.class" />
+		<copydir src="${my-applet-src}" dest="${tmp-home}" includes="**/*.gif" />
+		<copydir src="${my-applet-src}" dest="${tmp-home}" includes="**/*.png" />
+		<copydir src="${lib-home}/com" dest="${my-applet-src}/com" includes="**/*.*" />
+		<copydir src="${lib-home}/org" dest="${my-applet-src}/org" includes="**/*.*" />
+		<javac srcdir="${my-applet-src}" destdir="${tmp-home}"
+			includeAntRuntime="false">
+			<classpath>
+				<path refid="classpath-exist-a-core" />
+				<path refid="classpath-exist-a-jetty" />
+			</classpath>
+		</javac>
+		<delete file="${tmp-home}/test.jar" />
+		<jar basedir="${tmp-home}" jarfile="${tmp-home}/test.jar" update="true">
+			<manifest>
+				<attribute name="Main-Class" value="net.monasterium.MOMApplet" />
+			</manifest>
+		</jar>
+		<antcall target="sign-applet" />
+		<copy file="${tmp-home}/test.jar" tofile="${exist-home}/webapp/MOMApplet.jar" overwrite="true"/>
+		<copydir src="${my-applet-src}" 
+		  dest="${exist-home}/webapp"
+			includes="**/*.class" />
+		<delete dir="${tmp-home}" />
+	</target>
+
+
+  <!-- 
+  #
+  # Configurations
+  #
+   -->
+  
+	<target name="configure-localhost" description="Configures localhost for eXist/A">
+
+		<echo message="-------------------------" />
+		<echo message="Configuring eXist/A" />
+		<echo message="-------------------------" />
+
+    <echo message="Creating directory for file uploads." />
+    <mkdir dir="${exist-home}/webapp/upload"/>
+
+    <echo message="Creating directory for binary data" />
+    <mkdir dir="${db-files}"/>
+     
+    <echo message="Creating directory for tmp files needed by betterFORM/ehCache" />
+    <mkdir dir="${jetty-home}/tmp" />
+
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+          
+		<echo message="# jetty.xml" />
+		<copy file="${jetty-home}/etc/jetty.xml" tofile="${jetty-home}/etc/jetty.xml.original" />
+		<xslt in="${jetty-home}/etc/jetty.xml.original" style="${build-scripts-home}/jetty.xsl"
+			out="${jetty-home}/etc/jetty.xml">
+			<param name="jetty-port" expression="${XRX.jetty.port}" />
+		</xslt>
+
+		<echo message="# conf.xml" />
+		<copy file="${exist-home}/conf.xml" tofile="${exist-home}/conf.xml.original" />
+		<xslt in="${exist-home}/conf.xml.original" style="${build-scripts-home}/conf.xsl"
+			out="${exist-home}/conf.xml">
+			<param name="cache-size" expression="${XRX.exist.cache-size}" />
+			<param name="collection-cache" expression="${XRX.exist.collection-cache}" />
+			<param name="db-files" expression="${db-files}" />
+			<param name="backup-cron-trigger" expression="${XRX.exist.backup-cron-trigger}" />
+		</xslt>
+
+		<echo message="# wrapper.conf" />
+		<copy file="${wrapper-home}/conf/wrapper.conf" tofile="${wrapper-home}/conf/wrapper.conf.original" />
+		<replace file="${wrapper-home}/conf/wrapper.conf">
+			<replacefilter token="wrapper.java.initmemory=16"
+				value="wrapper.java.initmemory=${XRX.java.initmemory}" />
+			<replacefilter token="wrapper.java.maxmemory=128"
+				value="wrapper.java.maxmemory=${XRX.java.maxmemory}" />
+		</replace>
+		<echo file="${wrapper-home}/conf/wrapper.conf" append="true">
+wrapper.java.additional.6=-Djava.io.tmpdir=../../../tools/jetty/tmp
+		</echo>
+
+		<echo message="# controller-config.xml" />
+		<copy file="${webinf-home}/controller-config.xml" tofile="${webinf-home}/controller-config.xml.original" />
+		<xslt in="${webinf-home}/controller-config.xml.original" style="${build-scripts-home}/controller-config.xsl"
+			out="${webinf-home}/controller-config.xml">
+			<param name="project-name" expression="${XRX.project-name}" />
+			<param name="xrx-lib-request-root" expression="${xrx-lib-request-root}" />
+			<param name="xrx-lib-db-root" expression="${xrx-lib-db-root}" />
+			<param name="xrx-main-db-root" expression="${xrx-main-db-root}" />
+		</xslt>
+
+    <!-- echo message="# classpath.xml" />
+    <xslt in="${build-scripts-home}/classpath.xml" style="${build-scripts-home}/classpath.xsl"
+      out=".classpath">
+      <param name="exist-home" expression="${exist-home}" />
+      <param name="my-exist-extensions-src" expression="${my-exist-extensions-src}" />
+      <param name="my-exist-webapp" expression="${my-exist-webapp}" />
+      <param name="my-betterform-src" expression="${my-betterform-src}" />
+      <param name="my-applet-src" expression="${my-applet-src}" />
+      <param name="my-xrx-src" expression="${my-xrx-src}" />
+    </xslt-->
+    
+    <echo message="# controller.xql" />
+    <copy file="${exist-home}/webapp/controller.xql" tofile="${exist-home}/webapp/controller.xql.original" />
+    <replace file="${exist-home}/webapp/controller.xql">
+      <replacefilter token='url="index.xml"' value='url="${XRX.project-name}/home"' />
+    </replace>
+    <replace file="${exist-home}/webapp/controller.xql">
+      <replacefilter token="(: ignore Cocoon :)" 
+        value="
+      
+					else if (matches($exist:path,'/upload/')) then
+					(
+					util:declare-option('exist:serialize', 'method=xml media-type=application/xml'),
+					&lt;dispatch xmlns='http://exist.sourceforge.net/NS/exist'&gt;
+					  &lt;ignore xmlns='http://exist.sourceforge.net/NS/exist'&gt;
+					        &lt;cache-control cache='no'/&gt;
+					  &lt;/ignore&gt;
+					&lt;/dispatch&gt;
+					)
+
+    " />
+    </replace>
+    
+    <echo message="# web.xml" />
+    <copy file="${webinf-home}/web.xml" tofile="${webinf-home}/web.xml.original" />
+    <xslt in="${webinf-home}/web.xml.original" style="${build-scripts-home}/web.xsl"
+      out="${webinf-home}/web.xml">
+      <param name="project-name" expression="${XRX.project-name}" />
+    </xslt>
+
+    <echo message="# My XRX conf.xml" />
+    <xslt in="build.properties.xml" style="${build-scripts-home}/xrx-project.xsl"
+      out="${my-xrx-src}/www/${XRX.project-name}/conf.xml">
+    </xslt>
+    
+    <antcall target="start-exist"/>    
+    
+    <echo message="Setting collection permissions for database root collection /db"/>
+    <xdb:xquery xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db" 
+      query="system:as-user('admin', '${XRX.password}', xmldb:set-collection-permissions('/db', 'admin', 'dba', 504))"/>
+    <antcall target="shutdown-exist"/>
+    
+	</target>
+
+	<target name="deploy-my-xrx"
+		description="Deploys all XRX Source Code (${my-xrx-src}) into the database">
+
+		<typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+			<classpath refid="classpath-exist-a-core" />
+		</typedef>
+
+		<echo message="-------------------------" />
+		<echo message="Deploying XRX Project ${XRX.project-name}" />
+		<echo message="-------------------------" />
+    <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www" 
+      collection="${XRX.project-name}"
+      user="admin"
+      password="${XRX.password}"/>
+    <sleep seconds="2"/>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant"
+			uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/${XRX.project-name}"
+			createsubcollections="true" createcollection="true" user="admin"
+			password="${XRX.password}">
+			<fileset dir="${my-xrx-src}/www/${XRX.project-name}" />
+		</xdb:store>
+
+	</target>
+
+  <target name="deploy-my-xrx-app">
+  
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+
+    <echo message="-------------------------" />
+    <echo message="Deploying my XRX App" />
+    <echo message="-------------------------" />
+    <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/${XRX.project-name}/app" 
+      collection="${app}"
+      user="admin"
+      password="${XRX.password}"/>
+    <sleep seconds="2"/>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/${XRX.project-name}/app"
+      createsubcollections="true" createcollection="true" user="admin"
+      password="${XRX.password}">
+      <fileset dir="${my-xrx-src}/www/${XRX.project-name}/app/${app}" />
+    </xdb:store>    
+  
+  </target>
+    
+  <target name="deploy-my-mom"
+    description="Deploys all XRX Source Code Mom into the database">
+    
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+    
+    <echo message="-------------------------" />
+    <echo message="Deploying XRX Project mom" />
+    <echo message="-------------------------" />
+    <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www" 
+      collection="mom"
+      user="admin"
+      password="${XRX.password}"/>
+    <sleep seconds="2"/>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/mom"
+      createsubcollections="true" createcollection="true" user="admin"
+      password="${XRX.password}">
+      <fileset dir="${my-xrx-src}/www/mom" />
+    </xdb:store>
+    
+  </target>
+
+  <target name="deploy-db-system-config"
+    description="Deploys all collection.xconf files. Reindex collections after calling this!">
+
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+
+    <echo message="-------------------------" />
+    <echo message="Deploying XRX Project ${XRX.project-name}" />
+    <echo message="-------------------------" />
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/system/config"
+      createsubcollections="true" createcollection="true" user="admin"
+      password="${XRX.password}">
+      <fileset dir="${my-xrx-src}/system/config" />
+    </xdb:store>
+
+  </target>
+
+  <target name="deploy-xrx-core"
+    description="Deploys all XRX Core Source Code into the database">
+
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath-exist-a-core" />
+    </typedef>
+
+    <echo message="-------------------------" />
+    <echo message="Deploying XRX Core" />
+    <echo message="-------------------------" />
+		<xdb:remove xmlns:xdb="http://exist-db.org/ant"
+		  uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www" 
+		  collection="core"
+		  user="admin"
+		  password="${XRX.password}"/>
+    <sleep seconds="2"/>
+    <xdb:store xmlns:xdb="http://exist-db.org/ant"
+      uri="xmldb:exist://localhost:${XRX.jetty.port}/xmlrpc/db/www/core"
+      createsubcollections="true" createcollection="true" user="admin"
+      password="${XRX.password}">
+      <fileset dir="${my-xrx-src}/www/core" />
+    </xdb:store>
+
+  </target>
+
+
+  <target name="deploy-xrx"
+    description="Deploys the XRX core project, the XRX libs and the my XRX project">
+
+    <echo message="-------------------------" />
+    <echo message="Deploying XRX Core and my XRX" />
+    <echo message="-------------------------" />
+    
+    <antcall target="deploy-xrx-core"/>
+    <antcall target="deploy-my-xrx"/>
+    
+  </target>
+
+  <target name="install" description="Installs eXist-A and betterFORM-A">
+    <antcall target="install-exist"/>
+    <antcall target="install-betterform"/>
+  </target>
+  
+	<target name="all"
+		description="Compile your project into a clean, configured eXist/betterFORM installation.">
+		<antcall target="install-exist" />
+		<antcall target="configure-localhost" />
+		<antcall target="exist-a" />
+		<antcall target="configure-localhost" />
+	</target>
+
+	<target name="prepare"
+		description="Start with a clean, configured eXist/betterFORM installation.">
+		<antcall target="clean" />
+		<antcall target="install-exist" />
+		<antcall target="configure-localhost" />
+	</target>
+
+	<target name="clean"
+		description="Run to start with a fresh eXist/betterFORM installation.">
+		<delete dir="${exist-home}" />
+		<delete dir="bin" />
+		<delete dir="loggerdir" />
+    <delete dir="${my-applet-src}/com" />
+    <delete dir="${my-applet-src}/org" />
+  </target>
+  
+</project>
+
+

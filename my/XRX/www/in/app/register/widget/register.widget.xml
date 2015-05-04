@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:xrx="http://www.monasterium.net/NS/xrx">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/register</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key>register</xrx:key>
+            <xrx:default>Register</xrx:default>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+    <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+    <xrx:licence/>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:xformsflag>false</xrx:xformsflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:res>
+        <xrx:css>
+            <style type="text/css">
+			
+#register-div{{
+  position:relative;
+  float:left;
+  width:760px;
+  margin-top:10px;
+  margin-right:20px;
+}}
+
+#register-div .large-link *{{
+	font-size:120%;
+	font-weight:bold;
+}}
+
+#register-div table{{
+	margin:0px;
+	padding:0px;
+}}
+
+#register-div table{{
+	width:100%;
+}}
+
+#register-div td{{
+	padding:5px;
+}}
+
+#register-div td.label{{
+	font-weight:bold;
+	width:200px;
+}}
+
+#register-div tr.grey{{
+	background-color:rgb(240,240,240);
+}}
+
+#register-div ul{{
+	list-style:none;
+}}
+
+#quarters{{
+  position:relative;
+  float:left;
+  width:100%;
+}}
+
+#quarters .quarter{{
+  position:relative;
+  float:left;
+  width:25%;
+  text-align:center;
+  margin-bottom:20px;
+}}
+
+#quarters a:link, #quarters *{{
+  text-decoration:none;
+  font-size:17px;
+}}
+
+#quarters .light-grey{{
+  color:rgb(120,120,120)
+}}
+
+.no-list-style{{
+	list-style:none;
+}}
+
+#register-info-table{{
+  position:relative;
+  float:left;
+  width:100%;
+}}
+
+			</style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:view>
+	  {
+	  (: request parameter :)
+	  let $register := $xrx:tokenized-uri[1]
+	  
+	  (: register info :)
+	  let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+	  let $first-folio-id-decoded := $register-db-base-collection//ead:archdesc/ead:dao[1]/@xlink:title/string()
+	  let $first-folio-id := if($first-folio-id-decoded) then xmldb:encode($first-folio-id-decoded) else ''
+	  let $register-entry := $register-db-base-collection//ead:ead/root(.)/atom:entry
+	  let $folio-count := count($register-db-base-collection//ead:archdesc/ead:dao)
+	  let $note := $register-db-base-collection//ead:archdesc/ead:did/ead:note/text()
+	  
+	  (: act info :)
+	  let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+	  let $act-count := count($act-db-base-collection//ead:c[@otherlevel='textgroup'])
+	  let $transcription-count := count($act-db-base-collection/atom:entry[.//tei:body/tei:p/text()])
+	  
+	  (: authors :)
+	  let $transcription-authors := distinct-values($act-db-base-collection/atom:entry//atom:entry/atom:author/atom:email/text())
+	  let $indexing-authors := distinct-values($act-db-base-collection/atom:entry/atom:author/atom:email/text())
+	  
+	  return
+		<div id="register-div">
+            <div class="h2">
+                <xrx:i18n>
+                    <xrx:key>register</xrx:key>
+                    <xrx:default>Register</xrx:default>
+                </xrx:i18n>
+                <span>&#160;{ $register }</span>
+            </div>
+            <br/>
+            <div id="quarters">
+                <div class="quarter">
+			    {
+			    let $label :=
+			    <span>
+                        <xrx:i18n>
+                            <xrx:key>browse-by-folio</xrx:key>
+                            <xrx:default>Browse by Folio</xrx:default>
+                        </xrx:i18n>
+                    </span>
+          return
+          if($folio-count gt 0) then
+					<a href="{ folio:link(($register, $first-folio-id)) }">{ $label }</a>
+					else <span class="light-grey">{ $label }</span>
+					}
+				</div>
+                <div class="quarter">
+				  {
+				  let $label :=
+				  <span>
+                        <xrx:i18n>
+                            <xrx:key>browse-by-act</xrx:key>
+                            <xrx:default>Browse by Act</xrx:default>
+                        </xrx:i18n>
+                    </span>
+				  return
+				  if($act-count gt 0) then
+					<a href="{ act:link(($register, '*')) }">{ $label }</a>
+					else <span class="light-grey">{ $label }</span>
+					}
+				</div>
+                <div class="quarter">
+				  {
+				  let $label :=
+				  <span>
+                        <xrx:i18n>
+                            <xrx:key>browse-transcriptions</xrx:key>
+                            <xrx:default>Browse Transcriptions</xrx:default>
+                        </xrx:i18n>
+                    </span>
+          return
+          if($transcription-count gt 0) then
+          <a href="{ transcription:link(($register, '*')) }">{ $label }</a>
+          else <span class="light-grey">{ $label }</span>
+          }
+				</div>
+                <div class="quarter">
+                    <a href="{ conf:param('request-root') }search?register={ $register }&amp;_firstvisit=true">
+                        <xrx:i18n>
+                            <xrx:key>search-in</xrx:key>
+                            <xrx:default>Search in</xrx:default>
+                        </xrx:i18n>
+				    &#160;{ $register }
+				  </a>
+                </div>
+            </div>
+            <br/>
+            <xrx:auth>
+                <xrx:rules>
+                    <xrx:rule>
+                        <xrx:user/>
+                        <xrx:role>archivist</xrx:role>
+                    </xrx:rule>
+                </xrx:rules>
+                <xrx:true>
+                    <div id="my-functions">
+                        <div class="h3">
+                            <xrx:i18n>
+                                <xrx:key>my-functions</xrx:key>
+                                <xrx:default>MyFunctions</xrx:default>
+                            </xrx:i18n>
+                        </div>
+                        <div class="function-links">
+                            <div class="function-link">
+                                <a href="{ conf:param('request-root') }{ $register }/edit-register">
+                                    <span>‣&#160;</span>
+                                    <xrx:i18n>
+                                        <xrx:key>edit-register</xrx:key>
+                                        <xrx:default>Edit register</xrx:default>
+                                    </xrx:i18n>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="function-links">
+                            <div class="function-link">
+                                <a href="{ conf:param('request-root') }{ $register }/remove-register">
+                                    <span>‣&#160;</span>
+                                    <xrx:i18n>
+                                        <xrx:key>remove-register</xrx:key>
+                                        <xrx:default>Remove register</xrx:default>
+                                    </xrx:i18n>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="function-links">
+                            <div class="function-link">
+                                <a href="{ conf:param('request-root') }{ $register }/indexing">
+                                    <span>‣&#160;</span>
+                                    <xrx:i18n>
+                                        <xrx:key>indexing</xrx:key>
+                                        <xrx:default>Indexing</xrx:default>
+                                    </xrx:i18n>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </xrx:true>
+                <xrx:false>
+                    <span/>
+                </xrx:false>
+            </xrx:auth>
+            <div id="register-info-table">
+                <table>
+                    <tr class="grey">
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>authors-and-contributors</xrx:key>
+                                <xrx:default>Authors and Contributors</xrx:default>
+                            </xrx:i18n>
+                        </td>
+                        <td>
+                            <ul>
+								{
+								for $id in $transcription-authors
+								let $username := user:firstname-name($id)
+								order by $id
+								return
+								<li class="no-list-style">
+                                    <span>{ $username }&#160;(</span>
+                                    <xrx:i18n>
+                                        <xrx:key>transcription</xrx:key>
+                                        <xrx:default>Transcription</xrx:default>
+                                    </xrx:i18n>
+                                    <span>)</span>
+                                </li>
+								}
+							</ul>
+                            <ul>
+								{
+								for $id in $indexing-authors
+								let $username := user:firstname-name($id)
+								order by $id
+								return
+								<li class="no-list-style">
+                                    <span>{ $username }&#160;(</span>
+                                    <xrx:i18n>
+                                        <xrx:key>indexing</xrx:key>
+                                        <xrx:default>Indexing</xrx:default>
+                                    </xrx:i18n>
+                                    <span>)</span>
+                                </li>
+								}
+							</ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>date-of-publication</xrx:key>
+                                <xrx:default>Date of Publication</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>{ substring-before($register-entry/atom:published/text(), 'T')}</td>
+                    </tr>
+                    <tr class="grey">
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>last-update</xrx:key>
+                                <xrx:default>Last Update</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>{ substring-before($register-entry/atom:updated/text(), 'T') }</td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>number-of-folios</xrx:key>
+                                <xrx:default>Number of Folios</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>{ $folio-count }</td>
+                    </tr>
+                    <tr class="grey">
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>indexed-acts</xrx:key>
+                                <xrx:default>Indexed acts</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>{ $act-count }</td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>transcribed-acts</xrx:key>
+                                <xrx:default>Transcribed acts</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>{ $transcription-count }</td>
+                    </tr>
+                    <tr class="grey">
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>notes</xrx:key>
+                                <xrx:default>Notes</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>{ $note }</td>
+                    </tr>
+                </table>
+                <br/>
+				{
+				for $entry at $num in $register-db-base-collection//ead:archdesc//ead:indexentry
+				let $year := $entry//ead:title/text()
+				return
+				<table>
+                    <tr class="grey">
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>aldermens-year</xrx:key>
+                                <xrx:default>Aldermen's Year</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>{ $year }</td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <xrx:i18n>
+                                <xrx:key>index-of-aldermen</xrx:key>
+                                <xrx:default>Index of Aldermen</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </td>
+                        <td>
+                            <ul>
+								{
+								for $alderman in $entry//ead:persname
+								let $aldermans-name := $alderman/text()
+								return
+								if($aldermans-name) then
+								<li>
+                                    <span>{ $aldermans-name }</span>
+									{
+									if($alderman[@role='mayor']) then
+									<span>
+                                        <span>&#160;(</span>
+                                        <xrx:i18n>
+                                            <xrx:key>mayor</xrx:key>
+                                            <xrx:default>Mayor</xrx:default>
+                                        </xrx:i18n>
+                                        <span>)</span>
+                                    </span>
+									else()
+									}
+								</li>
+								else()
+								}
+							</ul>
+                        </td>
+                    </tr>
+                </table>
+				}
+			</div>
+        </div>
+		}
+	</xrx:view>
+</xrx:widget>

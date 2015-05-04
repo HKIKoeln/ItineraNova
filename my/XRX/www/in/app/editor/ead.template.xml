@@ -1,0 +1,63 @@
+<atom:entry xmlns:vre="http://www.monasterium.net/NS/vre"
+	xmlns:atom="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app"
+	xmlns:tei="http://www.tei-c.org/ns/1.0/">
+	<atom:id />
+	<atom:title />
+	<atom:published />
+	<atom:updated />
+	<atom:author>
+		<atom:email />
+	</atom:author>
+	<app:control>
+		<app:draft>no</app:draft>
+	</app:control>
+	<atom:content type="application/xml">
+		<ead:ead xmlns:ead="urn:isbn:1-931666-22-9">
+			<ead:eadheader>
+				<ead:eadid />
+				<ead:filedesc>
+					<ead:titlestmt>
+						<ead:titleproper />
+					</ead:titlestmt>
+				</ead:filedesc>
+			</ead:eadheader>
+			<ead:archdesc level="otherlevel" otherlevel="register">
+				<ead:did>
+					<ead:unitid />
+					<ead:unitdate />
+					<ead:physloc type="chamber" />
+					<ead:note />
+				</ead:did>
+				<ead:index>
+					<ead:indexentry>
+						<ead:namegrp>
+							<ead:title />
+							<ead:persname id="pers-01" role="alderman" />
+							<ead:persname id="pers-02" role="alderman" />
+							<ead:persname id="pers-03" role="alderman" />
+							<ead:persname id="pers-04" role="alderman" />
+							<ead:persname id="pers-05" role="alderman" />
+							<ead:persname id="pers-06" role="alderman" />
+							<ead:persname id="pers-07" role="alderman" />
+							<ead:persname id="pers-08" role="alderman" />
+							<ead:persname id="pers-09" role="alderman" />
+							<ead:persname id="pers-10" role="alderman" />
+							<ead:persname id="pers-11" role="alderman" />
+							<ead:persname id="pers-12" role="alderman" />
+							<ead:persname id="pers-13" role="alderman" />
+							<ead:persname id="pers-14" role="alderman" />
+							<ead:persname id="pers-15" role="alderman" />
+							<ead:persname id="pers-16" role="mayor" />
+							<ead:persname id="pers-17" role="mayor" />
+							<ead:persname id="pers-18" role="mayor" />
+							<ead:persname id="pers-19" role="mayor" />
+							<ead:persname id="pers-20" role="mayor" />
+						</ead:namegrp>
+					</ead:indexentry>
+				</ead:index>
+				<ead:dsc>
+				</ead:dsc>
+			</ead:archdesc>
+		</ead:ead>
+	</atom:content>
+</atom:entry>

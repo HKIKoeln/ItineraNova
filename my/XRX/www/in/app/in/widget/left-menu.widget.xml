@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/left-menu</xrx:id>
+    <xrx:res>
+        <xrx:css>
+            <style type="text/css">
+
+/*
+*
+* Left menu
+*
+*/
+#left-menu{{
+	position:realtive;
+	float:left;
+	left:0px;
+	top:80px;
+	width:200px;
+	min-height:700px;
+	
+	margin:10px;
+	padding:0px;
+	z-index:88;
+}}
+#inner-left-menu{{
+  margin-right:20px;
+}}
+
+/*
+*
+* Left menu headings
+*
+*/
+#left-menu .left-menu-heading *{{
+	color:rgb(142,163,132);
+	font-size:large;
+}}
+
+#left-menu .left-menu-heading{{
+  margin:0px;
+  padding:5px;
+}}
+
+
+/*
+*
+* Left menu items
+*
+*/
+#left-menu .left-menu-item{{
+  font-size: 95%;
+  font-weight: bold;
+  color:rgb(142,163,132);
+  text-decoration:none;
+  padding: 5px;
+}}
+
+#left-menu .left-menu-link {{
+  color:rgb(142,163,132);
+  text-decoration: none;
+}}
+
+div.left-menu-item:hover{{
+	cursor: pointer;
+	color:#EF6A2F;
+	background-color:#EFF3E1;
+}}
+
+div.left-menu-item a:hover{{
+	cursor: pointer;
+	color:#EF6A2F;
+	text-decoration: none;  
+}}
+
+
+/*
+*
+* Select viewer and language
+*
+*/		
+#choose-a-viewer-div{{
+	margin:5px;
+	margin-left:20px;
+	background-color:#FF7A3F;
+	padding:10px;
+}}
+
+.lang-select{{
+	margin: 0px;
+	margin-left:5px;
+	padding:0px;   
+}}
+
+	    </style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:model>
+        <xf:model id="mleft-menu">
+            <xf:instance>
+                <xrx:data>
+                    <xrx:lang>{ $xrx:lang }</xrx:lang>
+                </xrx:data>
+            </xf:instance>
+            <xf:instance id="iconfigured-langs">
+	      { conf:param('languages') }
+	    </xf:instance>
+            <xf:bind id="blang" nodeset="//xrx:lang"/>
+        </xf:model>
+    </xrx:model>
+    <xrx:view>
+        <div id="left-menu">
+            <div id="inner-left-menu">
+                <div class="left-menu-heading">
+                    <span>
+                        <xrx:i18n>
+                            <xrx:key>about</xrx:key>
+                            <xrx:default>About</xrx:default>
+                        </xrx:i18n>
+                    </span>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }home" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>home</xrx:key>
+                            <xrx:default>Home</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }state-of-affairs" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>state-of-affairs</xrx:key>
+                            <xrx:default>State of Affairs</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }court-of-alderman" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>court-of-alderman</xrx:key>
+                            <xrx:default>Court of Alderman</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }method" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>method</xrx:key>
+                            <xrx:default>Method</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }subscribe-to-newsletter" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>subscribe-to-newsletter</xrx:key>
+                            <xrx:default>Subscribe to Newsletter</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }newsletter-archive" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>newsletter-archive</xrx:key>
+                            <xrx:default>Newsletter Archive</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }links" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>links</xrx:key>
+                            <xrx:default>Links</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <br/>
+                <div class="left-menu-heading">
+                    <span>
+                        <xrx:i18n>
+                            <xrx:key>collection</xrx:key>
+                            <xrx:default>Collection</xrx:default>
+                        </xrx:i18n>
+                    </span>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }1/chamber" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>browse</xrx:key>
+                            <xrx:default>Browse</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+			{
+			if(false() (:ends-with(request:get-url(), '/browse-folio') and not (ends-with(request:get-url(), '/browse')):))
+			then
+			<div id="choose-a-viewer-div">
+                    <xf:group model="default">
+                        <xf:select1 appearance="full" ref="instance('session')/viewer">
+                            <xf:label>
+                                <b>
+                                    <xrx:i18n>
+                                        <xrx:key>choose-a-viewer</xrx:key>
+                                        <xrx:default>Choose a Viewer</xrx:default>
+                                    </xrx:i18n>
+                                </b>
+                                <br/>
+                            </xf:label>
+                            <xf:item>
+                                <xf:label>
+                                    <xrx:i18n>
+                                        <xrx:key>normal</xrx:key>
+                                        <xrx:default>Normal</xrx:default>
+                                    </xrx:i18n>
+                                    <br/>
+                                </xf:label>
+                                <xf:value>html</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>
+								Javascript
+								<br/>
+                                </xf:label>
+                                <xf:value>javascript</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>Flash</xf:label>
+                                <xf:value>flash</xf:value>
+                            </xf:item>
+                            <xf:action ev:event="xforms-value-changed">
+                                <xf:load show="replace">
+                                    <xf:resource value="concat('{ request:get-url() }?_viewer=', //xrx:viewer)"/>
+                                </xf:load>
+                            </xf:action>
+                        </xf:select1>
+                    </xf:group>
+                </div>
+			else()
+			}
+			<div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }search?_firstvisit=true" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>transcription-search</xrx:key>
+                            <xrx:default>Transcription Search</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }annotation-search?_firstvisit=true" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>annotation-search</xrx:key>
+                            <xrx:default>Annotation Search</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:role>volunteer</xrx:role>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div class="left-menu-item">
+                            <a href="{ conf:param('request-root') }list-of-images" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>list-of-images</xrx:key>
+                                    <xrx:default>List of Images</xrx:default>
+                                </xrx:i18n>
+                            </a>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <span/>
+                    </xrx:false>
+                </xrx:auth>
+                <br/>
+                <div class="left-menu-heading">
+                    <span>
+                        <xrx:i18n>
+                            <xrx:key>my-archive</xrx:key>
+                            <xrx:default>MyArchive</xrx:default>
+                        </xrx:i18n>
+                    </span>
+                </div>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:dbgroup>atom</xrx:dbgroup>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div class="left-menu-item">
+                            <a href="{ conf:param('request-root') }my-transcriptions" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>my-transcriptions</xrx:key>
+                                    <xrx:default>My Transcriptions</xrx:default>
+                                </xrx:i18n>
+                            </a>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <span/>
+                    </xrx:false>
+                </xrx:auth>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:dbgroup>atom</xrx:dbgroup>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <span/>
+                    </xrx:true>
+                    <xrx:false>
+                        <div>
+                            <div class="left-menu-item">
+                                <a href="{ conf:param('request-root') }registration" class="left-menu-link">
+                                    <xrx:i18n>
+                                        <xrx:key>registration</xrx:key>
+                                        <xrx:default>Registration</xrx:default>
+                                    </xrx:i18n>
+                                </a>
+                            </div>
+                            <div class="left-menu-item">
+                                <a href="{ conf:param('request-root') }request-password" class="left-menu-link">
+                                    <xrx:i18n>
+                                        <xrx:key>forgot-password-question</xrx:key>
+                                        <xrx:default>Forgot password?</xrx:default>
+                                    </xrx:i18n>
+                                </a>
+                            </div>
+                        </div>
+                    </xrx:false>
+                </xrx:auth>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:role>archivist</xrx:role>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div class="left-menu-item">
+                            <a href="{ conf:param('request-root') }transcriptions-to-moderate" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>transcriptions-to-moderate</xrx:key>
+                                    <xrx:default>Transcriptions to moderate</xrx:default>
+                                </xrx:i18n>
+                            </a>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <span/>
+                    </xrx:false>
+                </xrx:auth>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:dbgroup>atom</xrx:dbgroup>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div>
+                            <xrx:auth>
+                                <xrx:rules>
+                                    <xrx:rule>
+                                        <xrx:user/>
+                                        <xrx:role>moderator</xrx:role>
+                                    </xrx:rule>
+                                </xrx:rules>
+                                <xrx:true>
+                                    <div class="left-menu-item">
+                                        <a href="{ conf:param('request-root') }annotations-to-moderate" class="left-menu-link">
+                                            <xrx:i18n>
+                                                <xrx:key>annotations-to-moderate</xrx:key>
+                                                <xrx:default>Annotations to moderate</xrx:default>
+                                            </xrx:i18n>
+                                        </a>
+                                    </div>
+                                </xrx:true>
+                                <xrx:false>
+                                    <div class="left-menu-item">
+                                        <a href="{ conf:param('request-root') }my-annotations" class="left-menu-link">
+                                            <xrx:i18n>
+                                                <xrx:key>my-annotations</xrx:key>
+                                                <xrx:default>My Annotations</xrx:default>
+                                            </xrx:i18n>
+                                        </a>
+                                    </div>
+                                </xrx:false>
+                            </xrx:auth>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <div/>
+                    </xrx:false>
+                </xrx:auth>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:role>translator</xrx:role>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div class="left-menu-item">
+                            <a href="{ conf:param('request-root') }translate" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>translations</xrx:key>
+                                    <xrx:default>Translations</xrx:default>
+                                </xrx:i18n>
+                            </a>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <span/>
+                    </xrx:false>
+                </xrx:auth>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:role>user-administrator</xrx:role>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div class="left-menu-item">
+                            <a href="{ conf:param('request-root') }manage-roles" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>manage-roles</xrx:key>
+                                    <xrx:default>Manage roles</xrx:default>
+                                </xrx:i18n>
+                            </a>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <span/>
+                    </xrx:false>
+                </xrx:auth>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:dbgroup>atom</xrx:dbgroup>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div class="left-menu-item">
+                            <a href="{ conf:param('request-root') }change-password" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>change-password</xrx:key>
+                                    <xrx:default>Change my password</xrx:default>
+                                </xrx:i18n>
+                            </a>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <span/>
+                    </xrx:false>
+                </xrx:auth>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:rule>
+                            <xrx:user/>
+                            <xrx:dbgroup>atom</xrx:dbgroup>
+                        </xrx:rule>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div class="left-menu-item">
+            {
+            let $refer := xmldb:encode(concat(request:get-uri(), '?',
+              request:get-query-string()))
+            return
+            <a href="{ conf:param('request-root') }service/?atomid=tag:www.monasterium.net,2011:/core/service/logout2&amp;refer={ $refer }" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>logout</xrx:key>
+                                    <xrx:default>Logout</xrx:default>
+                                </xrx:i18n>
+                            </a>
+            }
+          </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <div class="left-menu-item">
+            {
+            let $refer := xmldb:encode(concat(request:get-uri(), '?',
+              request:get-query-string()))
+            return
+            <a href="{ conf:param('request-root') }login2?refer={ $refer }" class="left-menu-link">
+                                <xrx:i18n>
+                                    <xrx:key>login</xrx:key>
+                                    <xrx:default>Login</xrx:default>
+                                </xrx:i18n>
+                            </a>
+            }
+          </div>
+                    </xrx:false>
+                </xrx:auth>
+                <br/>
+                <div class="lang-select">
+			  {
+			  if($xrx:xformsflag) then
+				<xf:group model="mleft-menu">
+                        <xf:select1 bind="blang">
+                            <xf:label>
+                                <xrx:i18n>
+                                    <xrx:key>choose-a-language</xrx:key>
+                                    <xrx:default>Choose a Language</xrx:default>
+                                </xrx:i18n>
+                                <span>:</span>
+                            </xf:label>
+                            <xf:itemset nodeset="instance('iconfigured-langs')//xrx:lang">
+                                <xf:label ref="@name"/>
+                                <xf:value ref="@key"/>
+                            </xf:itemset>
+                            <xf:action ev:event="xforms-value-changed">
+                                <xf:load show="replace">
+                                    <xf:resource value="concat('{ request:get-url() }{ xrx:request-query-string('', '') }&amp;_lang=', //xrx:lang)"/>
+                                </xf:load>
+                            </xf:action>
+                        </xf:select1>
+                    </xf:group>
+				else
+        <form name="langselect-form" method="get">
+                        <div>
+                            <xrx:i18n>
+                                <xrx:key>choose-a-language</xrx:key>
+                                <xrx:default>Choose a Language</xrx:default>
+                            </xrx:i18n>
+                            <span>:</span>
+                        </div>
+                        <select name="_lang" onchange="this.langselect-form.submit();">
+            {
+            for $language in conf:param('languages')//xrx:lang
+            let $lang-name := data($language/@name)
+            let $lang-key := $language/@key/string()
+            return
+            element option
+            {
+            attribute value { $lang-key },
+            if($lang-key = xs:string($xrx:lang)) then attribute selected {'selected'} else
+            (),
+            text { $lang-name }
+            }
+            }
+         </select>
+          {
+          for $param in request:get-parameter-names()
+          return
+          if(not(starts-with($param, '_'))) then
+          <input type="hidden" name="{ $param }" value="{ request:get-parameter($param, ()) }"/>
+          else()
+          }
+        </form>
+        }
+			</div>
+                <br/>
+                <br/>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }imprint" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>imprint</xrx:key>
+                            <xrx:default>Imprint</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <div class="left-menu-item">
+                    <a href="{ conf:param('request-root') }contact" class="left-menu-link">
+                        <xrx:i18n>
+                            <xrx:key>contact</xrx:key>
+                            <xrx:default>Contact</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </xrx:view>
+</xrx:widget>

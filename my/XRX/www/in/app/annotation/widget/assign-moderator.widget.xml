@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/assign-moderator</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key>assign-moderator</xrx:key>
+            <xrx:default>Assign moderator</xrx:default>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>andre.streicher@uni-koeln.de</xrx:author>
+    <xrx:licence>
+This is a component file of the VdU Software for a Virtual Research Environment for the handling of Medieval charters.
+
+As the source code is available here, it is somewhere between an alpha- and a beta-release, may be changed without any consideration of backward compatibility of other parts of the system, therefore, without any notice.
+
+This file is part of the VdU Virtual Research Environment Toolkit (VdU/VRET).
+
+The VdU/VRET is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VdU/VRET is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VdU/VRET.  If not, see http://www.gnu.org/licenses.
+
+We expect VdU/VRET to be distributed in the future with a license more lenient towards the inclusion of components into other systems, once it leaves the active development stage.
+  </xrx:licence>
+    <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:xformsflag>true</xrx:xformsflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:model>
+    </xrx:model>
+    <xrx:res>
+        <xrx:js>
+            <script type="text/javascript" src="{ conf:param('request-root') }jquery.min.js"/>
+            <script type="text/javascript" src="{ conf:param('request-root') }assignModerator-functions.js"/>
+        </xrx:js>
+        <xrx:css>
+            <xrx:include>
+                <xrx:css>tag:itineranova.be,2011:/in/css/global</xrx:css>
+            </xrx:include>
+            <style type="text/css">
+
+#basic{{
+    position:relative;
+    height:100%;
+}}
+
+#category-list{{
+    position:relative;
+    float:left;
+    background:#f0f0f0;
+    padding:10px;
+    height:100%;
+    width:95%;
+    bottom:10px;
+}}
+
+#add-new-category{{
+    position:relative;
+    left:20px;
+    background:#f0f0f0;
+}}
+
+.button{{
+    background-image:url(bfResources/scripts/dijit/themes/tundra/images/buttonEnabled.png);
+    border:solid #BDBDBD 1px;
+    border-bottom:solid #848484 1px;
+    padding: 1px 5px;
+    cursor:pointer;
+}}
+
+.button:hover{{
+    background-image:url(bfResources/scripts/dijit/themes/tundra/images/buttonHover.png);
+}}
+
+			</style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:model>
+        <xf:model id="mdefault-header">
+            <xf:instance>
+                <xrx:data>
+                    <xrx:lang>{ $xrx:lang }</xrx:lang>
+                </xrx:data>
+            </xf:instance>
+            <xf:instance id="iconfigured-langs">
+                { conf:param('languages') }
+            </xf:instance>
+            <xf:bind id="blang" nodeset="//xrx:lang"/>
+        </xf:model>
+    </xrx:model>
+    <xrx:view>
+        <div>
+            {
+            <div id="basic">
+                <div>
+                    <a href="{ concat(conf:param('request-root'), 'annotations-to-moderate') }">
+                        <span>&lt;&lt;</span>
+                        <xrx:i18n>
+                            <xrx:key>back</xrx:key>
+                            <xrx:default>back</xrx:default>
+                        </xrx:i18n>
+                    </a>
+                </div>
+                <xrx:auth>
+                    <xrx:rules>
+                        <xrx:or>
+                            <xrx:rule>
+                                <xrx:user/>
+                                <xrx:role>moderator</xrx:role>
+                            </xrx:rule>
+                            <xrx:rule>
+                                <xrx:user/>
+                                <xrx:role>archivist</xrx:role>
+                            </xrx:rule>
+                        </xrx:or>
+                    </xrx:rules>
+                    <xrx:true>
+                        <div id="content-area">
+                            <div class="h2">
+                                <xrx:i18n>
+                                    <xrx:key>assign-moderator-to-user</xrx:key>
+                                    <xrx:default>Assign moderator to user</xrx:default>
+                                </xrx:i18n>
+                            </div>
+                            <br/>
+                            <div id="category-list">
+                                                    {
+                                                    let $members := role:emails('moderator')
+                                                    return
+                                                    <div id="list">
+                                    <table>
+                                                    {
+                                                    (: user info :)
+                                                    let $user-xmls :=
+                                                            for $user in $user:db-base-collection/xrx:user
+                                                            order by $user/xrx:name
+                                                                return
+                                                                $user
+                                                    for $user at $number in $user-xmls
+                                                    let $firstname := $user/xrx:firstname/text()
+                                                    let $name := $user/xrx:name/text()
+                                                    let $email := $user/xrx:email/text()
+                                                    let $moderator := $user/xrx:moderator/text()
+                                                    return
+                                                    <tr id="user{ $number }" style="position:relative;">
+                                            <td style="position:relative;float:left;padding:5px;width:390px;">
+                                                <span style="position:relative;top:-3px;">‣ { $name }, { $firstname } ({ $email })</span>
+                                            </td>
+                                            <td style="position:relative;float:left;padding:5px;width:270px;border-right:solid grey 1px;border-left:solid grey 1px;height:10px;">
+                                                <span style="position:relative;top:-3px;" id="modContainer{ $number }">
+                                                    <xrx:i18n>
+                                                        <xrx:key>moderator</xrx:key>
+                                                        <xrx:default>Moderator</xrx:default>
+                                                    </xrx:i18n>:
+                                                                <span id="modText{ $number }">{ $moderator }</span>
+                                                </span>
+                                                <select style="position:relative;top:-5px;border:solid grey 1px;display:none;" id="modSelect{ $number }">
+                                                                {
+                                                                for $member in $members
+                                                                return
+                                                                    if($member = $moderator)then
+                                                                        <option selected="selected">{$member}</option>
+                                                                    else
+                                                                        <option>{$member}</option>
+                                                                }
+                                                            </select>
+                                            </td>
+                                            <td style="position:relative;float:left;padding:5px;">
+                                                <div id="edit{ $number }" class="button" style="position:relative;left:3px;top:-5px;float:left;" onClick="prepareEdit('{ $number }')">
+                                                    <xrx:i18n>
+                                                        <xrx:key>edit</xrx:key>
+                                                        <xrx:default>Edit</xrx:default>
+                                                    </xrx:i18n>
+                                                </div>
+                                                <div id="save{ $number }" class="button" style="position:relative;left:3px;top:-5px;float:left;display:none;" onClick="saveModeration('{ $number }', '{ $email }')">
+                                                    <xrx:i18n>
+                                                        <xrx:key>save</xrx:key>
+                                                        <xrx:default>Save</xrx:default>
+                                                    </xrx:i18n>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                                    }
+                                                    </table>
+                                </div>
+                                                    }
+                                                </div>
+                        </div>
+                    </xrx:true>
+                    <xrx:false>
+                        <div>
+                            <div class="h2">
+                                <xrx:i18n>
+                                    <xrx:key>assign-moderator-to-user</xrx:key>
+                                    <xrx:default>Assign moderator to user</xrx:default>
+                                </xrx:i18n>
+                            </div>
+                            <xrx:i18n>
+                                <xrx:key>protected-page-message</xrx:key>
+                                <xrx:default>Protected page. Please login first.</xrx:default>
+                            </xrx:i18n>
+                            <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/login2</xrx:subwidget>
+                        </div>
+                    </xrx:false>
+                </xrx:auth>
+            </div>
+            }
+        </div>
+    </xrx:view>
+</xrx:widget>

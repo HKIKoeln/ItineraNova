@@ -1,0 +1,181 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" 
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/discard-transcription</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>discard-transcription</xrx:key>
+      <xrx:default>Discard Transcription</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>true</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+	    <xrx:include>
+	      <xrx:css>tag:itineranova.be,2011:/in/css/transcription-preview</xrx:css>
+	    </xrx:include>
+      <style type="text/css">
+
+#dcontext-info{{
+  font-weight:bold;
+  font-size:1.4em;
+  margin:10px;
+}}
+
+#comment-textarea .xfValue{{
+  position:relative;
+  float:left;
+  width:745px;
+}}
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model>
+  {
+    (: request parameter :)
+    let $register := $xrx:tokenized-uri[1]
+    let $act := $xrx:tokenized-uri[2]
+    let $scope := $xrx:tokenized-uri[3]
+    return
+    <xf:model id="mdiscard-transcription">
+      <xf:instance>
+        <data xmlns="">
+          <register>{ $register }</register>
+          <act>{ $act }</act>
+          <scope>{ $scope }</scope>
+          <comment/>
+        </data>
+      </xf:instance>
+      <xf:submission id="sdiscard-transcription" action="{ conf:param('request-root') }service/?atomid=tag:itineranova.be,2011:/in/service/discard-transcription" method="post" replace="none"/>
+    </xf:model>
+  }
+  </xrx:model>
+  <xrx:view>
+  {
+    (: request parameter :)
+    let $register := $xrx:tokenized-uri[1]
+    let $act := $xrx:tokenized-uri[2]
+    let $act-decoded := xmldb:decode($act)
+    let $scope := $xrx:tokenized-uri[3]
+  
+    (: get the entry :)
+    let $atomid := metadata:atomid('transcription', ($register, $act))
+    let $transcription-base-collection := metadata:base-collection('transcription', $register, $scope)
+    let $transcription-entry := $transcription-base-collection//atom:id[.=$atomid]/parent::atom:entry
+    let $author := $transcription-entry/atom:author/atom:email/text()
+    
+    (: security info :)
+    let $is-archivist := auth:matches(<xrx:rule><xrx:user/><xrx:role>archivist</xrx:role></xrx:rule>)
+    let $is-author := $author = $xrx:user-id
+    let $may-discard := (($scope = 'draft') and ($is-archivist = true())) or (($scope = 'private') and ($is-author = true()))
+    
+    (: cancel link :)
+    let $cancel-link := 
+      if($scope = 'private') then concat(conf:param('request-root'), 'my-transcriptions')
+      else concat(conf:param('request-root'), 'transcriptions-to-moderate')
+    
+    return
+    <div>
+      <div class="h2">
+        <xrx:i18n>
+          <xrx:key>discard-transcription</xrx:key>
+          <xrx:default>Discard Transcription</xrx:default>
+        </xrx:i18n>
+      </div>
+      <xrx:auth>
+        <xrx:rules>
+          <xrx:rule>
+	          <xrx:user/>
+	          <xrx:dbgroup>atom</xrx:dbgroup>
+	        </xrx:rule>
+        </xrx:rules>
+        <xrx:true>
+          <div>
+            {
+            if($may-discard) then
+            <div>
+				      <div>
+				        <xrx:i18n>
+				          <xrx:key>confirm-discard-transcription-message</xrx:key>
+				          <xrx:default>Do you really want to discard this transcription? This can not be undone.</xrx:default>
+				        </xrx:i18n>
+				      </div>
+				      <div id="dcontext-info">
+				        <span>{ $register }, </span>
+				        <span>{ $act-decoded }</span>
+				      </div>
+	            <div id="dcomment">
+	              <div>
+	                <span>
+	                  <xrx:i18n>
+	                    <xrx:key>comment</xrx:key>
+	                    <xrx:default>Comment</xrx:default>
+	                  </xrx:i18n>
+	                </span>
+	              </div>
+	              <xf:group model="mdiscard-transcription">
+	                <xf:textarea id="comment-textarea" appearance="growing" ref="comment"/>
+	              </xf:group>
+	            </div>
+				      <div id="dtrigger">
+					      <xf:group model="mdiscard-transcription">
+					        <xf:trigger>
+					          <xf:label>
+					            <xrx:i18n>
+					              <xrx:key>cancel</xrx:key>
+					              <xrx:default>Cancel</xrx:default>
+					            </xrx:i18n>
+					          </xf:label>
+					          <xf:action ev:event="DOMActivate">
+					            <xf:load show="replace" resource="{ $cancel-link }{ if($scope = 'draft') then concat('?', transcription:rquery-string()) else '' }#{ $atomid }"/>
+					          </xf:action>
+					        </xf:trigger>
+					        <xf:trigger>
+					          <xf:label>
+					            <xrx:i18n>
+					              <xrx:key>discard-now</xrx:key>
+					              <xrx:default>Discard now</xrx:default>
+					            </xrx:i18n>
+					            <span>!</span>
+					          </xf:label>
+					          <xf:action ev:event="DOMActivate">
+					            <xf:send submission="sdiscard-transcription"/>
+				              <xf:load show="replace" resource="{ $cancel-link }"/>
+					          </xf:action>
+					        </xf:trigger>
+					      </xf:group>
+					    </div>
+					  </div>
+				    else
+				    <div>
+				      <xrx:i18n>
+				        <xrx:key>action-not-allowed</xrx:key>
+				        <xrx:default>Action is not allowed</xrx:default>
+				      </xrx:i18n>
+				    </div>
+				    }
+				  </div>
+			  </xrx:true>
+			  <xrx:false>
+			    <div>
+			      <xrx:i18n>
+			        <xrx:key>protected-page-message</xrx:key>
+			        <xrx:default>Protected page. Please login first.</xrx:default>
+			      </xrx:i18n>
+			    </div>
+			  </xrx:false>
+	    </xrx:auth>
+    </div>
+  }
+  </xrx:view>
+</xrx:widget>

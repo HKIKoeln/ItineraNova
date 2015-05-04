@@ -1,0 +1,59 @@
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns:xf="http://www.w3.org/2002/xforms">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/indexing-main</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/fullscreen</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>true</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+      <style type="text/css">
+#evtLogContainer{{
+  display:none;
+}}
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model>
+  </xrx:model>
+  <xrx:view>
+    <div>
+      <xrx:auth>
+        <xrx:rules>
+          <xrx:rule>
+            <xrx:user/>
+            <xrx:role>archivist</xrx:role>
+          </xrx:rule>
+        </xrx:rules>
+        <xrx:true>
+          <div>
+			      <xrx:subwidget>tag:itineranova.be,2011:/in/widget/indexing-iipmooviewer</xrx:subwidget>
+			      <xrx:subwidget>tag:itineranova.be,2011:/in/widget/indexing-form-main</xrx:subwidget>
+		      </div>
+			  </xrx:true>
+			  <xrx:false>
+			    <span>
+			      <xrx:i18n>
+			        <xrx:key>protected-page-message</xrx:key>
+			        <xrx:default>Protected page. Please login first.</xrx:default>
+			      </xrx:i18n>
+			    </span>
+			  </xrx:false>
+      </xrx:auth>
+    </div>
+  </xrx:view>
+</xrx:widget>

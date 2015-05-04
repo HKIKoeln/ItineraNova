@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/folio</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key>folio</xrx:key>
+            <xrx:default>Folio</xrx:default>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+    <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:xformsflag>false</xrx:xformsflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:res>
+        <link rel="stylesheet" type="text/css" media="all" href="/lib/iipmooviewer-1.1/css/iip.css"/>
+        <xrx:js>
+            <script type="text/javascript" src="{ conf:param('request-root') }jquery.min.js"/>
+            <script type="text/javascript" src="{ conf:param('request-root') }jquery.mousewheel.js"/>
+            <script type="text/javascript" src="{ conf:param('request-root') }jquery.Jcrop.js"/>
+            <!--script type="text/javascript" src="/lib/iipmooviewer-1.1/javascript/mootools-1.2-core-compressed.js"/>
+            <script type="text/javascript" src="/lib/iipmooviewer-1.1/javascript/mootools-1.2-more-compressed.js"/>
+            <script type="text/javascript" src="/lib/iipmooviewer-1.1/javascript/iipmooviewer-1.1.js"/-->
+            <script type="text/javascript" src="{ conf:param('request-root') }folio-functions.js"/>
+        </xrx:js>
+        <xrx:css>
+            <style type="text/css">
+		  
+#content{{
+  margin:0;
+}}
+#viewer{{
+  width:780px;
+}}
+#image-navi-top{{
+  position:absolute;
+  right:0px;
+  top:-34px;
+  margin:0px;
+  padding:0px;
+  z-index:9999;
+}}
+#image-navi-bottom{{
+  position:absolute;
+  right:0px;
+  bottom:-32px;
+  margin:0px;
+  padding:0px;
+  z-index:9999;
+}}
+#image-navi input{{
+	border:0.1em outset #BBB;
+	border-right:0.1em solid #CCC;
+	font-size:14px;
+	text-decoration:none;
+	text-align:center;
+	padding:0.4em;
+	height:30px;
+	cursor:pointer;
+	margin:0px;
+}}
+#image-navi input:hover {{
+	border-style:inset;
+}}
+#context-label {{
+	position:absolute;
+	left:0px;
+	top:-22px;
+}}
+#folio-img{{
+  width:780px;
+	margin:0px;
+	padding:0px;
+	border:none;
+}}
+.white-text{{
+	color:white;
+}}
+
+.direct{{
+        display:none;
+        z-index:3;
+        position:absolute;
+        background: rgba(0, 0, 0, 0.0);
+        border:solid #EF6A2F 1px;
+        -moz-border-radius:3px;
+        -webkit-border-radius:3px;
+        -khtml-border-radius:3px;
+        border-radius:3px;
+    }}
+
+#dbrowse-folio .transparent-div{{
+  background-color:black;
+  color:white;
+  font-weight:bold;
+  z-index:9999;
+  top:0px;
+  right:0px;
+  padding:10px;
+  position:absolute;
+  opacity:0.8; 
+  height:20px;
+}}
+
+#directanno{{
+       display: none;
+       position:absolute;
+       background:white;
+       z-index:20;
+       float:left;
+       width:191px;
+       border:solid #EF6A2F 1px;
+       -moz-border-radius:10px; /* Firefox */
+       -webkit-border-radius:10px; /* Safari, Chrome */
+       -khtml-border-radius:10px; /* Konqueror */
+       border-radius:5px; /* CSS3 */
+    }}
+    
+    .button {{
+        -moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+				-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+				box-shadow:inset 0px 1px 0px 0px #ffffff;
+				background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+				background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+				filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+				background-color:#ededed;
+				-moz-border-radius:6px;
+				-webkit-border-radius:6px;
+				float:left;
+				border-radius:6px;
+				border:1px solid #dcdcdc;
+				display:inline;
+				color:#777777;
+				font-family:arial;
+				font-size:15px;
+				font-weight:bold;
+				padding:8px 18px;
+				text-decoration:none;
+				text-shadow:1px 1px 0px #ffffff;
+				margin:1px;
+				cursor:default;
+    }}
+                  
+    .button:hover{{
+      background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+			background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+			filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+			background-color:#dfdfdf;
+			cursor:default;
+    }}
+    
+    #transcription{{
+       float: left;
+       border: 1px solid rgb(142,163,132);
+       background: transparent;
+       top:5px;
+       left:2px;
+       max-width:278px;
+       width: 278px;
+       height: 100px;
+    }}
+    
+    #comment{{
+       float: left;
+       border: 1px solid rgb(142,163,132);
+       background: transparent;
+       top:5px;
+       left:2px;
+       max-width:278px;
+       width: 278px;
+       height: 100px;
+    }}
+    
+    #search-label{{
+        color:rgb(142,163,132);
+        position:absolute;
+        background:white;
+        padding:5px;
+        border:solid #EF6A2F 1px;
+        -moz-border-radius:10px; /* Firefox */
+        -webkit-border-radius:10px; /* Safari, Chrome */
+        -khtml-border-radius:10px; /* Konqueror */
+        border-radius:5px; /* CSS3 */
+        -moz-box-shadow: 2px 2px 2px #888;
+        -webkit-box-shadow: 2px 2px 2px #888;
+        box-shadow: 2px 2px 2px #888;
+        top:-65px;
+    }}
+    
+    
+    #tooltip {{
+    display: none;
+    position: fixed;
+    z-index:99999;
+    top: 200px;
+    left: 200px;
+    width: 280px;
+    background-color: white;
+    padding:5px;
+    cursor: pointer;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    -khtml-border-radius:3px;
+    border: solid #EF6A2F 1px;
+    border-radius:5px;
+    -moz-box-shadow:    4px -3px 10px 1px #202020;
+    -webkit-box-shadow: 4px -3px 10px 1px #202020;
+    box-shadow:         4px -3px 10px 1px #202020;
+		}}
+		
+		#data{{
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}}
+		
+		#showInterface{{
+			display: block;
+		}}
+		
+		#editInterface{{
+			display: none;
+			z-index:40;
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}}
+		
+		#buttonBar{{
+			position:relative;
+			z-index:40;
+			top:4px;
+			padding:4px;
+			left:25px;
+		}}
+		
+		#editTaskBar{{
+			position:relative;
+			display:none;
+			padding:5px;
+		}}
+		
+		#editSurfaceBar{{
+			position:relative;
+			display:none;
+			padding:5px;
+		}}
+		
+		#directselected{{
+			display:none;
+			position:absolute;
+			-moz-border-radius:3px;
+			-webkit-border-radius:3px;
+			-khtml-border-radius:3px;
+			border-radius:3px;
+			border:solid blue 1px;
+			z-index:20;
+		}}
+		
+		#wfR{{
+			display:none;
+			padding:5px;
+		}}
+		
+		#wfR span{{
+			position:relative;
+			left:80px;
+			color:rgb(142,163,132);
+			font-weight:bold;
+    	font-size:13;
+    	-moz-border-radius:3px;
+			-webkit-border-radius:3px;
+			-khtml-border-radius:3px;
+			border-radius:3px;
+			border:solid rgb(142,163,132) 1px;
+			width:100%;
+			padding:3px;
+		}}
+		
+		#reportInterface{{
+			position:relative;
+			display:none;
+		}}
+		    
+    .annoTask{{
+       display: inline;
+       position:relative;
+       float:left;
+       height: 15px;
+    }}
+    
+    #taskBar{{
+    	position: relative;
+    	top: 3px;
+    	z-index: 40;
+    	width:100%;
+    }}
+      </style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:view>
+	  {
+	  (: request parameters :)
+    let $register-id := $xrx:tokenized-uri[1]
+    let $folio-id := $xrx:tokenized-uri[2]
+    let $viewer := session:get-attribute('viewer')
+    let $all-params := request:get-parameter-names()
+    let $search := if(count($all-params) gt 0)then
+                        request:get-query-string()
+                   else ''
+	
+	  (: register info :)
+	  let $register-db-base-collection := metadata:base-collection('register', $register-id, 'public')
+	  
+	  (: list of images :)
+	  (: image server base uri :)
+    let $image-server-base-uri := 'http://itineranova.be/images/'
+    (: all image elements :)
+    let $image-elements := $register-db-base-collection//ead:archdesc/ead:dao
+    (: count image elements :)
+    let $image-count := count($image-elements)
+
+
+     
+    (: actual image :)
+    (: element :)
+    let $image-element := $image-elements[@xlink:title=xmldb:decode($folio-id)]
+    (: url :)
+    let $image-url := data($image-element/@xlink:href)
+    (: title :)
+    let $image-title := data($image-element/@xlink:title)
+
+    (: the index of the actual image element :)
+    let $index :=
+	    for $f at $ind in $register-db-base-collection//ead:ead//ead:dao
+	    return
+	    if(data($f/@xlink:title)=xmldb:decode($folio-id))
+	    then $ind
+	    else()
+    
+    (: image server folder :)
+    let $image-path := translate(substring-after($image-url,$image-server-base-uri), '.jpg', '.tif')     
+
+
+    (: act info :)
+    let $act-db-base-collection := metadata:base-collection('act', $register-id, 'public')
+    let $related-acts := $act-db-base-collection//ead:c[@otherlevel='textgroup'][.//ead:dao/@xpointer=$image-title]
+
+    (: image viewer :)
+    (: backward 1 :)
+    let $backward-1 :=
+        if(not($index = 1))then
+            ((xs:integer($index) - 1) + $image-count) mod ($image-count)
+        else
+            $image-count
+    (: backward 10 :)
+    let $backward-10 := 
+      ((xs:integer($index) - 10) + $image-count) mod ($image-count)
+    (: backward 100 :) 
+    let $backward-100 := 
+      ((xs:integer($index) - 100) + $image-count) mod ($image-count)
+    (: forward 1 :)
+    let $forward-1 := 
+        if(not($index+1 = $image-count))then
+            (xs:integer($index) + 1) mod ($image-count)
+        else
+            $image-count
+    (: forward 10 :)
+    let $forward-10 := 
+      (xs:integer($index) + 10) mod ($image-count)   
+    (: forward 100 :)
+    let $forward-100 := (xs:integer($index) + 100) mod ($image-count)
+    
+    let $image-navi :=
+    <div id="image-navi">
+            <input type="button" value="|&lt;" onclick="location.href = '{ folio:link(($register-id, data($image-elements[1]/@xlink:title))) }';" style="padding:3px 8px;"/>
+            <input type="button" value="-100" onclick="location.href = '{ folio:link(($register-id, data($image-elements[$backward-100]/@xlink:title))) }';" style="padding:3px 8px;"/>
+            <input type="button" value="-10" onclick="location.href = '{ folio:link(($register-id, data($image-elements[$backward-10]/@xlink:title))) }';" style="padding:3px 8px;"/>
+            <input type="button" value="-1" onclick="location.href = '{ folio:link(($register-id, data($image-elements[$backward-1]/@xlink:title))) }';" style="padding:3px 8px;"/>
+            <input type="button" value="+1" onclick="location.href = '{ folio:link(($register-id, data($image-elements[$forward-1]/@xlink:title))) }';" style="padding:3px 8px;"/>
+            <input type="button" value="+10" onclick="location.href = '{ folio:link(($register-id, data($image-elements[$forward-10]/@xlink:title))) }';" style="padding:3px 8px;"/>
+            <input type="button" value="+100" onclick="location.href = '{ folio:link(($register-id, data($image-elements[$forward-100]/@xlink:title))) }';" style="padding:3px 8px;"/>
+            <input type="button" value="&gt;|" onclick="location.href = '{ folio:link(($register-id, data($image-elements[$image-count]/@xlink:title))) }';" style="padding:3px 8px;"/>
+        </div>          
+	  return
+		<div id="dbrowse-folio">
+            <div id="viewer" onmouseover="jQuery('.direct').css('display', 'block');" onmouseout="jQuery('.direct').css('display', 'none');">
+                {
+                if($search != '')then
+                <div id="search-label">
+                    <b>
+                        <a href="{ conf:param('request-root') }annotation-search?{$search}" style="color:rgb(142,163,132);padding:5px;">
+                            «
+                            <xrx:i18n>
+                                <xrx:key>back-to-search</xrx:key>
+                                <xrx:default>Back to search</xrx:default>
+                            </xrx:i18n>
+                        </a>
+                    </b>
+                </div>
+                else()
+                }
+                <div id="context-label">
+                    <span>{ $register-id }</span>
+                    <span>, </span>
+                    <span>
+                        <xrx:i18n>
+                            <xrx:key>folio</xrx:key>
+                            <xrx:default>Folio</xrx:default>
+                        </xrx:i18n>
+                        <span>:&#160;{ $image-title }</span>
+                    </span>
+                    <span>
+                        <span>&#160;({ $index }&#160;</span>
+                        <xrx:i18n>
+                            <xrx:key>of</xrx:key>
+                            <xrx:default>of</xrx:default>
+                        </xrx:i18n>
+                        <span>&#160;{ $image-count })</span>
+                    </span>
+                </div>
+                <a id="folio-img-link" href="{ $image-url }" title="{ $image-title }">
+                    <img id="folio-img" src="{ $image-url }" alt="{ $image-title }"/>
+                </a>
+                <div id="directselected"/>
+                <div id="publicAnnos">
+	            		{
+	            		let $directannos := collection(concat(conf:param('annotation-db-base-uri'), $register-id, '/', $folio-id))//*:TEI[string(./*:facsimile/*:surfaceGrp/*:graphic/@url) = $image-url]
+	            		for $directanno at $number in $directannos
+	            		return
+	            		<div id="pub{string($directanno/*:facsimile/*:surfaceGrp/@id)}" name="publicAnno">
+                        <div id="publicfields{$number}">
+	            				{
+	            				let $pub-surfaces := $directanno/*:facsimile/*:surfaceGrp/*:surface
+	            				let $pub-jQuery-on-strings :=
+	            				for $pub-surface at $index in $pub-surfaces
+	            				return
+	            				concat("jQuery('#pubannofield", $number, "-", $index, "').css('border-color','blue');")
+	            				let $pub-jQuery-out-strings :=
+	            				for $pub-surface at $index in $pub-surfaces
+	            				return
+	            				concat("jQuery('#pubannofield", $number, "-", $index, "').css('border-color','#EF6A2F');")
+	            				let $pub-on-mouse-over := 
+	            				string-join(
+	            				$pub-jQuery-on-strings,
+	            				' '                   
+	            				)
+	            				let $pub-on-mouse-out := 
+	            				string-join(
+	            				$pub-jQuery-out-strings,
+	            				' '                   
+	            				)
+	            				for $surface at $index in $pub-surfaces
+	            				return
+	            				<div>
+                                <xrx:auth>
+                                    <xrx:rules>
+                                        <xrx:rule>
+                                            <xrx:user/>
+                                            <xrx:role>moderator</xrx:role>
+                                        </xrx:rule>
+                                    </xrx:rules>
+                                    <xrx:true>
+                                        <div id="pubannofield{$number}-{$index}" class="direct" style="left:{xs:integer($surface/@ulx)}px;top:{xs:integer($surface/@uly)}px;height:{xs:integer($surface/@lrx)}px;width:{xs:integer($surface/@lry)}px;" onmouseover="{ $pub-on-mouse-over }" onmouseout="{ $pub-on-mouse-out }" onClick="loadInfoTool('{string($directanno/*:facsimile/*:surfaceGrp/@id)}', '{$xrx:user-id}', '{$number}', 'moderator', 'public', '{ $register-id }', '{ $folio-id }', '{ $xrx:lang }')" lang="{$surface/@id}"/>
+                                    </xrx:true>
+                                    <xrx:false>
+                                        <div id="pubannofield{$number}-{$index}" class="direct" style="left:{xs:integer($surface/@ulx)}px;top:{xs:integer($surface/@uly)}px;height:{xs:integer($surface/@lrx)}px;width:{xs:integer($surface/@lry)}px;" onmouseover="{ $pub-on-mouse-over }" onmouseout="{ $pub-on-mouse-out }" onClick="loadInfoTool('{string($directanno/*:facsimile/*:surfaceGrp/@id)}', '{$xrx:user-id}', '{$number}', 'user', 'public', '{ $register-id }', '{ $folio-id }', '{ $xrx:lang }')" lang="{$surface/@id}"/>
+                                    </xrx:false>
+                                </xrx:auth>
+                            </div>
+	            				}  
+	            			</div>
+                    </div>
+	            		}      
+	            	</div>
+                <div id="tooltip" onmousedown="moveTooltip(event);" onmouseup="stopTooltip(event);">
+                    <div id="showInterface">
+                        <img src="{ conf:param('request-root') }button_close.png" style="position:absolute;left:277px;top:4px;width:10px;" title="Close information field" onClick="closeInfoField()"/>
+                        <div id="data" onmouseup="stopTooltip(event);">
+                            <span style="font-weight:bold">
+                                <xrx:i18n>
+                                    <xrx:key>category</xrx:key>
+                                    <xrx:default>Category</xrx:default>
+                                </xrx:i18n>:&#160;</span>
+                            <span id="category-content"/>
+                            <br/>
+                            <span style="font-weight:bold">
+                                <xrx:i18n>
+                                    <xrx:key>keyword</xrx:key>
+                                    <xrx:default>Keyword</xrx:default>
+                                </xrx:i18n>:&#160;</span>
+                            <span id="keyword-content"/>
+                            <br/>
+                            <span style="font-weight:bold">
+                                <xrx:i18n>
+                                    <xrx:key>transcription</xrx:key>
+                                    <xrx:default>Transcription</xrx:default>
+                                </xrx:i18n>:&#160;</span>
+                            <span id="transcription-content"/>
+                            <div id="contributor-div">
+                                <br/>
+                                <span style="font-size:10px;color:grey;">
+                                    <xrx:i18n>
+                                        <xrx:key>contributor</xrx:key>
+                                        <xrx:default>Contributor</xrx:default>
+                                    </xrx:i18n>: </span>
+                                <span style="font-size:10px;color:grey;" id="contributor-content"/>
+                            </div>
+                        </div>
+                    	<xrx:auth>
+                    		<xrx:rules>
+                    			<xrx:rule>
+                    				<xrx:user/>
+                    				<xrx:dbgroup>atom</xrx:dbgroup>
+                    			</xrx:rule>
+                    		</xrx:rules>
+                    		<xrx:true>
+                    			<div>
+		                        <div id="taskBar" onmouseup="stopTooltip(event);">
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="publishButton">
+		                                <img class="annoTask" src="{ conf:param('request-root') }export.png" title="Publish Annotation"/>
+		                            </p>
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="editButton">
+		                                <img class="annoTask" src="{ conf:param('request-root') }button_edit.png" title="Edit Annotation data"/>
+		                            </p>
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="editSurfaceButton">
+		                                <img class="annoTask" src="{ conf:param('request-root') }border-draw.png" title="Edit Annotation surface"/>
+		                            </p>
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="addButton">
+		                                <img class="annoTask" src="{ conf:param('request-root') }add-icon.png" title="Add Annotation surface"/>
+		                            </p>
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="deleteButton">
+		                                <img class="annoTask" src="{ conf:param('request-root') }remove.png" title="Delete Annotation"/>
+		                            </p>
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="reportButton">
+		                                <img class="annoTask" src="{ conf:param('request-root') }dialog-warning.png" title="Report Annotation"/>
+		                            </p>
+		                        </div>
+		                        <div id="editSurfaceBar">
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="returnButton">
+		                                <img class="annoTask" src="{ conf:param('request-root') }return-icon.png" title="Return to Annotation overview"/>
+		                            </p>
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="prepareEditSurface">
+		                                <img class="annoTask" src="{ conf:param('request-root') }move.png" title="Edit Annotation surface"/>
+		                            </p>
+		                            <p class="button" style="height:16px;padding:2px 3px;" id="deleteSurface">
+		                                <img class="annoTask" src="{ conf:param('request-root') }Trash-icon.png" title="Delete Annotation surface"/>
+		                            </p>
+		                        </div>
+		                        <div id="editTaskBar">
+		                            <p id="addSurface" class="button" style="height:18px;padding:2px 3px;">
+		                                <xrx:i18n>
+		                                    <xrx:key>save-surface</xrx:key>
+		                                    <xrx:default>Save surface</xrx:default>
+		                                </xrx:i18n>
+		                            </p>
+		                            <p id="cancelEdit" class="button" style="height:18px;padding:2px 3px;">
+		                                <xrx:i18n>
+		                                    <xrx:key>cancel</xrx:key>
+		                                    <xrx:default>Cancel</xrx:default>
+		                                </xrx:i18n>
+		                            </p>
+		                        </div>
+		                        <div id="wfR">
+                            <span>
+                                <xrx:i18n>
+                                    <xrx:key>wait-for-release</xrx:key>
+                                    <xrx:default>Wait for release</xrx:default>
+                                </xrx:i18n>
+                            </span>
+                        </div>
+                    			</div>
+                    		</xrx:true>
+                    		<xrx:false>
+                    			<div/>
+                    		</xrx:false>
+                    	</xrx:auth>
+                    </div>
+                    <div id="editInterface" onmouseup="stopTooltip(event);">
+                        <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                            <xrx:i18n>
+                                <xrx:key>category</xrx:key>
+                                <xrx:default>Category</xrx:default>
+                            </xrx:i18n>:
+	            			</span>
+                        <select id="category" style="position:relative;float:left;left:10px;top:3px;width:187px;border: 1px solid rgb(142,163,132);background: transparent;" onmousedown="stopTooltip(event);" onmouseup="stopTooltip(event);">
+	            				{   
+	            				let $categories := doc(concat(conf:param('annotation-db-base-uri'), 'webapp-data/Categories.xml'))//*:category
+	            				for $category in $categories
+	            				return
+	            				<option id="{$category/text()}">
+                                <xrx:i18n>
+                                    <xrx:key>{$category/text()}</xrx:key>
+                                    <xrx:default>{$category/text()}</xrx:default>
+                                </xrx:i18n>
+                            </option>
+	            				}
+	            			</select>
+                        <br/>
+                        <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                            <xrx:i18n>
+                                <xrx:key>keyword</xrx:key>
+                                <xrx:default>Keyword</xrx:default>
+                            </xrx:i18n>:
+	            			</span>
+                        <input type="text" id="keyword" style="position:relative;width:185px;left:13px;top:4px;float:left;border: 1px solid rgb(142,163,132);" onmousedown="stopTooltip(event);" onmouseup="stopTooltip(event);"/>
+                        <br/>
+                        <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                            <xrx:i18n>
+                                <xrx:key>transcription</xrx:key>
+                                <xrx:default>Transcription</xrx:default>
+                            </xrx:i18n>:
+	            			</span>
+                        <textarea id="transcription" name="annotation" style="position:relative;float:left;" onmouseup="stopTooltip(event);"/>
+                        <br/>
+                        <div id="buttonBar">
+                            <p id="saveanno" class="button" onClick="storeAnno('{$xrx:user-id}', 'user', '{ $xrx:lang }', '{ $register-id }', '{ $folio-id }')" style="position:relative;top:0px;float:left;text-align:center;width:70px;">
+                                <xrx:i18n>
+                                    <xrx:key>save</xrx:key>
+                                    <xrx:default>Save</xrx:default>
+                                </xrx:i18n>
+                            </p>
+                            <p id="cancel" class="button" onClick="cancelAnno('{$xrx:user-id}', 'user', '{ $xrx:lang }', '{ $register-id }', '{ $folio-id }');" style="position:relative;float:left;text-align:center;top:0px;width:70px;">
+                                <xrx:i18n>
+                                    <xrx:key>cancel</xrx:key>
+                                    <xrx:default>Cancel</xrx:default>
+                                </xrx:i18n>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="reportInterface" onmouseup="stopTooltip(event);">
+                        <span style="position:relative;float:left;top:4px;width:200px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                            <xrx:i18n>
+                                <xrx:key>comment</xrx:key>
+                                <xrx:default>Comment</xrx:default>
+                            </xrx:i18n>:
+	            			</span>
+                        <textarea id="comment" style="position:relative;float:left;"/>
+                        <div style="position:relative;float:left;padding:3px;top:5px;left:30px;">
+                            <p id="sendReport" class="button" style="position:relative;top:0px;float:left;text-align:center;width:70px;">
+                                <xrx:i18n>
+                                    <xrx:key>send</xrx:key>
+                                    <xrx:default>Send</xrx:default>
+                                </xrx:i18n>
+                            </p>
+                            <p id="cancelReport" class="button" onClick="cancelReport();" style="position:relative;float:left;text-align:center;top:0px;width:70px;">
+                                <xrx:i18n>
+                                    <xrx:key>cancel</xrx:key>
+                                    <xrx:default>Cancel</xrx:default>
+                                </xrx:i18n>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="image-navi-top">{ $image-navi }</div>
+                <div class="transparent-div">
+                    <xrx:i18n>
+                        <xrx:key>related-acts</xrx:key>
+                        <xrx:default>Related Acts</xrx:default>
+                    </xrx:i18n>
+                    <span>:&#160;</span>
+					{
+					for $act at $pos in $related-acts
+					let $act-name := $act/ead:did/ead:unitid/text()
+					return
+					<span>
+                        <a class="white-text" href="{ act:link(($register-id, $act-name)) }">{ $act-name }</a>
+						{
+						if(not($pos = count($related-acts))) then
+						<span>,&#160;</span>
+						else()
+						}
+					</span>
+					}
+					<span>,&#160;&#160;</span>
+                    <!--span>
+                        <a class="white-text" href="{ conf:param('request-root') }{ $register-id }/iipmooviewer?_start={ $index }">
+                            <xrx:i18n>
+                                <xrx:key>open-register-in-viewer</xrx:key>
+                                <xrx:default>Open register in Viewer</xrx:default>
+                            </xrx:i18n>
+                        </a>
+                        <span>, </span>
+                    </span-->
+                    <span>
+                        <a class="white-text" href="{ xmldb:encode-uri(xmldb:decode(concat(conf:param('request-root') , $register-id, '/' , $image-element/@xlink:title, '/annotation'))) }">
+                            <xrx:i18n>
+                                <xrx:key>open-register-annotation-tool/xrx:key</xrx:key>
+                                <xrx:default>Open register in Annotation Tool</xrx:default>
+                            </xrx:i18n>
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <div id="image-navi-bottom">{ $image-navi }</div>
+            <input type="hidden" size="4" id="x1" name="x" value="0"/>
+            <input type="hidden" size="4" id="y1" name="y" value="0"/>
+            <input type="hidden" size="4" id="x2" name="x2" value="0"/>
+            <input type="hidden" size="4" id="y2" name="y2" value="0"/>
+            <input type="hidden" size="4" id="w" name="w" value="0"/>
+            <input type="hidden" size="4" id="h" name="h" value="0"/>
+        </div>
+		}
+	</xrx:view>
+</xrx:widget>

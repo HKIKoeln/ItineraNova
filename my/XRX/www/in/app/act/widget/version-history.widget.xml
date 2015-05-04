@@ -1,0 +1,170 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns="http://www.w3.org/1999/xhtml">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/version-history</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>version-history</xrx:key>
+      <xrx:default>Version history</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+   <xrx:processor>
+     <xrx:xformsflag>false</xrx:xformsflag>
+   </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:css>
+      <style type="text/css">
+
+.h3{{
+  font-weight:bold;
+}}
+
+.h3 *, .h3{{
+  font-size:20px;
+}}
+
+.dversions{{
+  margin-bottom:30px;
+}}
+
+.dtranscription{{
+  margin-top:7px;
+}}
+
+.dactlabel *{{
+  font-variant:small-caps;
+  font-weight:bold;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model/>
+  <xrx:view>
+  {
+    (: request parameters :)
+    let $register := $xrx:tokenized-uri[1]
+    let $register-decoded := xmldb:decode($register)
+    let $act := $xrx:tokenized-uri[2]
+    let $act-decoded := xmldb:decode($act)
+    
+    (: the registers DB base collection :)
+    let $register-db-base-collection :=
+      collection(concat(conf:param('data-db-base-uri'),$register-decoded))
+    
+    (: act info :)
+    let $a := $register-db-base-collection//ead:c[@otherlevel='textgroup'][ead:did/ead:unitid=$act-decoded]
+    let $entry := $a/ancestor::atom:entry
+    
+    (: versions info :)
+    let $revisions := v:revisions($entry)
+    let $number-of-revisions := count($revisions)
+    let $older-versions-exist := $number-of-revisions gt 0
+    let $versions :=
+      for $revision in $revisions
+      order by $revision descending
+      return
+      v:doc($entry, $revision)
+
+    return
+    <div>
+      <div>
+        <a href="{ conf:param('request-root') }browse/act/{ $register }/{ $act }">
+          <span>&lt;&lt;&#160;</span>
+          <xrx:i18n>
+            <xrx:key>back</xrx:key>
+            <xrx:default>back</xrx:default>
+          </xrx:i18n>
+        </a>
+      </div>
+      <div class="h2">
+        <xrx:i18n>
+          <xrx:key>version-history</xrx:key>
+          <xrx:default>Version history</xrx:default>
+        </xrx:i18n>
+      </div>
+      {
+	    for $version at $num in $versions
+	    let $version-updates := 
+	      for $update in $version//atom:updated/text()
+	      order by $update
+	      return
+	      $update
+	    let $last-version-update := $version-updates[last()]
+	    let $date-label := translate(substring-before($last-version-update, '.'), 'T', ' ')
+	    let $versionnum-from-revision := $number-of-revisions - $num
+	    
+	    let $main-author := $version/atom:author/atom:email/text()
+	    let $main-author-label := concat(user:firstname-name($main-author), ' (', $main-author, ')')
+	    
+	    let $transcription-author := ($version//atom:author)[2]/atom:email/text()
+	    let $transcription-author-label := concat(user:firstname-name($transcription-author), ' (', $transcription-author, ')')
+	    
+	     
+	    return
+	
+	    <div class="dversions">
+	      {
+	      if($num = 1) then
+	      <a href="{ conf:param('request-root') }browse/act/{ $register }/{ $act }" class="h3">
+	        <xrx:i18n>
+	          <xrx:key>actual-version</xrx:key>
+	          <xrx:default>Actual version</xrx:default>
+	        </xrx:i18n>
+	      </a>
+	      else
+	      <a href="{ conf:param('request-root') }{ $register }/{ $act }/{ $versionnum-from-revision }/version" class="h3">
+	        <xrx:i18n>
+	          <xrx:key>version</xrx:key>
+	          <xrx:default>Version</xrx:default>
+	        </xrx:i18n>
+	        <span>&#160;{ $versionnum-from-revision }</span>
+	      </a>
+	      }
+	      <span>&#160;&#160;{ $date-label }</span>
+	      <div>
+          <div>
+	          <xrx:i18n>
+	            <xrx:key>transcription-by</xrx:key>
+	            <xrx:default>Transcription by</xrx:default>
+	          </xrx:i18n>
+	          <span>:&#160;{ $transcription-author-label }</span>
+	        </div>
+	      </div>
+	      {
+	      for $text at $pos in $version//ead:c[@otherlevel='text']
+	      let $addition-label := $pos - 1
+	      let $transcription-element := $text//tei:body/tei:p
+	      let $xsl := collection('/db/www')/xsl:stylesheet[@id='in-tei2html']
+	      let $transform := transform:transform($transcription-element, $xsl, ())
+	      return
+	      <div class="dtranscription">
+	        {
+	        if($pos = 1) then
+	        <div class="dactlabel">
+	          <span>
+		          <xrx:i18n>
+		            <xrx:key>act</xrx:key>
+		            <xrx:default>Act</xrx:default>
+		          </xrx:i18n>
+		        </span>
+	        </div>
+	        else
+	        <div class="dactlabel"><span>Add. { $addition-label }</span></div>
+	        }
+	        <span>{ $transform }</span>
+	      </div>
+	      }
+	    </div>
+	    }
+    </div>
+  }
+  </xrx:view>
+</xrx:widget>

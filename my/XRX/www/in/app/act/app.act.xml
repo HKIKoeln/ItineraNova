@@ -1,0 +1,15 @@
+<xrx:app xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/app/act</xrx:id>
+  <xrx:modules>
+    <xrx:module>
+      <xrx:resource>indexing.xqm</xrx:resource>
+      <xrx:prefix>indexing</xrx:prefix>
+      <xrx:uri>http://itineranova.be/NS/indexing</xrx:uri>
+    </xrx:module>
+    <xrx:module>
+      <xrx:resource>act.xqm</xrx:resource>
+      <xrx:prefix>act</xrx:prefix>
+      <xrx:uri>http://itineranova.be/NS/act</xrx:uri>
+    </xrx:module>
+  </xrx:modules>
+</xrx:app>

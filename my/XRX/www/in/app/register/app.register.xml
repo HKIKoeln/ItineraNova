@@ -1,0 +1,10 @@
+<xrx:app xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/app/register</xrx:id>
+  <xrx:modules>
+    <xrx:module>
+      <xrx:resource>register.xqm</xrx:resource>
+      <xrx:prefix>register</xrx:prefix>
+      <xrx:uri>http://itineranova.be/NS/register</xrx:uri>
+    </xrx:module>
+  </xrx:modules>
+</xrx:app>

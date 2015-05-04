@@ -1,0 +1,81 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/rename-folio</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>rename-folio</xrx:key>
+      <xrx:default>Rename folio</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:translateflag>true</xrx:translateflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:body>
+    {
+    
+    let $old-folio := $data//*:oldname/text()
+    let $new-folio := $data//*:newname/text()
+    let $register := $data//*:register/text()
+    
+    let $title := attribute{"xlink:title"}{$new-folio}
+    
+    let $register-db-base-collection := metadata:base-collection('register', $register, 'public')
+    
+    let $new-folio-already-exists :=
+        exists($register-db-base-collection//ead:dao[@xlink:title=$new-folio])
+    
+    let $folio-attribute :=
+        $register-db-base-collection//atom:content/ead:ead/ead:archdesc/ead:dao[@xlink:title=$old-folio]//@xlink:title
+        
+    let $changetitle :=
+        if(not($new-folio-already-exists) and $new-folio != '' and ends-with($new-folio, '°')) then
+            upd:replace-node(
+                $folio-attribute,
+                $title)
+        else ()
+    
+    let $feed := metadata:feed('register', $register, 'public')
+    let $entry-name := metadata:entryname('register', $register)
+    
+    let $savechanges :=
+        if(not($new-folio-already-exists) and $new-folio != '' and ends-with($new-folio, '°')) then
+            atom:PUT(
+                $feed,
+                $entry-name,
+                $changetitle)
+        else ()
+        
+    return
+    if(not($new-folio != '')) then
+    <xrx:response status="0">
+      <xrx:message>Requested name empty.</xrx:message>
+      <xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon>
+    </xrx:response>
+    else if(not(ends-with($new-folio, '°'))) then
+    <xrx:response status="0">
+      <xrx:message>Folio name must end with '°'.</xrx:message>
+      <xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon>
+    </xrx:response>
+    else if($new-folio-already-exists) then
+    <xrx:response status="0">
+      <xrx:message>A folio with the requested name already exists.</xrx:message>
+      <xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon>
+    </xrx:response>
+    else if($savechanges eq ()) then
+    <xrx:response status="-1">
+      <xrx:message>An error occured.</xrx:message>
+      <xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon>
+    </xrx:response>
+    else
+    <xrx:response status="1">
+      <xrx:message>Folio { $old-folio } successfully renamed to { $new-folio }.</xrx:message>
+      <xrx:icon>{ conf:param('request-root') }face-smile.png</xrx:icon>
+    </xrx:response>
+    }
+  </xrx:body>
+</xrx:service>

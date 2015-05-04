@@ -1,0 +1,3222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" id="cei-xsd-annotated">
+    <xs:element name="cei">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Wurzelelement für alle Dokumente, die den Regeln der 
+			CEI (Charters Encoding Initiative, http://www.cei.lmu.de) folgen.
+ CEI-Ableger mit Angaben zur EditMOM-Verarbeitung als appinfo und verringert auf ein Auszeichnungskonzept für Monasterium.net  2006-05-21
+
+Änderungen:
+2010-02-08: group:layout als Kind von abstract eingeführt
+2009-11-20: listBibl wieder eingeführt
+2009-09-04: minOccurs="1" und maxOccurs="1" für Elemente "body/idno", "issued" und "date_sort" für Validierung beim Import eingeführt (JG) 
+2009-09-03: persName als Kind von persName eingeführt
+2009-07-22: xs:group:Layout und Orignialbefund in dimensions, material, sealDesc, seal, legend, foreign, witness, arch eingefügt, um Siglen mit hochgestelleten Buchstaben aus Druckfassungen zuzulassen (GV)
+2009-07-06: xs:attribute type in persName ergänzt
+2008-05-28: xs:group ref=note in xs:element ref=note korrigiert
+2008-05-19: divNote für Fußnotenblock eingeführt
+2008-01-18: region und country neben Settlement ergänzt
+2006-09-05: archFond, idno, scope: complex-type mixed
+2006-09-01: num als Subelement zu date und dateRange eingeführt
+2006-08-11: sealMaterial und sealCondition eingeführt; ein paar Aufräumarbeiten, legend in sealDesc eingebaut als Übergangslösung für Import aus Augias GV
+2006-08-10: Gruppen: Formularium, RelevantPersonal getilgt, Referenz in Sachliches eingefügt; Standard-Attribute auf id und n reduziert, dafür rend nur noch bei hi, lang auf ausgewählte Elemente beschränkt (vgl. EditMOM), nota in &amp;quot;diplomaticAnalysis&amp;quot; eingefügt. measure mit num/index und Originalbefund versehen. GV
+2006-08-09: seal, witness und alle Subelemente als globale Elemente definiert, den neuen globalen Elementen &amp;lt;menu&gt; vergeben (GV)
+2006-07-06: pict zu group:Originalbefund hinzugefügt, NotariusSub auch als Teil von group:Formular eingefügt; issuer, recipient auch in der Transkription zulässig (GV)
+2006-07-05: lang_MOM in mixed Type true umgewandelt (GV)
+2006-06-27: verschiedene Attribut-Korrekturen (GV)
+2006-06-26: lang_MOM eingeführt. (GV)
+2006-06-21: teiHeader fakultativ, respStmt aus text/front  herausgenommen (GV)
+2006-06-16: date_sort korrigiert, Attribut b_name zu &amp;lt;text&gt; eingeführt (GV)
+2006-06-07: issuer &amp;amp; recipient nur in abstract zugelassen; subelemente von bibl entfernt; a global definiert, appinfo zu settlement, repository und scope global definiert. (GV)
+2006-05-21: Captions geändert und ein paar Sicherheits &amp;lt;present&gt;no eingefügt. (GV)
+2006-05-18: sourceDescVolltext ergänzt und kleinere editMOM-Ergänzungen (GV)
+2006-05-17: sourceDesc aufgeräumt; Versuch alle Elemente, die in die Maske kommen, global zu definieren; note aus den Fließtexten geworfen. (GV)
+2006-05-16: expan statt abbr für Abkürzung, note/index als eigener Reiter, &amp;lt;caption xml:lang=&amp;quot;de&amp;quot;&gt; eingefügt; Attribute (z.B. id/n) mit &amp;lt;present&gt;no&amp;lt;/present&gt; versehen. Menü &amp;quot;Siegelbeschreibung&amp;quot; ergänzt. &amp;lt;sup&gt; in p und abstract zugelassen, aber nicht in Menüs übernommen, denn diese Tags müssen noch nachbearbeitet werden. (GV)
+2006-05-11 Einige Elemente, die in Fließtextfeldern auftauchen, global definiert (pTenor, a, legend), in einigen Fällen &amp;lt;present&gt;no&amp;lt;/present&gt; eingefügt (group etc.) (GV)
+2006-05-09 Knoten, die selber nicht angezeigt werden und keine anzuzeigenden Subknoten haben, sind mit dem Attribut &amp;lt;present&gt;no&amp;lt;/present&gt; in der EditMOM-appinfo versehen. Alle Elemente, die als Fließtext auftauchen können, sind global definiert. (GV)
+2006-05-02 listBibl (listBiblEdition, listBiblRegest, listBiblFaksimile, listBiblErw), sourceDesc (sourceDescRegest), p (p, pTenor) typisiert, um in der Anzeige differenzieren zu können. EditMOM:Auswahlliste eingeführt. (GV)
+2006-04-25 Weitere &amp;lt;tab&gt;-hinzugefügt. (GV)
+2006-04-06 Innerhalb von hi Formular zugelassen; issuer verzweigt wie persName, persName kann auch note enthalten. Weitere Attributlisten plausibler aufgereiht. (GV)
+2006-04-05 Reihenfolge der Tenorelemente plausibler angeordnet, hi::target in hi::type korrigiert, ein paar Attributlisten plausibler aufgereiht. (GV)
+2006-03-28 p aus dem Originalbefund direkt unterhalb von tenor verschoben, um sachlich fehlerhafte Rekursionen zu vermeiden (GV)
+2006-03-19 (Ausgangsversion)
+
+ </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="teiHeader">
+                    <xs:annotation>
+                        <xs:appinfo source="EditVDU">Dateikopf</xs:appinfo>
+                        <xs:documentation xml:lang="de">Der Dateikopf beschreibt die Datei nach den Regeln der TEI (http://www.tei-c.org), Version P4</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="fileDesc">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="titleStmt">
+                                            <xs:annotation>
+                                                <xs:appinfo source="EditVDU">titleStmt</xs:appinfo>
+                                                <xs:documentation xml:lang="de"> Den Regeln der TEI entsprechend müßten hier verschiedene Elemente verpflichtend sein: title z.B. [strict!]
+ TODO </xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                        <xs:element ref="title"/>
+                                                        <xs:element name="author"/>
+                                                        <xs:element ref="p"/>
+                                                    </xs:choice>
+                                                </xs:sequence>
+                                                <xs:attributeGroup ref="standard"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" ref="publicationStmt"/>
+                                        <xs:element minOccurs="0" name="sourceDesc">
+                                            <xs:annotation>
+                                                <xs:appinfo source="EditVDU">Quellenangaben</xs:appinfo>
+                                                <xs:documentation xml:lang="de">enthält die bibliographischen Angaben der Quellen, aus denen der elektronische Text stammt.</xs:documentation>
+                                                <xs:documentation xml:lang="en">supplies a bibliographic description of the copy text(s) from which an electronic text was derived or generated.</xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:choice minOccurs="0">
+                                                        <xs:element ref="p">
+                                                            <xs:annotation>
+                                                                <xs:appinfo source="EditVDU">Paragraph</xs:appinfo>
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                    </xs:choice>
+                                                </xs:sequence>
+                                                <xs:attributeGroup ref="standard"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attributeGroup ref="standard"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="0" ref="encodingDesc"/>
+                            <xs:element minOccurs="0" name="projectDesc">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="de">Angaben zum Projekt</xs:documentation>
+                                    <xs:appinfo source="EditVDU">Projektangaben</xs:appinfo>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                            <xs:element ref="p"/>
+                                            <xs:element ref="respStmt"/>
+                                        </xs:choice>
+                                    </xs:sequence>
+                                    <xs:attributeGroup ref="standard"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="standard"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element ref="text"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="transcription"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="encodingDesc">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">Codierungsregeln</xs:appinfo>
+            <xs:documentation xml:lang="de">Formale Regeln, die bei der Codierung angewendet worden sind.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:complexContent mixed="true">
+                <xs:extension base="xs:anyType">
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="publicationStmt">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">Veröffentlichungsangaben</xs:appinfo>
+            <xs:documentation xml:lang="de">Angaben zur Veröffentlichung des Textes (Zeitpunkt, rechtsverbindlicher Ort, Beschränkungen, Verantwortlichkeiten ...)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="publisher">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:anySimpleType">
+                                    <xs:attributeGroup ref="standard"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="pubPlace">
+                        <xs:annotation>
+                            <xs:appinfo source="EditVDU">Veröffentlichungsort</xs:appinfo>
+                            <xs:documentation xml:lang="de">Ort der Veröffentlichung</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:anySimpleType">
+                                    <xs:attributeGroup ref="standard"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="availability">
+                        <xs:annotation>
+                            <xs:appinfo source="EditVDU">Verfügbarkeit</xs:appinfo>
+                            <xs:documentation xml:lang="de">Verfügbarkeit und insbesondere ihre Einschränkungen ("restricted")</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType mixed="true">
+                            <xs:attribute name="status" type="xs:anySimpleType"/>
+                            <xs:attributeGroup ref="standard"/>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:group ref="date"/>
+                    <xs:element ref="p"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="respStmt">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">Verantwortung</xs:appinfo>
+            <xs:documentation xml:lang="de">Angaben über die inhaltliche, redaktionelle und verlegerische Verantwortung</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="name"/>
+                    <xs:element name="resp">
+                        <xs:annotation>
+                            <xs:appinfo source="EditVDU">Verantwortlichkeit</xs:appinfo>
+                            <xs:documentation xml:lang="de">beschreibt die intellektuelle Verantwortlichkeit einer Person</xs:documentation>
+                            <xs:documentation xml:lang="en">contains a phrase describing the nature of a person's intellectual responsibility.</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attributeGroup ref="identification"/>
+                                    <xs:attributeGroup ref="standard"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:group ref="date"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="text">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">Text</xs:appinfo>
+            <xs:documentation xml:lang="de">Mit type="charter" als Urkunde identifiziert; type="collection" faßt einen Bestand zusammen.
+Textelemente:</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:choice>
+                <xs:sequence minOccurs="0">
+                    <xs:element minOccurs="0" name="front">
+                        <xs:annotation>
+                            <xs:appinfo source="EditVDU">Vorspann</xs:appinfo>
+                            <xs:documentation xml:lang="de">Der Vorspann zu einem Text (Titelblatt, Vorwort, Inhaltsverzeichnis, Danksagung etc.)</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType mixed="true">
+                            <xs:sequence>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="sourceDesc">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:element name="sourceDescRegest">
+                                                        <xs:annotation>
+                                                            <xs:appinfo source="EditVDU">Regestquelle</xs:appinfo>
+                                                            <xs:documentation xml:lang="de">CEI_MOM-spezifisch: Eigentlich eine SourceDesc, die über ein Schlüsselwort "Regest" auf die Quelle des Regests verweist.</xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element maxOccurs="unbounded" ref="bibl">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation xml:lang="de">Gibt die Quelle für das Regest an.</xs:documentation>
+                                                                        <xs:appinfo source="EditVDU">TODO</xs:appinfo>
+                                                                    </xs:annotation>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                            <xs:attribute name="ref">
+                                                                <xs:annotation>
+                                                                    <xs:appinfo source="EditVDU">Verweis</xs:appinfo>
+                                                                    <xs:documentation xml:lang="de">Verweis auf eine Textpassage, zu der hier die Quelle angegeben wird.</xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:attribute>
+                                                            <xs:attributeGroup ref="standard"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="sourceDescVolltext">
+                                                        <xs:annotation>
+                                                            <xs:appinfo source="EditVDU">TODOs</xs:appinfo>
+                                                            <xs:documentation xml:lang="de">CEI_MOM-spezifisch: Eigentlich eine SourceDesc, die über ein Schlüsselwort "Volltext" auf die Quelle des Regests verweist.</xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element maxOccurs="unbounded" ref="bibl">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation xml:lang="de">Gibt die Quelle für den Volltext an.</xs:documentation>
+                                                                        <xs:appinfo source="EditVDU">Volltext</xs:appinfo>
+                                                                    </xs:annotation>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                            <xs:attribute name="ref">
+                                                                <xs:annotation>
+                                                                    <xs:appinfo source="EditVDU">Textpassage</xs:appinfo>
+                                                                    <xs:documentation xml:lang="de">Verweis auf eine Textpassage, zu der hier die Quelle angegeben wird.</xs:documentation>
+                                                                </xs:annotation>
+                                                            </xs:attribute>
+                                                            <xs:attributeGroup ref="standard"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element ref="p">
+                                                        <xs:annotation>
+                                                            <xs:appinfo source="EditVDU">Textpassage</xs:appinfo>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                </xs:choice>
+                                            </xs:sequence>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element ref="publicationStmt">
+                                        <xs:annotation>
+                                            <xs:appinfo source="EditVDU">TODO</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:group ref="textualElements">
+                                        <xs:annotation>
+                                            <xs:appinfo source="EditVDU">Textelemente</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:group>
+                                    <xs:group ref="reference">
+                                        <xs:annotation>
+                                            <xs:appinfo source="EditVDU">Referenz</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:group>
+                                    <xs:element ref="provenance"/>
+                                </xs:choice>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:choice>
+                        <xs:element name="body" minOccurs="1" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:appinfo source="Textkörper" xml:lang="de">Referenz</xs:appinfo>
+                                <xs:documentation xml:lang="de">Der Textkörper</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:choice>
+                                    <xs:sequence minOccurs="1">
+                                        <xs:element minOccurs="1" ref="idno">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="de">Gibt die Identifikationsnummer der Urkunde im aktuellen Corpus an.</xs:documentation>
+                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                    <present>Maskenfeld</present>
+                                                    <tab>Regest</tab>
+                                                    <rowCount>1</rowCount>
+                                                    <caption xml:lang="de">Nummer im Bestand</caption>
+                                                </xs:appinfo-->
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" ref="chDesc"/>
+                                        <xs:element minOccurs="0" ref="tenor">
+                                            <xs:annotation>
+                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                    <present>Fließtext</present>
+                                                    <rowCount>15</rowCount>
+                                                    <tab>Transkription</tab>
+                                                </xs:appinfo-->
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element maxOccurs="unbounded" name="group">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="de">Eine Gruppe von eigenständigen Texten als Teil eines Corpus z.B.</xs:documentation>
+                                <!--xs:appinfo source="EditMOM.xsd">
+                                    <present>no</present>
+                                </xs:appinfo-->
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice maxOccurs="unbounded">
+                                        <xs:element ref="h1">
+                                            <xs:annotation>
+                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                    <present>no</present>
+                                                </xs:appinfo-->
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element ref="text"/>
+                                    </xs:choice>
+                                </xs:sequence>
+                                <xs:attributeGroup ref="standard"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:choice>
+                    <xs:element minOccurs="0" name="back">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Anhänge zu einem Text (z.B. Endnoten, Register, Verzeichnisse)</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element ref="index">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <liste>simple</liste>
+                                                <present>Maskenfeld</present>
+                                                <tab>Anhang</tab>
+                                                <caption xml:lang="de">Sachindex</caption>
+                                                </xs:appinfo-->
+                                            <xs:appinfo source="EditVDU">Sachindex</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element ref="persName">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <liste>simple</liste>
+                                                <present>Maskenfeld</present>
+                                                <tab>Anhang</tab>
+                                                <rowCount>1</rowCount>
+                                                <caption xml:lang="de">Personenindex</caption>
+                                                </xs:appinfo-->
+                                            <!--xs:appinfo source="EditVDU">Personenindex</xs:appinfo-->
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element ref="placeName">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <liste>simple</liste>
+                                                <present>Maskenfeld</present>
+                                                <rowCount>1</rowCount>
+                                                <tab>Anhang</tab>
+                                                <caption xml:lang="de">Ortsindex</caption>
+                                                </xs:appinfo-->
+                                            <xs:appinfo source="EditVDU">Ortsindex</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element ref="geogName">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <liste>simple</liste>
+                                                <rowCount>1</rowCount>
+                                                <present>Maskenfeld</present>
+                                                <tab>Anhang</tab>
+                                                <caption xml:lang="de">Geographischer Index</caption>
+                                                </xs:appinfo-->
+                                            <xs:appinfo source="EditVDU">Geographischer Index</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element ref="divNotes">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <present>Fließtext</present>
+                                                <rowCount>10</rowCount>
+                                                <tab>Anhang</tab>
+                                                <caption xml:lang="de">Fußnoten</caption>
+                                                </xs:appinfo-->
+                                            <xs:appinfo source="EditVDU">Fußnoten</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:choice>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:choice>
+            <xs:attribute name="type"/>
+            <xs:attribute ref="picture"/>
+            <xs:attribute ref="certainty"/>
+            <xs:attributeGroup ref="standard"/>
+            <xs:attribute name="b_name" type="xs:anySimpleType">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">MOM-spezifisch! Enthält noch mal den Bestandsname.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="idno">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Identifikationsnummer eines Objektes innerhalb der aktuellen Struktur (z.B. Nummer in einem Urkundenbuch, Bestand in einem Archiv, Handschriftensignatur in einer Bibliothek.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Signatur</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Signatur</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:group ref="layout"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="chDesc">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Faßt die Metadaten einer Urkunde zusammen.
+Metadatenelemente</xs:documentation>
+            <xs:documentation xml:lang="en">contains the meta-data for the charter</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="abstract">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Fließtext</present>
+                                <tab>Regest</tab>
+                                <rowCount>5</rowCount>
+                                <caption xml:lang="de">Regest</caption>
+                                </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Regest</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="issued" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Diese Konstruktion kann allgemeine Elemente für die Beschreibung von Ausstellungsort und -zeit verwenden und ist deshalb den Konstrukten "issuePlace" und "date" bzw. "publicationStmt" vorzuziehen.	[strict!]</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType mixed="true">
+                            <xs:sequence>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element ref="placeName">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <present>Maskenfeld</present>
+                                                <tab>Regest</tab>
+                                                <rowCount>1</rowCount>
+                                                <caption xml:lang="de">Ausstellungsort</caption>
+                                            </xs:appinfo-->
+                                            <xs:appinfo source="EditVDU">Ausstellungsort</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:choice>
+                                        <xs:element ref="date">
+                                            <xs:annotation>
+                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                    <present>Maskenfeld</present>
+                                                    <rowCount>1</rowCount>
+                                                    <tab>Regest</tab>
+                                                    <caption xml:lang="de">Datierung-Einzeldatum</caption>
+                                                </xs:appinfo-->
+                                                <xs:appinfo source="EditVDU">Datierung-Einzeldatum</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element ref="dateRange">
+                                            <xs:annotation>
+                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                    <present>Maskenfeld</present>
+                                                    <rowCount>1</rowCount>
+                                                    <tab>Regest</tab>
+                                                    <caption xml:lang="de">Datierung-Zeitraum</caption>
+                                                </xs:appinfo-->
+                                                <xs:appinfo source="EditVDU">Datierung-Zeitraum</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:choice>
+                                </xs:choice>
+                                <xs:element name="date_sort" minOccurs="1" maxOccurs="1">
+                                    <xs:annotation>
+                                        <xs:documentation>CEI_MOM-spezifisch</xs:documentation>
+                                        <!--xs:appinfo source="EditMOM.xsd">
+                                            <present>no</present>
+                                        </xs:appinfo-->
+                                    </xs:annotation>
+                                </xs:element>
+                            </xs:sequence>
+                            <xs:attributeGroup ref="standard"/>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="witnessOrig">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Der einzelne Textzeuge (MOM)</xs:documentation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <liste>complex</liste>
+                                <tab>Überlieferung</tab>
+                                </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Textzeuge</xs:appinfo>
+                        </xs:annotation>
+                        <xs:complexType mixed="true">
+                            <xs:sequence>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element ref="traditioForm"/>
+                                    <xs:choice>
+                                        <xs:element ref="archIdentifier"/>
+                                        <xs:element ref="msIdentifier"/>
+                                    </xs:choice>
+                                    <xs:element ref="auth"/>
+                                    <xs:element ref="physicalDesc"/>
+                                    <xs:element ref="nota">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <present>no</present>
+                                            </xs:appinfo-->
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element ref="figure">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <present>no</present>
+                                            </xs:appinfo-->
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:choice>
+                            </xs:sequence>
+                            <xs:attribute ref="certainty" use="optional"/>
+                            <xs:attribute name="type" type="xs:anySimpleType" use="optional"/>
+                            <xs:attribute name="sigil" type="xs:anySimpleType">
+                                <xs:annotation>
+                                    <xs:documentation xml:lang="de">P5 sieht dafür das Attribut id vor. Diese Lösung ist sowohl dem Element, als auch dem Attribut vorzuziehen. [strict!]</xs:documentation>
+                                </xs:annotation>
+                            </xs:attribute>
+                            <xs:attributeGroup ref="standard"/>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="witListPar"/>
+                    <xs:element name="class" type="xs:anySimpleType">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">classifciation of the document</xs:documentation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>no</present>
+                            </xs:appinfo-->
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="diplomaticAnalysis">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Enthält Bemerkungen zur diplomatischen Kritik der Urkunde, die formale Beobachtungen der inneren wie äußeren Merkmale ebenso wie inhaltliche Überlegungen enthalten kann.</xs:documentation>
+                            <xs:documentation xml:lang="en">contains a diplomatic analysis of the document, formal critics or critics by the content.</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType mixed="true">
+                            <xs:sequence>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element name="listBibl">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="de">undifferenzierte Bibliographische Auflistung von Titeln, die die Urkunde betreffen..</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:choice>
+                                                        <xs:element minOccurs="0" ref="ref">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <present>no</present>
+                                                                </xs:appinfo-->
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                        <xs:element ref="bibl">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <liste>simple</liste>
+                                                                    <present>Maskenfeld</present>
+                                                                    <rowCount>2</rowCount>
+                                                                    <tab>Vorspann</tab>
+                                                                    <caption xml:lang="de">Editionen</caption>
+                                                                </xs:appinfo-->
+                                                                <xs:appinfo source="EditVDU">Editionen</xs:appinfo>
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                    </xs:choice>
+                                                </xs:choice>
+                                            </xs:sequence>
+                                            <xs:attributeGroup ref="standard"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="listBiblEdition">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="de">Bibliographische Auflistung der Editionen = listBibl type="print".</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:choice>
+                                                        <xs:element minOccurs="0" ref="ref">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <present>no</present>
+                                                                </xs:appinfo-->
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                        <xs:element ref="bibl">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <liste>simple</liste>
+                                                                    <present>Maskenfeld</present>
+                                                                    <rowCount>2</rowCount>
+                                                                    <tab>Vorspann</tab>
+                                                                    <caption xml:lang="de">Editionen</caption>
+                                                                    </xs:appinfo-->
+                                                                <xs:appinfo source="EditVDU">Editionen</xs:appinfo>
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                    </xs:choice>
+                                                </xs:choice>
+                                            </xs:sequence>
+                                            <xs:attributeGroup ref="standard"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="listBiblRegest">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="de">Bibliographische Auflistungen = listBibl type="regesta".</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:choice>
+                                                        <xs:element minOccurs="0" ref="ref">
+                                                            <xs:annotation>
+                                                                <xs:appinfo source="EditMOM.xsd">
+                                                                    <present>no</present>
+                                                                </xs:appinfo>
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                        <xs:element ref="bibl">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <liste>simple</liste>
+                                                                    <rowCount>2</rowCount>
+                                                                    <present>Maskenfeld</present>
+                                                                    <tab>Vorspann</tab>
+                                                                    <caption xml:lang="de">Regesten</caption>
+                                                                    </xs:appinfo-->
+                                                                <xs:appinfo source="EditVDU">Regesten</xs:appinfo>
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                    </xs:choice>
+                                                </xs:choice>
+                                            </xs:sequence>
+                                            <xs:attributeGroup ref="standard"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="listBiblFaksimile">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="de">Bibliographische Auflistung der Faksimiles = listBibl type="facsimilia"</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:choice>
+                                                        <xs:element minOccurs="0" ref="ref">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <present>no</present>
+                                                                </xs:appinfo-->
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                        <xs:element ref="bibl">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <liste>simple</liste>
+                                                                    <present>Maskenfeld</present>
+                                                                    <rowCount>2</rowCount>
+                                                                    <tab>Vorspann</tab>
+                                                                    <caption xml:lang="de">Abbildungen</caption>
+                                                                    </xs:appinfo-->
+                                                                <xs:appinfo source="EditVDU">Abbildungen</xs:appinfo>
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                    </xs:choice>
+                                                </xs:choice>
+                                            </xs:sequence>
+                                            <xs:attributeGroup ref="standard"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element name="listBiblErw">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="de">Bibliographische Auflistung der Erwähnungen = listBibl type="studies"</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType mixed="true">
+                                            <xs:sequence>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:choice>
+                                                        <xs:element minOccurs="0" ref="ref">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <present>no</present>
+                                                                </xs:appinfo-->
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                        <xs:element ref="bibl">
+                                                            <xs:annotation>
+                                                                <!--xs:appinfo source="EditMOM.xsd">
+                                                                    <liste>simple</liste>
+                                                                    <present>Maskenfeld</present>
+                                                                    <rowCount>2</rowCount>
+                                                                    <tab>Vorspann</tab>
+                                                                    <caption xml:lang="de">Literatur</caption>
+                                                                    </xs:appinfo-->
+                                                                <xs:appinfo source="EditVDU">Literatur</xs:appinfo>
+                                                            </xs:annotation>
+                                                        </xs:element>
+                                                    </xs:choice>
+                                                </xs:choice>
+                                            </xs:sequence>
+                                            <xs:attributeGroup ref="standard"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                    <xs:element ref="p">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <present>Fließtext</present>
+                                                <rowCount>10</rowCount>
+                                                <tab>Vorspann</tab>
+                                                <caption xml:lang="de">Diplomatischer und inhaltlicher Kommentar</caption>
+                                            </xs:appinfo-->
+                                            <xs:appinfo source="EditVDU">Diplomatischer und inhaltlicher Kommentar</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element ref="quoteOriginaldatierung">
+                                        <xs:annotation>
+                                            <!--xs:appinfo source="EditMOM.xsd">
+                                                <present>Fließtext</present>
+                                                <rowCount>1</rowCount>
+                                                <tab>Regest</tab>
+                                                <caption xml:lang="de">Originaldatierung</caption>
+                                            </xs:appinfo-->
+                                            <xs:appinfo source="EditVDU">Originaldatierung</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element ref="nota"/>
+                                </xs:choice>
+                            </xs:sequence>
+                            <xs:attributeGroup ref="standard"/>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="lang_MOM">
+                        <xs:annotation>
+                            <xs:documentation>MOM-spezifisch: Eigentlich tenor@lang</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType mixed="true">
+                            <xs:attributeGroup ref="standard"/>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="abstract">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Das Regest, das den Rechtsinhalt einer Urkunde zusammenfaßt, in Editionen als kurzes "Kopfregest", in anderen Umgebungen auch als ausführliches "Langregest" mit wörtlichen Zitaten. Das Regest sollte den Aussteller und den Empfänger der Urkunde nennen.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>Fließtext</present>
+                <tab>Regest</tab>
+                <rowCount>5</rowCount>
+                <caption xml:lang="de">Regest</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Regest</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <!--xs:appinfo source="EditMOM.xsd">
+                            <present>no</present>
+                        </xs:appinfo-->
+                    </xs:annotation>
+                    <xs:group ref="Sachliches"/>
+                    <xs:group ref="layout"/>
+                    <xs:element ref="recipient"/>
+                    <xs:element ref="issuer"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="figure">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Referenz auf ein Bild</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" name="figDesc">
+                    <xs:complexType mixed="true">
+                        <xs:sequence>
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:group ref="layout"/>
+                                <xs:group ref="biblArch"/>
+                            </xs:choice>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="standard"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" name="graphic">
+                    <xs:complexType mixed="true">
+                        <xs:attribute name="url"/>
+                        <xs:attributeGroup ref="standard"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="witListPar">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Textzeugen: kopiale Überlieferung (MOM)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="witness"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="witness">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Der einzelne Textzeuge</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferungen</menu>
+                <liste>complex</liste>
+                <tab>Überlieferung</tab>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Überlieferung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="traditioForm"/>
+                    <xs:choice>
+                        <xs:element ref="archIdentifier"/>
+                        <xs:element ref="msIdentifier"/>
+                    </xs:choice>
+                    <xs:element ref="auth"/>
+                    <xs:element ref="physicalDesc"/>
+                    <xs:element ref="nota">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>no</present>
+                            </xs:appinfo-->
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="figure">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>no</present>
+                            </xs:appinfo-->
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:group ref="layout"/>
+                    <xs:group ref="textualElements"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="traditioForm">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Überlieferungsform: Original, Kopial, Insert, Transsumpt, Vidimus, Konzept. Die verwendete Begrifflichkeit ist dem VID zu entnehmen oder in der profileDesc zu dokumentieren.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferungen</menu>
+                <present>Auswahlliste
+					<item xml:lang="de" value="orig.">Original</item>
+                    <item xml:lang="de" vaue="cop.">Kopie</item>
+                    <item xml:lang="de" value="ins.">Insert</item>
+                    <item xml:lang="de" value="transsumpt">Transsumpt</item>
+                    <item xml:lang="de" value="vidimus">Vidimus</item>
+                    <item xml:lang="de" value="conc.">Konzept</item>
+                </present>
+                <rowCount>1</rowCount>
+                <tab>Überlieferung</tab>
+                <caption xml:lang="de">Überlieferungsart</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Überlieferungsart</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:group ref="layout"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="condition">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferung</menu>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Überlieferung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:group ref="layout"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sealCondition">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Siegelbeschreibung</menu>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Siegelbeschreibung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="auth">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">beschreibt die Mittel zur Beglaubigung der Urkunde (Siegel, Notarsunterschriften etc.)</xs:documentation>
+            <xs:documentation xml:lang="en">describes the authentification of the document.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferungen</menu>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Überlieferungen</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="notariusDesc"/>
+                    <xs:element ref="sealDesc">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <liste>simple</liste>
+                                <present>Fließtext</present>
+                                <rowCount>2</rowCount>
+                                <tab>Überlieferung</tab>
+                                <caption xml:lang="de">Siegelbeschreibung</caption>
+                                </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Siegelbeschreibung</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sealDesc">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">eine differenzierte Siegelbeschreibung.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferungen</menu>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Überlieferungen</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="seal"/>
+                    <xs:element ref="legend">
+                        <xs:annotation>
+                            <xs:appinfo source="EditMOM.xsd">
+                                <present>no</present>
+                            </xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:group ref="layout"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="seal">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein einzelnes Siegel (CEI_MOM spezifisch!)</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Siegelbeschreibung</menu>
+                <caption xml:lang="de">Siegel</caption>
+                <present>Fließtext</present>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Siegel</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="layout"/>
+                    <xs:element ref="sigillant"/>
+                    <xs:element ref="legend"/>
+                    <xs:element ref="sealDimensions"/>
+                    <xs:element ref="sealMaterial"/>
+                    <xs:element ref="sealCondition"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="legend">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">gibt den Text, der auf einem Siegel angebracht ist, wieder.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Siegelbeschreibung</menu>
+                <caption xml:lang="de">Siegellegende</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Siegellegende</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="place"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sigillant">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">der Siegelinhaber</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Siegelbeschreibung</menu>
+                <caption xml:lang="de">Siegler</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Siegler</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="quote"/>
+                    <xs:group ref="Sachauszeichnung"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="reg"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="notariusDesc">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Beschreibung einer notariellen Unterfertigung.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferungen</menu>
+                <liste>simple</liste>
+                <tab>Überlieferung</tab>
+                <caption xml:lang="de">Notarielle Unterfertigung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Notarielle Unterfertigung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="notariusSub">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Fließtext</present>
+                                <rowCount>2</rowCount>
+                                <tab>Überlieferung</tab>
+                                <caption xml:lang="de">Notarsunterschrift</caption>
+                            </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Notarsunterschrift</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="notariusSign">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>no</present>
+                            </xs:appinfo-->
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="quote"/>
+                    <xs:element ref="persName"/>
+                    <xs:choice>
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Geographische Angaben</xs:documentation>
+                        </xs:annotation>
+                        <xs:element ref="placeName"/>
+                        <xs:element ref="geogName"/>
+                    </xs:choice>
+                    <xs:element ref="index"/>
+                    <xs:element ref="num"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="physicalDesc">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">beschreibt die physikalischen Merkmale des Textzeugen, als Freitext erfaßt werden können oder weitere Strukturen haben können wie Beschreibstoff (material), Maße (dimensions) etc.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferungen</menu>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Überlieferungen</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="material">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Maskenfeld</present>
+                                <rowCount>1</rowCount>
+                                <tab>Überlieferung</tab>
+                                <caption xml:lang="de">Beschreibstoff</caption>
+                                </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Beschreibstoff</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="dimensions">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Maskenfeld</present>
+                                <rowCount>1</rowCount>
+                                <tab>Überlieferung</tab>
+                                <caption xml:lang="de">Maße</caption>
+                                </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Maße</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="condition">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Maskenfeld</present>
+                                <rowCount>1</rowCount>
+                                <tab>Überlieferung</tab>
+                                <caption xml:lang="de">Zustand</caption>
+                            </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Zustand</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="dimensions">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Maße des Objekts (Höhe x Breite oder in eigenen Elementen)</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferung</menu>
+                <caption xml:lang="de">Maße</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Maße</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:group ref="layout"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sealDimensions">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Maße des Objekts (Höhe x Breite oder in eigenen Elementen)</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Siegelbeschreibung</menu>
+                <caption xml:lang="de">Maße</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Maße</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="material">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Stoff des beschriebenen Objekts (Beschreibstoff, Siegelmaterial)</xs:documentation>
+            <xs:documentation xml:lang="en">describes the material on which the document is written</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Überlieferung</menu>
+                <caption xml:lang="de">Material</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Material</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:group ref="layout"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sealMaterial">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Stoff des beschriebenen Objekts (Beschreibstoff, Siegelmaterial)</xs:documentation>
+            <xs:documentation xml:lang="en">describes the material on which the document is written</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Siegelbeschreibung</menu>
+                <caption xml:lang="de">Material</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Material</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="nota">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Enthält Vermerke der ausstellenden Kanzlei auf der Urkunde. Für Archivvermerke beim Empfänger vgl. rubrum</xs:documentation>
+            <xs:documentation xml:lang="en">contains the extra sigillum notes on the document.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+            </xs:appinfo-->
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type" use="optional"/>
+            <xs:attribute name="position" type="xs:anySimpleType" use="optional"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="archIdentifier">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">beschreibt die institutionelle Referenz auf eine Archivale (mit Lagerort, Signatur etc.)</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Archivsignatur</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Archivsignatur</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="settlement"/>
+                    <xs:element ref="region"/>
+                    <xs:element ref="country"/>
+                    <xs:element ref="repository"/>
+                    <xs:element ref="arch">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Maskenfeld</present>
+                                <rowCount>1</rowCount>
+                                <menu>Referenz</menu>
+                                <caption xml:lang="de">Archivname</caption>
+                            </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Archivname</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="archFond">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Maskenfeld</present>
+                                <rowCount>1</rowCount>
+                                <menu>Referenz</menu>
+                                <caption xml:lang="de">Archivbestand</caption>
+                            </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Archivbestand</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="idno">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>Maskenfeld</present>
+                                <rowCount>1</rowCount>
+                                <menu>Referenz</menu>
+                                <caption xml:lang="de">Signatur im Bestand</caption>
+                                </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Signatur im Bestand</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="scope"/>
+                    <xs:element ref="altIdentifier"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="altIdentifier">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Eine Angabe zu nicht mehr gültigen Fundort im Archiv</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:choice>
+                        <xs:element ref="settlement"/>
+                        <xs:element ref="region"/>
+                        <xs:element ref="country"/>
+                        <xs:element ref="repository"/>
+                        <xs:element minOccurs="0" ref="arch"/>
+                    </xs:choice>
+                    <xs:element ref="archFond"/>
+                    <xs:element ref="idno"/>
+                    <xs:element ref="scope"/>
+                    <xs:element ref="note"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="arch">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Das Archiv als im Moment der Textentstehung existierende Institution, die Schriftgut aus der Vergangenheit verwahrt.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Archivbezeichnung</caption>
+                <menu>Referenz</menu>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Archivbezeichnung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:group ref="layout"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="expan"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="archFond">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein Bestand in einem Archiv, d.h. gewöhnlich eine Gruppe von Archivgut, das in einem Provenienzzusammenhang steht.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Archivbestand</caption>
+                <menu>Referenz</menu>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Referenz</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute ref="expan"/>
+                    <xs:attribute ref="lang"/>
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="provenance">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die archivische Provenienz, d.h. die Registratur oder das erste Archiv, das die Urkunde nach ihrem aktiven Gebrauch verwahrt hat.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:group ref="biblArch"/>
+            <xs:attribute name="b_id" type="xs:anySimpleType"/>
+            <xs:attribute ref="abbr"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="msIdentifier">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Bezeichnung einer Handschrift mit Lagerort und Signatur/Bezeichnung innerhalb der lagernden Institution.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Handschriftensignatur</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Handschriftensignatur</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="settlement"/>
+                    <xs:element ref="region"/>
+                    <xs:element ref="country"/>
+                    <xs:element ref="repository">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <menu>Referenz</menu>
+                                <caption xml:lang="de">Bibliotheksname</caption>
+                            </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Bibliotheksname</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="idno">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <menu>Referenz</menu>
+                                <caption xml:lang="de">Signatur</caption>
+                            </xs:appinfo-->
+                            <xs:appinfo source="EditVDU">Handschriftensignatur</xs:appinfo>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="scope"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="repository">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Einrichtung, in der ein Objekt gelagert ist.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Bibliothek</caption>
+                <menu>Referenz</menu>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Bibliothek</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:anySimpleType">
+                    <xs:attribute ref="lang"/>
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="quoteOriginaldatierung">
+        <xs:annotation>
+            <xs:documentation>Orginaldatierung in cei_MOM, eigentlich als quote type="Originaldatierung"</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:element ref="num"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="tenor">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Der eigentliche Urkundentext.
+Transkriptionselemente</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>Fließtext</present>
+                <rowCount>15</rowCount>
+                <tab>Transkription</tab>
+                <caption xml:lang="de">Transkription</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Transkription</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:group ref="Formular"/>
+                    <xs:element ref="pTenor"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="p">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein Absatz mit Fließtext</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>Fließtext</present>
+                <rowCount>15</rowCount>
+                <caption xml:lang="de">Absatz</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Absatz</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="archIdentifier"/>
+                    <xs:element ref="msIdentifier"/>
+                    <xs:element ref="bibl"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="a"/>
+                    <xs:element ref="hi"/>
+                    <xs:element ref="c"/>
+                    <xs:element ref="sup">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>no</present>
+                            </xs:appinfo-->
+                        </xs:annotation>
+                    </xs:element>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pTenor">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Absatzgliederung in der Urkunde</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Absatzgliederung in der Urkunde</xs:appinfo>
+            <xs:documentation xml:lang="de">Ein Absatz</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Formular"/>
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="recipient"/>
+                    <xs:element ref="issuer"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="Formular">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="invocatio"/>
+                <xs:element ref="intitulatio"/>
+                <xs:element ref="inscriptio"/>
+                <xs:element ref="arenga"/>
+                <xs:element ref="publicatio"/>
+                <xs:element ref="narratio"/>
+                <xs:element ref="dispositio"/>
+                <xs:element ref="sanctio"/>
+                <xs:element ref="corroboratio"/>
+                <xs:element ref="datatio"/>
+                <xs:element ref="subscriptio"/>
+                <xs:element maxOccurs="unbounded" ref="notariusSub"/>
+                <xs:element ref="setPhrase"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="invocatio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Invocatio</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Invocatio</xs:appinfo>
+            <xs:documentation xml:lang="de">Eine (meist einleitende) Anrufung Gottes</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="intitulatio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Intitulatio</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Intitulatio</xs:appinfo>
+            <xs:documentation xml:lang="de">Die Nennung des Ausstellers mit seinen Titeln</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="inscriptio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Inscriptio</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Inscriptio</xs:appinfo>
+            <xs:documentation xml:lang="de">Eine Adresse im Urkundentext</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="publicatio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Publicatio</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Publicatio</xs:appinfo>
+            <xs:documentation xml:lang="de">Die Veröffentlichungsformel</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="arenga">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Arenga</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Arenga</xs:appinfo>
+            <xs:documentation xml:lang="de">Eine allgemeine Einleitung, die die Ausstellung der Urkunde begründet</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="narratio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Narratio</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Narratio</xs:appinfo>
+            <xs:documentation xml:lang="de">erzählt die Ereignisse und Handlungen, die der Ausstellung der Urkunde vorangegangen sind</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="dispositio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Dispositio</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Dispositio</xs:appinfo>
+            <xs:documentation xml:lang="de">enthält die eigentlichen Rechtsverfügungen</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="corroboratio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Corroboratio</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Corroboratio</xs:appinfo>
+            <xs:documentation xml:lang="de">kündigt die Beglaubigungsmittel an</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sanctio">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Textpassage, in der eine Strafe bei Brechen des Urkundeninhalts angedroht wird.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Sanctio</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Sanctio</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="subscriptio">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Unterschriftsbestandteile, wie echte Unterschriftszeilen, Signumzeilen, Gegenzeichnungen durch Kanzleimitarbeiter usw.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Unterschriften</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Unterschriften</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="setPhrase"/>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="notariusSub"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">Die Unterscheidung in "Signumzeile", "Rekognitionszeile", "Notarsunterschrift" (vgl. notariusSub: [strict!]) etc. Der verwendete Sprachgebrauch sollte sich an das VID anlehnen oder in der encodingDesc beschrieben werden.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="datatio">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Datierung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Datierung</xs:appinfo>
+            <xs:documentation xml:lang="de">Datierung der Urkunde</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="apprecatio">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">eine gebetsartige abschließende Floskel</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="setPhrase"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="setPhrase">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">eine stark festgelegte Textpassage, die sich nur durch die individuellen Bedingungen (Zeit, Ort, Person, syntaktische Einbindung) verändert, die aber keine strukturierende Funktion im Sinne des Urkundenformulars hat. Soweit möglich sollte sich der Inhalt des Attributs "type" an der Terminologie des "Vocabulaire Internationale de Diplomatique" orientieren.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Klauser, Binnenformel</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Klauser, Binnenformel</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="notariusSub">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Notarsunterschrift</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Formular</menu>
+                <caption xml:lang="de">Notarsunterschrift</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Notarsunterschrift</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="notariusSign">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Das Notarszeichen</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:anySimpleType">
+                    <xs:attribute ref="key"/>
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="Originalbefund">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="transcription"/>
+                <xs:element ref="hi"/>
+                <xs:element ref="pb"/>
+                <xs:element ref="lb"/>
+                <xs:element ref="sup">
+                    <xs:annotation>
+                        <!--xs:appinfo source="EditMOM.xsd">
+                            <present>no</present>
+                        </xs:appinfo-->
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="pict"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:group name="transcription">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="expan"/>
+                <xs:element ref="add"/>
+                <xs:element ref="del"/>
+                <xs:element ref="corr"/>
+                <xs:element ref="space"/>
+                <xs:element ref="damage"/>
+                <xs:element ref="c"/>
+                <xs:element ref="sic"/>
+                <xs:element ref="handShift"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="space">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein signifikant großer unbeschriebener Raum in der Transkriptionsvorlage. Der Leerraum wird mit den Attributen "dim" (horizontal/vertical) und "extent" (Größe) beschrieben: Z.B. dim="vertical" extent="4 Zeilen".
+Ist die Lücke durch eine Rasur entstanden, ist ein leeres Element "del" vorzuziehen.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Unbeschrieben</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Unbeschrieben</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="dim"/>
+            <xs:attribute name="extent"/>
+            <xs:attributeGroup ref="transcription"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="damage">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">enthält beschädigte Passagen, d.h. Stellen, in denen die physischen Eigenschaften des Textes ihn nur schwer oder gar nicht entzifferbar machen.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Beschädigte Stelle</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Beschädigte Stelle</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="expan"/>
+                    <xs:element ref="c"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="pb"/>
+                    <xs:element ref="handShift"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="extent" type="xs:anySimpleType"/>
+            <xs:attribute name="degree" type="xs:anySimpleType"/>
+            <xs:attribute name="agent" type="xs:anySimpleType"/>
+            <xs:attribute ref="certainty"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="handShift">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">ein Handwechsel im Dokument. Das Attribut "hand" benennt die Hand des folgenden Textes, falls z.B. über eine Referenz auf eine Liste der Schreiber (Element handList) möglich.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Handwechsel</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Handwechsel</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute ref="hand"/>
+            <xs:attribute ref="certainty"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="app">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Varianten anderer kopialer Überlieferungen werden über das Referenzwort als Element "lem" und die Varianten als Elemente "rdg" mit dem Attribut "sigil" für die Sigle.</xs:documentation>
+            <xs:documentation xml:lang="en">note in a critical apparatus listing variants</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>no</present>
+            </xs:appinfo-->
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element name="lem">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="de">Die im Haupttext erscheinende Version.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType mixed="true">
+                        <xs:sequence>
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:group ref="Sachauszeichnung"/>
+                                <xs:group ref="biblArch"/>
+                                <xs:group ref="layout"/>
+                                <xs:group ref="reference"/>
+                                <xs:group ref="textualElements"/>
+                            </xs:choice>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element maxOccurs="unbounded" name="rdg">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">reading</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType mixed="true">
+                        <xs:sequence>
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:group ref="biblArch"/>
+                                <xs:group ref="layout"/>
+                                <xs:group ref="reference"/>
+                            </xs:choice>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="expan">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Der ausgeschriebene Text einer Abkürzung.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Abkürzung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Abkürzung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="c"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="pb"/>
+                    <xs:element ref="add"/>
+                    <xs:element ref="corr"/>
+                    <xs:element ref="sic"/>
+                    <xs:element ref="damage"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="abbr">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">Die Buchstaben der Abkürzung</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute ref="certainty"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sic">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein Text, der augenfällige Fehler aufweist, aber in der Vorlage so steht. Aber auch für den Text, der vor einer Korrektur stand.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Fehler</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Fehler</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="expan"/>
+                    <xs:element ref="c"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="add"/>
+                    <xs:element ref="handShift"/>
+                    <xs:group ref="Referenz"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="corr"/>
+            <xs:attribute ref="hand"/>
+            <xs:attribute ref="certainty"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="corr">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Eine Textpassage, die im Text zunächst anders lautete und dann mit dem Inhalt des Elements korrigiert worden ist.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Korrektur</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Korrektur</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="expan"/>
+                    <xs:element ref="sic"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="pb"/>
+                    <xs:element ref="c"/>
+                    <xs:element ref="damage"/>
+                    <xs:element ref="handShift"/>
+                    <xs:group ref="Sachauszeichnung"/>
+                    <xs:group ref="Referenz"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="sic"/>
+            <xs:attributeGroup ref="transcription"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="del">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein noch lesbarer Text der im Original getilgt worden ist (z.B. durch Durchstreichen, Unterpunkten, Rasur).</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Tilgung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Tilgung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="expan"/>
+                    <xs:element ref="add"/>
+                    <xs:element ref="c"/>
+                    <xs:element ref="damage"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="pb"/>
+                    <xs:element ref="sic"/>
+                    <xs:group ref="Referenz"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="transcription"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="add">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Nachträgliche Hinzufügungen im Text, die nicht anderen Text ersetzen.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Hinzufügung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Hinzufügung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="expan"/>
+                    <xs:element ref="c"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="pb"/>
+                    <xs:element ref="sic"/>
+                    <xs:element ref="corr"/>
+                    <xs:element ref="del"/>
+                    <xs:element ref="damage"/>
+                    <xs:element ref="handShift"/>
+                    <xs:group ref="Sachauszeichnung"/>
+                    <xs:group ref="Referenz"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="transcription"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pict">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">graphische, zeichenartige Elemente im Text. Mit Hilfe des type-Attribut genauer zu bestimmen, mit entity oder URL auf eine externe Art der Darstellung zu verweisen.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Graphisches Zeichen</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Graphisches Zeichen</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="URL" type="xs:anySimpleType"/>
+            <xs:attributeGroup ref="transcription"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="layout">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Diese ganze Gruppe ist auf ihre Relevanz hin zu überprüfen, da sie graphische nicht semantische Informationen auszuzeichnen scheint. [strict!]</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="hi"/>
+                <xs:element ref="lb"/>
+                <xs:element ref="pb"/>
+                <xs:element ref="sup"/>
+                <xs:element ref="c"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="sup">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein hochgestelltes Zeichen, dessen logische Funktion "hochgestellt" ist, macht das Sinn? Evtl. nur cei_MOM spezifisch! [strict!] Der in Urkunden relevante Fall sind die Ordinalzahlen, in denen das hochgestellte Zeichen nämlich nicht für eine Abkürzung steht, sondern den Bezug einer Zahlenangabe über die Endung markiert. Die TEI sähe für Ordinalzahlen das Element "num", das mit den Attributen type und value die Funktion als Ordinalzahl und den eigentlichen Wert notiert. Es bleibt dabei jedoch unklar, wie zwischen dem Zahlzeichen und seiner Markierung als Ordinalzahl unterschieden werden kann.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">SUP</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Hochgestellt</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute name="class"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="lb">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Zeilenwechsel in der Vorlage.</xs:documentation>
+            <xs:documentation xml:lang="en">Line break in the source.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Zeilenwechsel</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zeilenwechsel</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pb">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Seitenwechsel in der Vorlage.</xs:documentation>
+            <xs:documentation xml:lang="en">Page break in the source.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Seitenwechsel</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Seitenwechsel in der Vorlage</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="c">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein einzelnes Zeichen in der Vorlage, das nicht mit dem gewählten Zeichensatz dargestellt werden kann. Die Art und Weise der Darstellung und Verarbeitung ist in der encodingDesc zu beschreiben.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <caption xml:lang="de">Sonderzeichen</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Sonderzeichen</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute ref="type">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">Der Name des Zeichens, wie er in der encodingDesc/profileDesc auftaucht und mit einer Darstellungsform versehen wird.</xs:documentation>
+                    <!-- ACHTUNG VDU ANNO FÜR ATTRIBUTE -->
+                    <!--xs:appinfo source="EditMOM.xsd">
+                        <caption>Beschreibung</caption>
+                    </xs:appinfo-->
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="hi">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">durch graphische Merkmale hervorgehobene Textpassagen, die keine rein inhaltliche Funktion haben, z.B. vergrößerte Initialen, gesperrte Texte, Texte zwischen Referenzpunkten, Elongata</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Original</menu>
+                <overlap>True</overlap>
+                <caption xml:lang="de">graphische Hervorhebung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">graphische Hervorhebung</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:group ref="Formular"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="rend"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="reference">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="ptr"/>
+                <xs:element ref="note"/>
+                <xs:element ref="figure"/>
+                <xs:element ref="anchor"/>
+                <xs:element ref="ref"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:group name="Referenz">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="anchor"/>
+                <xs:element ref="ref"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="ptr">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein leeres Element, das auf ein anderes Element im Text verweist, das ein id-Attribut besitzt. Die ID des Zieles wird im Attribut target notiert. Verweise auf Elemente außerhalb des aktuellen Dokuments sind mit dem Element xptr zu verwirklichen. Ist der Verweis als Textpassage im aktuellen Element ausformuliert, ist das Element "ref" zu verwenden.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attributeGroup ref="reference"/>
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ref">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Das Element enthält eine Textpassage, die auf eine anderes Element im Text verweist, das ein id-Attribut besitzt. Die ID des Zieles wird im Attribut "target" angegeben. Verweise auf Elemente außerhalb des aktuellen Dokuments sind mit dem Element xref zu verwirklichen. Ersetzt das Tag einen textlichen Verweis bzw. wird der Verweistext automatisch erzeugt, ist das Element "ptr" zu verwenden.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Verweis</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Verweis</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:anySimpleType">
+                    <xs:attributeGroup ref="reference"/>
+                    <xs:attribute ref="lang"/>
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="note">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein ergänzender Text zu einer bestimmten Textstelle, der im Druck gewöhnlich als Marginalie, Fuß- oder Endnote dargestellt wird.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">NOTE</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">NOTE</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                    <xs:element ref="bibl"/>
+                    <xs:element ref="archIdentifier"/>
+                    <xs:element ref="msIdentifier"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="place"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="textualElements">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="head" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="de">Eine Überschrift</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="h1"/>
+                <xs:element ref="h2"/>
+                <xs:element ref="p"/>
+                <xs:element ref="list"/>
+                <xs:element ref="foreign"/>
+                <xs:element ref="cit"/>
+                <xs:element ref="quote"/>
+                <xs:element ref="div"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="div">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Jede beliebige Art von Textabschnitt, die einen inhaltlichen Sinnabschnitt von mindestens einem Absatz umschließt und nicht durch speziellere Elemente (z.B. Formularteile, abstract) beschrieben werden kann.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="textualElements"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="divNotes">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Enthält die Fußnoten zur Urkunde.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">FUssNOTE</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">FUssNOTE</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="note"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="foreign">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Eine Textpassage, die nicht in der in der übergeordnet definierten Sprache formuliert ist (z.B. deutsche Namen in lateinischen Urkunden, eingeflochtene lateinische Textpassagen im deutschen Vorspann etc.)</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Anderssprachig</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Anderssprachig</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="cit">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein wörtliches Zitat gemeinsam mit der Herkunftsangabe. Die Quelle dabei nicht auf explizit bibliographische Angaben beschränkt, sondern kann auch kanonische Referenzen (wie z.B. Bibelzitate) enthalten.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Zitat mit Quellangabe</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zitat mit Quellangabe</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element ref="quote"/>
+                <xs:element ref="bibl"/>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="quote">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">enthält ein wörtliches Zitat. Die TEI sieht das Element für intertextuelle Zitate vor. Alternativ und lauf Guidelines der TEI im Zweifelsfall vorzuziehen ist das Element "q" vor, das für intratextuelle Zitate zu verwenden ist. Da in Urkunden jedoch Zitate gewöhnlich aus einer externen Textquelle schöpfen und nicht einem anderen Sprecher im Text zugeordnet sind, ist in diesem Kontext das Element "quote" im Zweifelsfall vorzuziehen. [strict!] Zu diskutieren ist nur der Fall eines angekündigten wörtlichen Zitats, z.B: wir bestätigen die Urkunde unseres Vaters die folgenden Wortlaut hat: ....</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Zitat</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zitat</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachauszeichnung"/>
+                    <xs:element ref="foreign"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="h1">
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:anySimpleType">
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="h2">
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:anySimpleType">
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="list">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Eine Liste</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element ref="item"/>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="item">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein Listenpunkt</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="Sachliches">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="Sachauszeichnung"/>
+                <xs:element ref="quote"/>
+                <xs:element ref="cit"/>
+                <xs:element ref="foreign"/>
+                <xs:group ref="Referenz"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="measure">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein Maßangabe inkl. Maßeinheit. Das Attribut "value" enthält eine vereinheitliche Form der Angabe die aus einem numerischen Wert und einer Maßangabe besteht.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Maße</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Maße</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="num"/>
+                    <xs:element ref="index"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="num">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Eine Zahlenangabe</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Zahl</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zahl</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="value"/>
+            <xs:attribute ref="lang"/>
+            <xs:attribute ref="rend"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="Sachauszeichnung">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="persName"/>
+                <xs:choice>
+                    <xs:annotation>
+                        <xs:documentation xml:lang="de">Geographische Angaben</xs:documentation>
+                    </xs:annotation>
+                    <xs:element ref="placeName"/>
+                    <xs:element ref="geogName"/>
+                </xs:choice>
+                <xs:element ref="index"/>
+                <xs:element ref="testis"/>
+                <xs:choice>
+                    <xs:annotation>
+                        <xs:documentation xml:lang="de">Datumsangaben</xs:documentation>
+                    </xs:annotation>
+                    <xs:element ref="date"/>
+                    <xs:element ref="dateRange"/>
+                </xs:choice>
+                <xs:element ref="num"/>
+                <xs:element ref="measure"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:group name="date">
+        <xs:choice>
+            <xs:element ref="date"/>
+            <xs:element ref="dateRange"/>
+        </xs:choice>
+    </xs:group>
+    <xs:element name="index">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Sachindex</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Sachindex</xs:appinfo>
+            <xs:documentation xml:lang="de">ein Eintrag für eine erschließende Liste von Stichwörtern (Register, Index)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="foreign"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="indexName"/>
+            <xs:attribute name="lemma"/>
+            <xs:attribute name="sublemma"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="date">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Angabe eines spezifischen Tages in einem Kalender (=Datumsangabe).</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Datumsangabe</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Datumsangabe</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="num"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="date"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="dateRange">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein Zeitraum, die Werte des kleinsten und des größten zutreffenden Datums in den Attributen "from" und "to"</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Zeitraumangabe</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zeitraumangabe</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="num"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="from">
+                <xs:annotation>
+                    <!--xs:appinfo source="EditMOM.xsd">
+                        <caption>von</caption>
+                    </xs:appinfo-->
+                    <xs:appinfo source="EditVDU">von</xs:appinfo>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="to">
+                <xs:annotation>
+                    <!--xs:appinfo source="EditMOM.xsd">
+                        <caption>von</caption>
+                    </xs:appinfo-->
+                    <xs:appinfo source="EditVDU">bis</xs:appinfo>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute ref="certainty"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="persName">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Personenname</caption>
+            </xs:appinfo-->
+            <xs:documentation xml:lang="de">ein Personenname</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:choice>
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Geographische Angaben</xs:documentation>
+                        </xs:annotation>
+                        <xs:element ref="persName"/>
+                        <xs:element ref="placeName"/>
+                        <xs:element ref="geogName"/>
+                    </xs:choice>
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="note"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="identification"/>
+            <xs:attribute ref="lang"/>
+            <xs:attribute ref="type"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="recipient">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Der Name der Person, die die Urkunde erhält (als Adressat oder als Begünstigter)</xs:documentation>
+            <xs:documentation xml:lang="en">The name of the person who is receives the document.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Empfänger</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Empfänger</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="persName"/>
+                    <xs:choice>
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Geographische Angaben</xs:documentation>
+                        </xs:annotation>
+                        <xs:element ref="placeName"/>
+                        <xs:element ref="geogName"/>
+                    </xs:choice>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="issuer">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Der Aussteller der Urkunde.</xs:documentation>
+            <xs:documentation xml:lang="en">marks a person the CID describes as follows:
+L'auteur d'un acte écrit est la personne au nom de qui cet acte est intitulé.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Aussteller</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Aussteller</xs:appinfo>
+            <!--xs:appinfo source="EditVDU-Test" xmlns:xe="http://monasterium.net/ns/xe">
+                <xe:label>Aussteller</xe:label>
+                <xe:relevant></xe:relevant>
+                <xe:required></xe:required>
+                <xe:control>input</xe:control>
+                <xe:appeareance></xe:appeareance>
+            </xs:appinfo-->
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="persName"/>
+                    <xs:choice>
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Geographische Angaben</xs:documentation>
+                        </xs:annotation>
+                        <xs:element ref="placeName"/>
+                        <xs:element ref="geogName"/>
+                    </xs:choice>
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="note"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="testis">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein einzelner Zeuge.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Zeuge</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zeuge</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="foreign"/>
+                    <xs:group ref="Originalbefund"/>
+                    <xs:choice>
+                        <xs:annotation>
+                            <xs:documentation xml:lang="de">Geographische Angaben</xs:documentation>
+                        </xs:annotation>
+                        <xs:element ref="placeName"/>
+                        <xs:element ref="geogName"/>
+                    </xs:choice>
+                    <xs:element ref="persName"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="region">
+        <xs:annotation>
+            <xs:documentation>der Name einer Region, eines Bundeslandes u.ä.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Land</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Land</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute ref="type"/>
+            <xs:attributeGroup ref="geog"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="country">
+        <xs:annotation>
+            <xs:documentation>der Name eines völkerrechtlich selbständigen Staates (z.B. Deutschland, Ungarn ...)</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Staat</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Staat</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute ref="type"/>
+            <xs:attributeGroup ref="geog"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="settlement">
+        <xs:annotation>
+            <xs:documentation>der Name einer Siedlung (Dorf, Stadt ...)</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Ort</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Ort</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute ref="type"/>
+            <xs:attributeGroup ref="geog"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="placeName">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Enthält geographische Angaben, die sich auf menschliche Siedlung oder politische Einheiten beziehen, d.h. Orte, Hofnamen, Klöster, Burgen, Bundesländer, Herrschaften, Staaten etc.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Ortsname</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Ortsname</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="note"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="geog"/>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="geogName">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Enhält naturräumliche geographische Angaben wie Bergnamen, Flußnamen, Landstriche, die keine politische Einheit bilden.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Sache</menu>
+                <caption xml:lang="de">Geographischer Name</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Geographischer Name</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="note"/>
+                    <xs:group ref="Originalbefund"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="geog"/>
+            <xs:attribute ref="type"/>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="BibliographicInformation">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element minOccurs="0" name="author">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="de">Der Autor eines Textes. Insbesondere im Rahmen einer bibliographischen Angabe gebraucht.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                                <xs:attributeGroup ref="standard"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" name="title">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                                <xs:attributeGroup ref="standard"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" name="imprint">
+                    <xs:complexType mixed="true">
+                        <xs:sequence>
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:element ref="scope"/>
+                                <xs:element name="pubPlace">
+                                    <xs:complexType>
+                                        <xs:simpleContent>
+                                            <xs:extension base="xs:string">
+                                                <xs:attributeGroup ref="standard"/>
+                                            </xs:extension>
+                                        </xs:simpleContent>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:group ref="date"/>
+                            </xs:choice>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="standard"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element ref="scope"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="name">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:group ref="layout"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="standard"/>
+            <xs:attributeGroup ref="reference"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:group name="biblArch">
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="country"/>
+                <xs:element ref="region"/>
+                <xs:element ref="settlement"/>
+                <xs:element ref="arch"/>
+                <xs:element ref="archFond"/>
+                <xs:element ref="idno"/>
+                <xs:element ref="provenance"/>
+                <xs:element ref="bibl"/>
+                <xs:element ref="msIdentifier"/>
+                <xs:element ref="archIdentifier"/>
+                <xs:element ref="repository"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+    <xs:element name="bibl">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Bibliographische Angaben. Es ist zu diskutieren, ob das Element auch für kanonische Angaben (wie z.B. Bibelzitate) verwendet werden kann, oder ob dafür ein eigenes Element notwendig ist. [strict!]</xs:documentation>
+            <xs:documentation xml:lang="en">Bibliographic informations</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <liste>simple</liste>
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Bibliogr. Angabe</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Bibliogr. Angabe</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:choice>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="layout"/>
+                    <xs:element ref="foreign"/>
+                    <xs:element ref="quote"/>
+                    <xs:element ref="scope">
+                        <xs:annotation>
+                            <!--xs:appinfo source="EditMOM.xsd">
+                                <present>no</present>
+                            </xs:appinfo-->
+                        </xs:annotation>
+                    </xs:element>
+                </xs:choice>
+            </xs:choice>
+            <xs:attribute ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="title">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="scope">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Umfang einer bibliographischen Angabe, insbesondere in einem übergeordneten bibliographsichen Zusammenhang. Z.B. die Seitenzahlen eines Aufsatzes in einem Sammelband, die Fundstelle einer Urkunde in einem Kopialbuch.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Blätter/Seiten</caption>
+                <menu>Referenz</menu>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Blätter/Seiten</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:anySimpleType">
+                    <xs:attribute ref="lang"/>
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="anchor">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Leeres Element, das als Zielpunkt einer Referenz dient.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <menu>Referenz</menu>
+                <caption xml:lang="de">Zielpunkt</caption>
+                </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zielpunkt</xs:appinfo>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attributeGroup ref="standard"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="a">
+        <xs:annotation>
+            <xs:documentation>CEI_MOM: Nur für vorläufigen Gebrauch um Konversionen aus HTML zu erleichtern!!!! [strict!] </xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>no</present>
+            </xs:appinfo-->
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="xs:anySimpleType">
+                    <xs:attribute name="href"/>
+                    <xs:attribute name="name"/>
+                    <xs:attribute name="target"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:attributeGroup name="reference">
+        <xs:attribute ref="type"/>
+        <xs:attribute ref="resp"/>
+        <xs:attribute ref="target"/>
+        <xs:attribute ref="key"/>
+    </xs:attributeGroup>
+    <xs:attribute name="target" type="xs:anySimpleType">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Ziel</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Ziel</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup name="certain">
+        <xs:attribute ref="certainty"/>
+        <xs:attribute ref="resp"/>
+    </xs:attributeGroup>
+    <xs:attribute name="certainty" type="xs:anySimpleType">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Für Genauigkeitsangaben z.B. bei Datierungen, werden mit Schlüsselwörtern (zu benennen in der encodingDesc) oder kurzen Beschreibungen charakterisiert werden. auch für Fälschungsmarkierungen? [strict!]</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Zuverlässigkeit</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Zuverlässigkeit</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup name="identification">
+        <xs:attribute ref="reg">
+            <xs:annotation>
+                <xs:documentation xml:lang="de">Normalisierte Version</xs:documentation>
+                <!--xs:appinfo source="EditMOM.xsd">
+                    <caption xml:lang="de">Normalform</caption>
+                </xs:appinfo-->
+                <xs:appinfo source="EditVDU">Normalform</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute ref="key"/>
+        <xs:attribute ref="certainty"/>
+    </xs:attributeGroup>
+    <xs:attribute name="reg"/>
+    <xs:attribute name="resp" type="xs:anySimpleType">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Der verantwortliche Bearbeiter für die normalisierten Angaben und die Angaben zum Befund.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Verantwortlich</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Verantwortlich</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type" type="xs:anySimpleType"/>
+    <xs:attribute name="picture" type="xs:anySimpleType"/>
+    <xs:attributeGroup name="geog">
+        <xs:attribute name="existent"/>
+        <xs:attributeGroup ref="identification"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="gap">
+        <xs:attribute name="reason"/>
+        <xs:attribute name="hand"/>
+        <xs:attribute name="extent"/>
+    </xs:attributeGroup>
+    <xs:attribute name="function" type="xs:anySimpleType">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Funktion des Tags im besonderen Kontext: z.B. Datum als ... ist so eigentlich nicht richtig.</xs:documentation>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="key" type="xs:anySimpleType">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Ein eindeutiger Bezeichner, der in einer externen Liste aufgelöst werden kann.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>no</present>
+                <caption xml:lang="de">Schlüsselwert</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Schlüsselwert</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup name="date">
+        <xs:attribute ref="value"/>
+        <xs:attribute ref="certainty"/>
+    </xs:attributeGroup>
+    <xs:attribute name="value" type="xs:anySimpleType"/>
+    <xs:attributeGroup name="abbreviation">
+        <xs:attribute ref="expan"/>
+        <xs:attribute ref="abbr"/>
+    </xs:attributeGroup>
+    <xs:attribute name="abbr" type="xs:anySimpleType">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Abkürzung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Abkürzung</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="expan" type="xs:anySimpleType">
+        <xs:annotation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Auflösung</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Auflösung</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup name="standard">
+        <xs:attribute ref="id"/>
+        <xs:attribute ref="n"/>
+    </xs:attributeGroup>
+    <xs:attribute name="id">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Eine im gesamten Dokument eindeutige ID, die mit einem Buchtstaben beginnt.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>no</present>
+            </xs:appinfo-->
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="n" type="xs:anySimpleType">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Eine lokale Identifikation, wie z.B. die Fußnotennummer.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <present>no</present>
+            </xs:appinfo-->
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="lang" type="xs:anySimpleType">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Sprache des Elements und aller Unterelemente, solange nichts anderes angegeben ist.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Sprache</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Sprache</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="rend" type="xs:anySimpleType">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">Die Art der Darstellung des Elements, insbesondere Bezeichnung der Schriftart bei Hervorhebungen.</xs:documentation>
+            <!--xs:appinfo source="EditMOM.xsd">
+                <caption xml:lang="de">Darstellungsweise</caption>
+            </xs:appinfo-->
+            <xs:appinfo source="EditVDU">Darstellungsweise</xs:appinfo>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup name="transcription">
+        <xs:attribute ref="type"/>
+        <xs:attribute ref="hand"/>
+        <xs:attribute ref="certainty"/>
+    </xs:attributeGroup>
+    <xs:attribute name="hand"/>
+    <xs:attributeGroup name="Overlap">
+        <xs:attribute name="spanTo"/>
+        <xs:attributeGroup ref="reference"/>
+    </xs:attributeGroup>
+</xs:schema>

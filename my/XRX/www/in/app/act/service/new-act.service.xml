@@ -1,0 +1,49 @@
+<xrx:service xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:itineranova.be,2011:/in/service/new-act</xrx:id>
+  <xrx:body>
+    {
+    
+    let $new-act := $data//*:newact/text()
+    let $register := $data//*:register/text()
+    
+    let $atomid := metadata:atomid('act', ($register, $new-act))
+    let $act-db-base-collection := metadata:base-collection('act', $register, 'public')
+    let $new-act-already-exists := exists($act-db-base-collection//atom:id[.=$atomid])
+    
+    let $template :=
+        template:get('tag:itineranova.be,2011:/in/template/act')
+    
+    let $changeid :=
+        if(not($new-act-already-exists) and $new-act != '') then
+            upd:replace-element-content(
+                $template/atom:id,
+                text{ $atomid })
+        else ()
+    
+    let $changeunitid :=
+        if(not($new-act-already-exists) and $new-act != '') then
+            upd:replace-element-content(
+                $changeid//atom:content/ead:c/ead:did/ead:unitid,
+                text{ $new-act })
+        else ()
+    
+    let $saveidchanges :=
+        if(not($new-act-already-exists) and $new-act != '') then
+            atom:POST(
+                metadata:feed('act', $register, 'public'),
+                metadata:entryname('act', $new-act),
+                $changeunitid)
+        else ()
+    
+    return
+    if(not($new-act != '')) then
+    <xrx:response status="0"><xrx:message>Requested name empty.</xrx:message><xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon></xrx:response>
+    else if($new-act-already-exists) then
+    <xrx:response status="0"><xrx:message>An act with the requested name already exists.</xrx:message><xrx:icon>{ conf:param('request-root') }dialog-warning.png</xrx:icon></xrx:response>
+    else if(1 eq 2) then
+    <xrx:response status="-1"><xrx:message>An error occured.</xrx:message><xrx:icon>{ conf:param('request-root') }dialog-error.png</xrx:icon></xrx:response>
+    else
+    <xrx:response status="1"><xrx:message>Act { $new-act } created.</xrx:message><xrx:icon>{ conf:param('request-root') }face-smile.png</xrx:icon></xrx:response>
+    }
+  </xrx:body>
+</xrx:service>

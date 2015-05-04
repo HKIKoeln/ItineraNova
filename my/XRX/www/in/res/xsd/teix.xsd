@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:ns1="http://www.tei-c.org/ns/1.0/"
+	xmlns:teix="http://www.tei-c.org/ns/Examples" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" targetNamespace="http://www.tei-c.org/ns/Examples">
+	<xs:import namespace="http://www.tei-c.org/ns/1.0/"
+		schemaLocation="tei_all.xsd" />
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace"
+		schemaLocation="xml.xsd" />
+	<xs:element name="egXML">
+		<xs:annotation>
+			<xs:documentation>(example of XML) contains a single well-formed XML
+				fragment demonstrating the use of some XML element or
+				attribute, in which the egXML element itself functions as the root element.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="true">
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="ns1:local" />
+				<xs:any namespace="##local" processContents="skip" />
+			</xs:choice>
+			<xs:attributeGroup ref="ns1:att.global.attributes" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

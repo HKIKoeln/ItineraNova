@@ -1,0 +1,63 @@
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns:xf="http://www.w3.org/2002/xforms">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/indexing-iipmooviewer</xrx:id>
+  <xrx:inherits>tag:itineranova.be,2011:/in/widget/iipmooviewer</xrx:inherits>
+  <xrx:res>
+    <xrx:js>
+      <script type="text/javascript" src="{ conf:param('request-root') }mootools-1.2-core-compressed.js"></script> 
+      <script type="text/javascript" src="{ conf:param('request-root') }mootools-1.2-more-compressed.js"></script> 
+      <script type="text/javascript" src="{ conf:param('request-root') }iipmooviewer-1.1.js"></script>
+    </xrx:js>
+    <xrx:css>
+      <link rel="stylesheet" type="text/css" media="all" href="{ conf:param('request-root') }iip.css" />
+      <style type="text/css">
+      
+#diipmooviewer{{
+  position:absolute;
+  width:100%;
+  height:45%;
+  margin:0;
+  padding:0;
+}}
+
+#navi{{
+  position:absolute;
+  width:100%;
+  margin:0px;
+  padding:0px;
+  z-index:5;
+}}
+
+#targetframe{{
+  position:abolute;
+  width:100%;
+  height:100%;
+}}
+
+#navigation-buttons{{
+  position:absolute;
+  right:0px;
+}}
+
+#drename-folio{{
+  position:relative;
+  float:left;
+  
+}}
+
+.dijitDialog{{
+  width:450px;
+}}
+
+#dialog-buttons{{
+  position:relative;
+  float:right;
+  margin:10px;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+</xrx:widget>

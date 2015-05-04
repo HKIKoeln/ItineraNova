@@ -1,0 +1,471 @@
+<xrx:widget xmlns:xf="http://www.w3.org/2002/xforms" 
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:bfc="http://betterform.sourceforge.net/xforms/controls">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/transcriptions-to-moderate</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key>transcriptions-to-moderate</xrx:key>
+      <xrx:default>Transcriptions to moderate</xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>true</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:js>
+      <script type="text/javascript" src="{ conf:param('request-root') }jquery.min.js"/>
+      <script src="{ conf:param('request-root') }codemirror.js"></script>
+      <script src="{ conf:param('request-root') }overlay.js"></script>
+      <script src="{ conf:param('request-root') }runmode.js"></script>
+      <script src="{ conf:param('request-root') }insyntax.js"></script>
+      <script src="{ conf:param('request-root') }intextdiff.js"></script>
+    </xrx:js>
+    <xrx:css>
+	    <xrx:include>
+	      <xrx:css>tag:itineranova.be,2011:/in/css/transcription-preview</xrx:css>
+	    </xrx:include>
+      <link rel="stylesheet" href="{ conf:param('request-root') }codemirror.css"/>
+      <link rel="stylesheet" href="{ conf:param('request-root') }insyntax.css"/>
+      <link rel="stylesheet" href="{ conf:param('request-root') }intextdiff.css"/>
+      <style type="text/css">
+
+#dtranscriptions-to-moderate{{
+  position:relative;
+  float:left;
+  margin-bottom:50px;
+}}
+
+.transcription-preview-container{{
+  position:relative;
+  float:left;
+  width:770px;
+  background:rgb(240,240,240);
+  margin:1px;
+}}
+
+.transcription-preview, .transcription-functions{{
+  position:relative;
+  float:left;
+  margin:10px;
+}}
+
+.transcription-preview{{
+  width:70%;
+}}
+
+.heading{{
+  font-weight:bold;
+  font-size:16px;
+}}
+
+.comment .xfValue{{
+  width:100%;
+}}
+
+.addition{{
+  margin-top:15px;
+}}
+
+.comment{{
+  color:MediumOrchid;
+}}
+
+pre{{
+  border:none;
+  margin:0;
+  padding:0;
+  background:white;
+}}
+
+.dcomment{{
+  position:relative;
+  float:left;
+  width:94%;
+  margin:3%;
+  padding:7px;
+  background:white;
+	-moz-box-shadow: 1px 1px 5px #888;
+	-webkit-box-shadow: 1px 1px 5px #888;
+	box-shadow: 1px 1px 5px #888;
+}}
+
+.revision-when-operation-who{{
+  color:grey;
+}}
+
+.cm-error {{
+  color: black !important;
+  border: none !important;
+}}
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model>
+    <xf:model id="mtranscriptions-to-moderate">
+      <xf:instance id="itranscription-to-moderate">
+        <data xmlns="">
+          <authorselect>{ $transcription:rauthorselect }</authorselect>
+          <url></url>
+          <baseurl>{ concat(request:get-uri(), '?page=1', '&amp;perpage=', $pagination:rperpage) }</baseurl>
+        </data>
+      </xf:instance>
+      
+      <xf:bind nodeset="url" calculate="concat(../baseurl, '&amp;authorselect=', ../authorselect)"/>
+      
+    </xf:model>
+  </xrx:model>
+  <xrx:view>
+    {
+    (: all entries :)
+    let $all-transcription-entries :=
+      metadata:base-collection($transcription:metadata-object-type, 'draft')/atom:entry
+
+    (: all authors :)
+    let $authors := distinct-values($all-transcription-entries/atom:author/atom:email/text())
+    
+    (: maybe only author specific transcriptions :)
+    let $transcription-entries := 
+      if($transcription:rauthorselect != '') then $all-transcription-entries[./atom:author/atom:email=$transcription:rauthorselect]
+      else $all-transcription-entries
+    
+    (: pagination :)
+    let $numentries := count($transcription-entries)
+    let $startstop := pagination:startstop($numentries)
+    let $navigation := pagination:navi($numentries)
+      
+    return
+    <div id="dtranscriptions-to-moderate">
+      <div class="h2">
+		    <xrx:i18n>
+		      <xrx:key>transcriptions-to-moderate</xrx:key>
+		      <xrx:default>Transcriptions to moderate</xrx:default>
+		    </xrx:i18n>
+      </div>
+      <xrx:auth>
+        <xrx:rules>
+          <xrx:rule>
+            <xrx:user/>
+            <xrx:role>archivist</xrx:role>
+          </xrx:rule>
+        </xrx:rules>
+        <xrx:true>
+          <div>
+            <xf:group model="mtranscriptions-to-moderate">
+	            <div class="dauthorselect">
+	              <xf:select1 ref="authorselect">
+	                <xf:label>
+	                  <xrx:i18n>
+	                    <xrx:key>select-author</xrx:key>
+	                    <xrx:default>Select author</xrx:default>
+	                  </xrx:i18n>
+	                  <span>:&#160;</span>
+	                </xf:label>
+	                {
+	                for $author in $authors
+	                let $name-firstname := user:name-firstname($author)
+	                let $label := concat($name-firstname, ' (', $author, ')')
+	                order by $name-firstname collation "?lang=de"
+	                return
+	                <xf:item>
+	                  <xf:label>{ $label }</xf:label>
+	                  <xf:value>{ $author }</xf:value>
+	                </xf:item>
+	                }
+	                <xf:action ev:event="xforms-value-changed">
+	                  <xf:load show="replace">
+	                    <xf:resource value="xs:anyURI(instance('itranscription-to-moderate')/url)"/>
+	                  </xf:load>
+	                </xf:action>
+	              </xf:select1>
+	            </div>
+	          </xf:group>
+            <div>{ $navigation }</div>
+          {
+            for $transcription-entry at $num in $transcription-entries[position() = $startstop]
+            
+            (: atom, act and register info :)
+            let $atom-id := $transcription-entry/atom:id/text()
+            let $register-name :=
+              substring-before(substring-after($atom-id, '/transcription/'), '/')
+            let $act-name :=
+              substring-after($atom-id, concat($register-name, '/'))
+            let $act-name-decoded :=
+              xmldb:decode($act-name)
+            
+            (: the transcription text :)  
+            let $transcriptions :=
+              tokenize($transcription-entry//atom:content/text(), '\|\|\|\|')
+            let $num-transcriptions := count($transcriptions)
+            
+            (: user revision :)  
+            let $revision-exists := exists($transcription-entry/xrx:revision) 
+            let $revision-who := $transcription-entry/xrx:revision/xrx:who/text()
+            let $revision-who-label := user:firstname-name($revision-who)
+            let $revision-when := $transcription-entry/xrx:revision/xrx:when/text()
+            let $suggested-when-label := substring-before($revision-when, 'T')
+            let $revision-operation := $transcription-entry/xrx:revision/xrx:operation/text()
+            let $revision-comment := $transcription-entry/xrx:revision/xrx:comment/text()
+            let $revisionid := $transcription-entry/xrx:revision/xrx:id/text()
+            let $revision-entry := if($revisionid != '') then revision:entry($revisionid, $revision-who) else ()
+            let $revision-transcriptions :=
+              tokenize($revision-entry//atom:content/text(), '\|\|\|\|')
+            let $num-revision-transcriptions := count($revision-transcriptions)    
+
+            (: last draft revision :)
+            let $lastrevision-entry := revision:lastentry($atom-id, 'draft')
+            let $lastrevision-exists := exists($lastrevision-entry/xrx:revision) 
+            let $lastrevision-who := $lastrevision-entry/xrx:revision/xrx:who/text()
+            let $lastrevision-who-label := user:firstname-name($revision-who)
+            let $lastrevision-when := $lastrevision-entry/xrx:revision/xrx:when/text()
+            let $lastsuggested-when-label := substring-before($revision-when, 'T')
+            let $lastrevision-operation := $lastrevision-entry/xrx:revision/xrx:operation/text()
+            let $lastrevision-comment := $lastrevision-entry/xrx:revision/xrx:comment/text()
+            let $lastrevisionid := $lastrevision-entry/xrx:revision/xrx:id/text()
+            let $lastrevision-transcriptions := 
+              tokenize($lastrevision-entry//atom:content/text(), '\|\|\|\|')
+            let $num-lastrevision-transcriptions := count($lastrevision-transcriptions)
+            
+            (: some public revision :)
+            let $scope2 := 'public'
+            let $act-public-revision-atomid := replace($atom-id, '/transcription/', '/act/')
+            let $public-revision-entry := revision:lastentry($act-public-revision-atomid, $scope2)
+            let $public-revision-transcriptions := 
+              if(exists($public-revision-entry) = true()) then tokenize(transcription:entry2text($public-revision-entry), '\|\|\|\|') else ()
+            let $num-public-revision-transcriptions := count($public-revision-transcriptions)                  
+            
+            (: diffs1: suggested user revision or public revision -- moderator version :)
+            let $diff1-num-transcriptions := 
+              if($revision-operation = 'start') then $num-public-revision-transcriptions else $num-revision-transcriptions
+            let $diff1-transcriptions := 
+              if($revision-operation = 'start') then $public-revision-transcriptions else $revision-transcriptions
+            let $max-additions1 := 
+              if($num-transcriptions gt $diff1-num-transcriptions) then $num-transcriptions else $diff1-num-transcriptions
+            let $diffs1 := 
+              for $addition in (1 to $max-additions1) 
+              return
+              text:diff($diff1-transcriptions[$addition], $transcriptions[$addition])              
+
+            (: diffs2: last draft revision -- suggested user revision :)
+            let $max-additions2 := 
+              if($num-transcriptions gt $num-lastrevision-transcriptions) then $num-transcriptions else $num-lastrevision-transcriptions
+            let $diffs2 := 
+              for $addition in (1 to $max-additions2) 
+              return
+              text:diff(if($lastrevision-transcriptions[$addition]) then $lastrevision-transcriptions[$addition] else "", $revision-transcriptions[$addition])
+            
+            let $update-time :=
+              $transcription-entry//atom:updated/text()
+            let $update-time-date :=
+              substring-before($update-time, 'T')
+            let $update-time-time :=
+              substring-before(substring-after($update-time, 'T'), '.')
+            let $author-email :=
+              $transcription-entry//atom:author/atom:email/text()
+            let $author :=
+              user:firstname-name($author-email)
+            let $transcription :=
+              $transcription-entry//atom:content/text()
+            
+            order by $revision-when descending
+            return
+            <div class="transcription-preview-container">
+              <a name="{ $atom-id }"/>
+              <div class="transcription-preview">
+                <div class="inner-transcription-preview">
+                  <div class="heading">{ $register-name }, { $act-name-decoded }</div>
+                  <div>
+                    <xrx:i18n>
+                      <xrx:key>last-update</xrx:key>
+                      <xrx:default>Last update</xrx:default>
+                    </xrx:i18n>
+                    <span>&#160;{ $update-time-date }</span>
+                  </div>
+                  <div>
+                    <xrx:i18n>
+                      <xrx:key>author</xrx:key>
+                      <xrx:default>Author</xrx:default>
+                    </xrx:i18n>
+                    <span>:&#160;{ $author }</span>
+                  </div>
+                  {
+                  if($revision-operation = 'start') then
+                  <h2 class="revision-heading">
+                    <xrx:i18n>
+                      <xrx:key>revising-a-public-transcription</xrx:key>
+                      <xrx:default>Revising a public transcription</xrx:default>
+                    </xrx:i18n>
+                  </h2>
+                  else()
+                  } 
+	                
+                  {
+                  if($revision-exists = false()) then
+                  <div class="transcription-text">
+                  { 
+                    for $t at $pos in $transcriptions
+                    let $label := 
+                      if($pos = 1) then 'Act'
+                      else concat('Add.', xs:string(($pos - 1)))
+                    return
+                    <div class="addition">
+                      <div>{ $label }</div>
+                      <script type="text/javascript">
+                      $(document).ready(function() {{
+                        CodeMirror.fromTextArea(document.getElementById("transcriptiontext1-{ $num }-{ $pos }"), {{ readOnly:'nocursor',lineNumbers:true }});
+                      }});
+                      </script>
+                      <textarea name="transcriptiontext1-{ $num }-{ $pos }" style="display:none" id="transcriptiontext1-{ $num }-{ $pos }">{ $t }</textarea>
+                    </div>
+                  }
+                  </div>
+                  else()
+                  }
+                  
+                  <div class="transcription-text">
+                  { 
+                    for $diff at $pos in $diffs1
+                    let $label := 
+                      if($pos = 1) then 'Act'
+                      else concat('Add.', xs:string(($pos - 1)))
+                    return
+                    <div class="addition">
+                      <div>{ $label }</div>
+                      <script type="text/javascript">
+                      $(document).ready(function() {{
+                        CodeMirror.fromTextArea(document.getElementById("transcriptiontext2-{ $num }-{ $pos }"), {{ readOnly:'nocursor',lineNumbers:true,mode:"intextdiff" }});
+                      }});
+                      </script>
+                      <textarea name="transcriptiontext2-{ $num }-{ $pos }" style="display:none" id="transcriptiontext2-{ $num }-{ $pos }">{ $diff/text() }</textarea>
+                    </div>
+                  }                   
+                  </div>
+
+                  {
+                  if($revision-exists = true() and $revision-operation != 'start') then
+                  <div>
+                    <hr/>
+                    <div>
+                      <h2 class="revision-heading">
+                        <xrx:i18n>
+                          <xrx:key>revision</xrx:key>
+                          <xrx:default>Revision</xrx:default>
+                        </xrx:i18n>
+                      </h2>
+                    </div>
+                  </div>
+                  else()
+                  }
+                  
+                  {
+                    if($revision-exists = true() and $revision-operation != 'start') then
+                    <div class="dcomment">
+                      <span class="comment"><pre>{ $revision-comment }</pre></span>
+                      <br/>
+                      {
+                      if($revision-operation = 'suggest') then
+                      <div class="revision-when-operation-who">
+                        <div>
+                          <span>{ $suggested-when-label },&#160;</span>
+                          <span>
+                            <xrx:i18n>
+                              <xrx:key>revision-suggested-by</xrx:key>
+                              <xrx:default>revision suggested by</xrx:default>
+                            </xrx:i18n>
+                            <span>&#160;{ $revision-who-label }</span>
+                          </span>
+                        </div>
+                      </div>
+                      else ()
+                      }
+                    </div>
+                    else()
+                  }
+                  
+                  {
+                  if($revision-operation != 'start') then
+                  <div class="transcription-text">
+                  { 
+                    for $diff at $pos in $diffs2
+                    let $label := 
+                      if($pos = 1) then 'Act'
+                      else concat('Add.', xs:string(($pos - 1)))
+                    return
+                    <div class="addition">
+                      <div>{ $label }</div>
+                      <script type="text/javascript">
+                      $(document).ready(function() {{
+                        CodeMirror.fromTextArea(document.getElementById("transcriptiontext3-{ $num }-{ $pos }"), {{ readOnly:'nocursor',lineNumbers:true,mode:"intextdiff" }});
+                      }});
+                      </script>
+                      <textarea name="transcriptiontext3-{ $num }-{ $pos }" style="display:none" id="transcriptiontext3-{ $num }-{ $pos }">{ $diff/text() }</textarea>
+                    </div>
+                  }
+                  </div>
+                  else()
+                  }
+                                    
+                </div>
+              </div>
+              <div class="transcription-functions">
+                <div class="inner-transcription-functions">
+                  <div>
+                    <a href="{ conf:param('request-root') }{ $register-name }/{ $act-name }/publish-transcription?{ transcription:rquery-string() }">
+                      <xrx:i18n>
+                        <xrx:key>publish-transcription</xrx:key>
+                        <xrx:default>Publish Transcription</xrx:default>
+                      </xrx:i18n>
+                    </a>
+                  </div>
+                  <div>
+                    <a href="{ conf:param('request-root') }{ $register-name }/{ $act-name }/contribute?{ transcription:rquery-string() }">
+	                    <xrx:i18n>
+	                      <xrx:key>contribute</xrx:key>
+	                      <xrx:default>Contribute</xrx:default>
+	                    </xrx:i18n>
+                    </a>
+                  </div>
+                  <div>
+                    <a href="{ conf:param('request-root') }{ $register-name }/{ $act-name }/send-back-to-user?{ transcription:rquery-string() }">
+                      <xrx:i18n>
+                        <xrx:key>send-back-to-user</xrx:key>
+                        <xrx:default>Send back to user</xrx:default>
+                      </xrx:i18n>
+                    </a>
+                  </div>
+                  <div>
+                    <a href="{ conf:param('request-root') }{ $register-name }/{ $act-name }/draft/discard-transcription?{ transcription:rquery-string() }">
+	                    <xrx:i18n>
+	                      <xrx:key>discard-transcription</xrx:key>
+	                      <xrx:default>Discard Transcription</xrx:default>
+	                    </xrx:i18n>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            }
+            <div>{ $navigation }</div>
+          </div>
+        </xrx:true>
+        <xrx:false>
+          <div>
+            <xrx:i18n>
+              <xrx:key>protected-page-message</xrx:key>
+              <xrx:default>Protected page. Please login first.</xrx:default>
+            </xrx:i18n>
+          </div>
+        </xrx:false>
+      </xrx:auth>
+    </div>
+    }
+  </xrx:view>
+</xrx:widget>

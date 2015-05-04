@@ -1,0 +1,1155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xrx:id>tag:itineranova.be,2011:/in/widget/annotations-to-moderate</xrx:id>
+    <xrx:title>
+        <xrx:i18n>
+            <xrx:key>annotations-to-moderate</xrx:key>
+            <xrx:default>Annotations to moderate</xrx:default>
+        </xrx:i18n>
+    </xrx:title>
+    <xrx:subtitle/>
+    <xrx:description/>
+    <xrx:author>andre.streicher@uni-koeln.de</xrx:author>
+    <xrx:licence/>
+    <xrx:portal>tag:itineranova.be,2011:/in/portal/default</xrx:portal>
+    <xrx:init>
+        <xrx:processor>
+            <xrx:xformsflag>true</xrx:xformsflag>
+        </xrx:processor>
+    </xrx:init>
+    <xrx:res>
+        <xrx:js>
+	        	<script type="text/javascript" src="{ conf:param('request-root') }jquery.min.js"/>
+	        	<script type="text/javascript" src="{ conf:param('request-root') }jquery.mousewheel.js"/>
+	        	<script type="text/javascript" src="{ conf:param('request-root') }jquery.Jcrop.js"/>
+            <script type="text/javascript" src="{ conf:param('request-root') }annoModeration-functions.js"/>
+        </xrx:js>
+        <xrx:css>
+            <xrx:include>
+                <xrx:css>tag:itineranova.be,2011:/in/css/global</xrx:css>
+            </xrx:include>
+            <style type="text/css">
+                #desktop-left-menu{{
+                    float:left;
+                    width:150px;
+                }}
+                
+                #loadtext{{
+                    display: none;
+                    top:30px;
+                    position:relative;
+                    color:#CAC6C6;
+                    font-weight:bold;
+                }}
+                
+                .button {{
+						        -moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+										-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+										box-shadow:inset 0px 1px 0px 0px #ffffff;
+										background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+										background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+										filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+										background-color:#ededed;
+										-moz-border-radius:6px;
+										-webkit-border-radius:6px;
+										float:left;
+										border-radius:6px;
+										border:1px solid #dcdcdc;
+										display:inline;
+										color:#777777;
+										font-family:arial;
+										font-size:15px;
+										font-weight:bold;
+										padding:8px 18px;
+										text-decoration:none;
+										text-shadow:1px 1px 0px #ffffff;
+										margin:1px;
+										cursor:default;
+						    }}
+						                  
+						    .button:hover{{
+						      background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+									background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+									filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+									background-color:#dfdfdf;
+									cursor:default;
+						    }}
+						    
+						    .hiddenButton{{
+						      -moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+									-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+									box-shadow:inset 0px 1px 0px 0px #ffffff;
+									background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+									background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+									filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+									background-color:#ededed;
+									-moz-border-radius:6px;
+									-webkit-border-radius:6px;
+									border-radius:6px;
+									border:1px solid #dcdcdc;
+									display:none;
+									float:left;
+									color:#777777;
+									font-family:arial;
+									font-size:15px;
+									font-weight:bold;
+									padding:8px 18px;
+									text-decoration:none;
+									text-shadow:1px 1px 0px #ffffff;
+									margin:1px;
+									cursor:default;
+						    }}
+						                  
+						    .hiddenButton:hover{{
+						       background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+									 background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+									 filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+									 background-color:#dfdfdf;
+									 cursor:default;
+						    }}
+                  
+                .zoomer{{
+                    height: 20px;
+                    top: 3px;
+                    position: relative;
+                }}
+                
+                #publish{{
+                    position: relative;
+                }}
+                
+                #request{{
+                    position: relative;
+                }}
+                
+                .requests{{
+                    top: 30px;
+                    position: relative;
+                    width: 730px;
+                    height: 17px;
+                    background-color: #F6F6F6;
+                    border-color: #FFFFFF #D9D9D9 #D9D9D9;
+                    border-style: solid;
+                    border-width: 1.55px 1.5px 1.5px 0;
+                    color: #000000; 
+                    padding: 7px 10px;
+                    -moz-border-radius:10px; /* Firefox */
+                    -webkit-border-radius:10px; /* Safari, Chrome */
+                    -khtml-border-radius:10px; /* Konqueror */
+                    border-radius:10px; /* CSS3 */
+                    -moz-box-shadow: 2px 2px 2px #888;
+                    -webkit-box-shadow: 2px 2px 2px #888;
+                    box-shadow: 2px 2px 2px #888;
+                }}
+                
+                .infofield{{
+                    display: none;
+                    top:30px;
+                    position:relative;
+                    width: 730px;
+                    height: 500px;
+                    background-color: 	#f5f5f5;
+                    border-color: #F6F6F6 #F6F6F6 #F6F6F6;
+                    border-style: solid;
+                    border-width: 1.55px 1.5px 1.5px 0;
+                    padding: 7px 10px;
+                    -moz-border-radius:0px 0px 10px 10px; /* Firefox */
+                    -webkit-border-radius:0px 0px 10px 10px; /* Safari, Chrome */
+                    -khtml-border-radius:0px 0px 10px 10px; /* Konqueror */
+                    border-radius:0px 0px 10px 10px; /* CSS3 */
+                    -moz-box-shadow: 2px 2px 2px #888;
+                    -webkit-box-shadow: 2px 2px 2px #888;
+                    box-shadow: 2px 2px 2px #888;
+                }}
+                
+                .wait{{
+                    display: none;
+                    top:30px;
+                    position:relative;
+                    width: 550px;
+                    height: 390px;
+                    background-color: 	#f5f5f5;
+                    border-color: #F6F6F6 #F6F6F6 #F6F6F6;
+                    border-style: solid;
+                    border-width: 1.55px 1.5px 1.5px 0;
+                    padding: 7px 10px;
+                    -moz-border-radius:0px 0px 10px 10px; /* Firefox */
+                    -webkit-border-radius:0px 0px 10px 10px; /* Safari, Chrome */
+                    -khtml-border-radius:0px 0px 10px 10px; /* Konqueror */
+                    border-radius:0px 0px 10px 10px; /* CSS3 */
+                }}
+                
+                .requestviewport{{
+    	           position:relative;
+    	           float:left;
+    	           left: 20px;
+    	           top: 10px;
+    	           width:700px;
+    	           height:300px;
+    	           overflow:auto;
+    	           z-index:1;
+    	           margin-top:0px;
+    	           margin-left:5px;
+    	           margin-right:5px;
+    	           margin-bottom:0px;
+    	           padding:0;
+    	           border:solid rgb(240,243,226) 1px;
+                }}
+                
+                .direct{{
+                    background: rgba(0, 0, 0, 0.0);
+                    z-index:1;
+                    position:absolute;
+                    border:solid #EF6A2F 2px;
+                    -moz-border-radius:3px;
+                    -webkit-border-radius:3px;
+                    -khtml-border-radius:3px;
+                    border-radius:3px;
+                }}
+                
+                #transcription{{
+						       float: left;
+						       border: 1px solid rgb(142,163,132);
+						       background: transparent;
+						       top:5px;
+						       left:2px;
+						       max-width: 265px;
+						       width: 265px;
+						       height: 100px;
+						       resize: none; 
+						    }}
+						                
+                .rimg{{
+    	            position:absolute;
+                  	width:950px;
+                  	z-index:0;
+                  	margin:0px;
+                  	padding:0px;
+                }}
+                
+                .input{{
+                   position: absolute;
+                   top:400px;
+                   left:50px;
+                   width: 660px;
+                   max-width: 660px;
+                   max-height: 60px;
+                }}
+                
+                .directannos{{
+                    display: none;
+                    position:absolute;
+                    background:white;
+                    z-index:20;
+                    float:left;
+                    width:191px;
+                    border:solid #EF6A2F 1px;
+                    -moz-border-radius:10px; /* Firefox */
+                    -webkit-border-radius:10px; /* Safari, Chrome */
+                    -khtml-border-radius:10px; /* Konqueror */
+                    border-radius:5px; /* CSS3 */
+                }}
+                
+                .annotationfield{{
+                    float: left;
+                    z-index:1;
+                    width: 300px;
+                    height: 100px;
+                }}
+                
+                #basic{{
+                    position:relative;
+                    float:left;
+                    padding-bottom: 50px;
+                }}
+                
+                .deletefield{{
+                    position:absolute;
+                    left:305px;
+                    top:580px;
+                    border:solid #EF6A2F 1px;
+                    -moz-border-radius:5px; /* Firefox */
+                    -webkit-border-radius:5px; /* Safari, Chrome */
+                    -khtml-border-radius:5px; /* Konqueror */
+                    border-radius:5px; /* CSS3 */
+                    -moz-box-shadow: 2px 2px 2px #888;
+                    -webkit-box-shadow: 2px 2px 2px #888;
+                    box-shadow: 2px 2px 2px #888;
+                    padding-right:8px;
+                    padding-top:5px;
+                    padding-left:4px;
+                    padding-bottom:2px;
+                }}
+                
+                
+						    #tooltip {{
+							    display: none;
+							    position: fixed;
+							    z-index:99999;
+							    top: 200px;
+							    left: 200px;
+							    width: 280px;
+							    background-color: white;
+							    padding:5px;
+							    cursor: pointer;
+							    -moz-border-radius:3px;
+							    -webkit-border-radius:3px;
+							    -khtml-border-radius:3px;
+							    border: solid #EF6A2F 1px;
+							    border-radius:5px;
+							    -moz-box-shadow:    4px -3px 10px 1px #202020;
+							    -webkit-box-shadow: 4px -3px 10px 1px #202020;
+							    box-shadow:         4px -3px 10px 1px #202020;
+								}}
+								
+								#data{{
+									-webkit-touch-callout: none;
+									-webkit-user-select: none;
+									-khtml-user-select: none;
+									-moz-user-select: none;
+									-ms-user-select: none;
+									user-select: none;
+								}}
+								
+								#showInterface{{
+									display: block;
+								}}
+								
+								#editInterface{{
+									display: none;
+									z-index:40;
+									-webkit-touch-callout: none;
+									-webkit-user-select: none;
+									-khtml-user-select: none;
+									-moz-user-select: none;
+									-ms-user-select: none;
+									user-select: none;
+								}}
+								
+								#buttonBar{{
+									position:relative;
+									z-index:40;
+									top:4px;
+									padding:4px;
+									left:25px;
+								}}
+								
+								#editTaskBar{{
+									position:relative;
+									display:none;
+									padding:5px;
+								}}
+								
+								#editSurfaceBar{{
+									position:relative;
+									display:none;
+									padding:5px;
+								}}
+								
+								#directselected{{
+									display:none;
+									position:absolute;
+									-moz-border-radius:3px;
+									-webkit-border-radius:3px;
+									-khtml-border-radius:3px;
+									border-radius:3px;
+									border:solid blue 1px;
+									z-index:20;
+								}}
+								
+								#reportInterface{{
+									position:relative;
+									display:none;
+								}}
+								    
+						    .annoTask{{
+						       display: inline;
+						       position:relative;
+						       float:left;
+						       height: 15px;
+						    }}
+						    
+						    #taskBar{{
+						    	position: relative;
+						    	top: 3px;
+						    	z-index: 40;
+						    	width:100%;
+						    }}
+    
+            </style>
+        </xrx:css>
+    </xrx:res>
+    <xrx:view>
+        <div>
+        	<input type="hidden" size="4" id="x1" name="x" value="0"/>
+        	<input type="hidden" size="4" id="y1" name="y" value="0"/>
+        	<input type="hidden" size="4" id="x2" name="x2" value="0"/>
+        	<input type="hidden" size="4" id="y2" name="y2" value="0"/>
+        	<input type="hidden" size="4" id="w" name="w" value="0"/>
+        	<input type="hidden" size="4" id="h" name="h" value="0"/>
+        	<div id="tooltip" onmousedown="moveTooltip(event);" onmouseup="stopTooltip(event);">
+	                    		<div id="showInterface">
+	                    			<img src="{ conf:param('request-root') }button_close.png" style="position:absolute;left:277px;top:4px;width:10px;" title="Close information field" onClick="closeInfoField()"/>
+	                    			<div id="data" onmouseup="stopTooltip(event);">
+	                    				<span style="font-weight:bold">
+	                    					<xrx:i18n>
+	                    						<xrx:key>category</xrx:key>
+	                    						<xrx:default>Category</xrx:default>
+	                    					</xrx:i18n>:&#160;</span>
+	                    				<span id="category-content"></span>
+	                    				<br/>
+	                    				<span style="font-weight:bold">
+	                    					<xrx:i18n>
+	                    						<xrx:key>keyword</xrx:key>
+	                    						<xrx:default>Keyword</xrx:default>
+	                    					</xrx:i18n>:&#160;</span>
+	                    				<span id="keyword-content"></span>
+	                    				<br/>
+	                    				<span style="font-weight:bold">
+	                    					<xrx:i18n>
+	                    						<xrx:key>transcription</xrx:key>
+	                    						<xrx:default>Transcription</xrx:default>
+	                    					</xrx:i18n>:&#160;</span>
+	                    				<span id="transcription-content"></span>
+	                    				<div id="contributor-div">
+	                    					<br/>
+	                    					<span style="font-size:10px;color:grey;">
+	                    						<xrx:i18n>
+	                    							<xrx:key>contributor</xrx:key>
+	                    							<xrx:default>Contributor</xrx:default>
+	                    						</xrx:i18n>: </span>
+	                    					<span style="font-size:10px;color:grey;" id="contributor-content"></span>
+	                    				</div>
+	                    			</div>
+	                    			<div id="taskBar" onmouseup="stopTooltip(event);">
+	                    				<p class="button" style="height:16px;padding:2px 3px;" id="editButton">
+	                    					<img class="annoTask" src="{ conf:param('request-root') }button_edit.png" title="Edit Annotation data"/>
+	                    				</p>
+	                    				<p class="button" style="height:16px;padding:2px 3px;" id="editSurfaceButton">
+	                    					<img class="annoTask" src="{ conf:param('request-root') }border-draw.png" title="Edit Annotation surface"/>
+	                    				</p>
+	                    				<p class="button" style="height:16px;padding:2px 3px;" id="addButton">
+	                    					<img class="annoTask" src="{ conf:param('request-root') }add-icon.png" title="Add Annotation surface"/>
+	                    				</p>
+	                    			</div>
+	                    			<div id="editSurfaceBar">
+	                    				<p class="button" style="height:16px;padding:2px 3px;" id="returnButton">
+	                    					<img class="annoTask" src="{ conf:param('request-root') }return-icon.png" title="Return to Annotation overview"/>
+	                    				</p>
+	                    				<p class="button" style="height:16px;padding:2px 3px;" id="prepareEditSurface">
+	                    					<img class="annoTask" src="{ conf:param('request-root') }move.png" title="Edit Annotation surface"/>
+	                    				</p>
+	                    				<p class="button" style="height:16px;padding:2px 3px;" id="deleteSurface">
+	                    					<img class="annoTask" src="{ conf:param('request-root') }Trash-icon.png" title="Delete Annotation surface"/>
+	                    				</p>
+	                    			</div>
+	                    			<div id="editTaskBar">
+	                    				<p id="addSurface" class="button" style="height:18px;padding:2px 3px;">
+	                    					<xrx:i18n>
+	                    						<xrx:key>save-surface</xrx:key>
+	                    						<xrx:default>Save surface</xrx:default>
+	                    					</xrx:i18n>
+	                    				</p>
+	                    				<p id="cancelEdit" class="button" style="height:18px;padding:2px 3px;">
+	                    					<xrx:i18n>
+	                    						<xrx:key>cancel</xrx:key>
+	                    						<xrx:default>Cancel</xrx:default>
+	                    					</xrx:i18n>
+	                    				</p>
+	                    			</div>
+	                    		</div>
+	                    		<div id="editInterface" onmouseup="stopTooltip(event);">
+	                    			<span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+	                    				<xrx:i18n>
+	                    					<xrx:key>category</xrx:key>
+	                    					<xrx:default>Category</xrx:default>
+	                    				</xrx:i18n>:
+	                    			</span>
+	                    			<select id="category" style="position:relative;float:left;left:10px;top:3px;width:187px;border: 1px solid rgb(142,163,132);background: transparent;" onmousedown="stopTooltip(event);" onmouseup="stopTooltip(event);">
+	                    				{   
+	                    				let $categories := doc(concat(conf:param('annotation-db-base-uri'), 'webapp-data/Categories.xml'))//*:category
+	                    				for $category in $categories
+	                    				return
+	                    				<option id="{$category/text()}">
+	                    					<xrx:i18n>
+	                    						<xrx:key>{$category/text()}</xrx:key>
+	                    						<xrx:default>{$category/text()}</xrx:default>
+	                    					</xrx:i18n>
+	                    				</option>
+	                    				}
+	                    			</select>
+	                    			<br/>
+	                    			<span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+	                    				<xrx:i18n>
+	                    					<xrx:key>keyword</xrx:key>
+	                    					<xrx:default>Keyword</xrx:default>
+	                    				</xrx:i18n>:
+	                    			</span>
+	                    			<input type="text" id="keyword" style="position:relative;width:185px;left:13px;top:4px;float:left;border: 1px solid rgb(142,163,132);" onmousedown="stopTooltip(event);" onmouseup="stopTooltip(event);"/>
+	                    			<br/>
+	                    			<span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+	                    				<xrx:i18n>
+	                    					<xrx:key>transcription</xrx:key>
+	                    					<xrx:default>Transcription</xrx:default>
+	                    				</xrx:i18n>:
+	                    			</span>
+	                    			<textarea id="transcription" name="annotation" style="position:relative;float:left;" onmouseup="stopTooltip(event);"/>
+	                    			<br/>
+	                    			<div id="buttonBar">
+	                    				<p id="saveanno" class="button" style="position:relative;top:0px;float:left;text-align:center;width:70px;">
+	                    					<xrx:i18n>
+	                    						<xrx:key>save</xrx:key>
+	                    						<xrx:default>Save</xrx:default>
+	                    					</xrx:i18n>
+	                    				</p>
+	                    				<p id="cancel" class="button" style="position:relative;float:left;text-align:center;top:0px;width:70px;">
+	                    					<xrx:i18n>
+	                    						<xrx:key>cancel</xrx:key>
+	                    						<xrx:default>Cancel</xrx:default>
+	                    					</xrx:i18n>
+	                    				</p>
+	                    			</div>
+	                    		</div>
+	                    	</div>
+            <xrx:auth>
+                <xrx:rules>
+                    <xrx:rule>
+                        <xrx:user/>
+                        <xrx:dbgroup>atom</xrx:dbgroup>
+                    </xrx:rule>
+                </xrx:rules>
+                <xrx:true>
+                    <div id="basic">
+                        <div class="h2">
+                            <xrx:i18n>
+                                <xrx:key>annotation-to-moderate</xrx:key>
+                                <xrx:default>Annotation to moderate</xrx:default>
+                            </xrx:i18n>
+                        </div>
+                        <span id="loadtext"/>
+	                    	 <xrx:auth>
+                            <xrx:rules>
+                                <xrx:rule>
+                                    <xrx:user/>
+                                    <xrx:role>moderator</xrx:role>
+                                </xrx:rule>
+                            </xrx:rules>
+                            <xrx:true>
+                                <div id="my-functions">
+                                    <div class="h3">
+                                        <xrx:i18n>
+                                            <xrx:key>my-functions</xrx:key>
+                                            <xrx:default>MyFunctions</xrx:default>
+                                        </xrx:i18n>
+                                    </div>
+                                    <div class="function-links">
+                                        <div class="function-link">
+                                            <a href="{ conf:param('request-root') }manage-categories">
+                                                <span>‣&#160;</span>
+                                                <xrx:i18n>
+                                                    <xrx:key>manage-categories</xrx:key>
+                                                    <xrx:default>Manage categories</xrx:default>
+                                                </xrx:i18n>
+                                            </a>
+                                        </div>
+                                        <div class="function-link">
+                                            <a href="{ conf:param('request-root') }assign-moderator">
+                                                <span>‣&#160;</span>
+                                                <xrx:i18n>
+                                                    <xrx:key>assign-moderator</xrx:key>
+                                                    <xrx:default>Assign moderator</xrx:default>
+                                                </xrx:i18n>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </xrx:true>
+                            <xrx:false>
+                                <span/>
+                            </xrx:false>
+                        </xrx:auth>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <xrx:auth>
+                            <xrx:rules>
+                                <xrx:rule>
+                                    <xrx:user/>
+                                    <xrx:role>moderator</xrx:role>
+                                </xrx:rule>
+                            </xrx:rules>
+                            <xrx:true>
+                                <div id="publish">
+                                    <div>
+                                        <div>
+                                            <br/>
+                                            <span style="position:relative;color:#999999;font-weight:bold;left:10px;top:20px;">
+                                                <xrx:i18n>
+                                                    <xrx:key>open-annotation-requests</xrx:key>
+                                                    <xrx:default>Open Annotation Requests</xrx:default>
+                                                </xrx:i18n>:
+                                            </span>  
+                        <div id="allRequests">                                        	
+	                        {
+	                        let $xslt := collection('/db/www')/xsl:stylesheet[@id='anno-tei2html']
+	                        let $requestannos := collection(concat(conf:param('xrx-user-db-base-uri'), xmldb:encode($xrx:user-id), '/metadata.annotation.request'))//atom:content
+	                        for $requestanno at $number in $requestannos
+	                        order by xs:date($requestanno//xrx:revision/xrx:when/text()) ascending
+	                            return
+	                            <div>
+	                               {
+	                               let $comment := string-length(xs:string($requestanno//xrx:revision/xrx:comment/text()))
+	                               let $waitdays := days-from-duration(current-date()-xs:date($requestanno//xrx:revision/xrx:when/text()))
+	                               let $object-uri := substring-after($requestanno//xrx:id/text(), 'annotation/')
+	                               let $tokens := tokenize($object-uri, '/')
+	                               let $register := $tokens[1]
+	                               let $folio := $tokens[2]
+	                               let $id := $tokens[3]
+	                               let $image-title := xmldb:decode($folio)
+	                               let $surfaceGrp := $requestanno//xrx:revision/xrx:annotation/*:TEI/*:facsimile/*:surfaceGrp
+	                                   return
+	                                   <div>
+	                                   {
+	                                   if($waitdays lt 10) then
+	                                                <div>
+	                                                        <div class="requests" id="publish{$number}" onclick="showRequest('start', '{$id}' , '{$number}', '{$xrx:user-id}', 'moderator', '{ $xrx:lang }');">
+	                                                            <div style="position:relative;float:left;">
+	                                                                <span>
+	                                                                    <xrx:i18n>
+	                                                                        <xrx:key>user</xrx:key>
+	                                                                        <xrx:default>User</xrx:default>
+	                                                                    </xrx:i18n>:&#160;</span>
+	                                                                <span>{xmldb:decode($requestanno//xrx:who/text())}</span>
+	                                                            </div>
+	                                                            <div class="informations" style="left:50px;position:relative;float:left;">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>register</xrx:key>
+	                                                                    <xrx:default>Register</xrx:default>
+	                                                                </xrx:i18n>:
+	                                                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/register">
+	                                                                    <span>{xmldb:decode($register)}</span>
+	                                                                </a>
+	                                                            </div>
+	                                                            <div style="position:relative;left:90px;float:left;">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>folio</xrx:key>
+	                                                                    <xrx:default>Folio</xrx:default>
+	                                                                </xrx:i18n>:
+	                                                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/{ xmldb:decode($folio) }/folio">
+	                                                                    <span>{xmldb:decode($folio)}</span>
+	                                                                </a>
+	                                                            </div>
+	                                                            <div style="left:130px;position:relative;float:left;">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>waiting-since</xrx:key>
+	                                                                    <xrx:default>Waiting since</xrx:default>
+	                                                                </xrx:i18n>:
+	                                                            <span>{string($waitdays)}&#160;</span>
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>days</xrx:key>
+	                                                                    <xrx:default>days</xrx:default>
+	                                                                </xrx:i18n>
+	                                                            </div>
+	                                                            <img src="{ conf:param('request-root') }plus.png" id="pubarrow{$number}" style="position:absolute;left:720px;top:8px;width:15px"/>
+	                                                        </div>
+	                                                    </div>                                             
+	                                   else 
+	                                     								<div>
+	                                                        <div class="requests" id="publish{$number}" onclick="showRequest('start', '{$id}' , '{$number}', '{$xrx:user-id}', 'moderator', '{ $xrx:lang }');" style="color:red;">
+	                                                            <div style="position:relative;float:left;">
+	                                                                <span>
+	                                                                    <xrx:i18n>
+	                                                                        <xrx:key>user</xrx:key>
+	                                                                        <xrx:default>User</xrx:default>
+	                                                                    </xrx:i18n>:&#160;</span>
+	                                                                <span>{xmldb:decode($requestanno//xrx:who/text())}</span>
+	                                                            </div>
+	                                                            <div class="informations" style="left:50px;position:relative;float:left;">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>register</xrx:key>
+	                                                                    <xrx:default>Register</xrx:default>
+	                                                                </xrx:i18n>:
+	                                                                <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/register" style="color:red;">
+	                                                                    <span>{xmldb:decode($register)}</span>
+	                                                                </a>
+	                                                            </div>
+	                                                            <div style="position:relative;left:90px;float:left;">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>folio</xrx:key>
+	                                                                    <xrx:default>Folio</xrx:default>
+	                                                                </xrx:i18n>:
+	                                                                <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/{ xmldb:decode($folio) }/folio" style="color:red;">
+	                                                                    <span>{xmldb:decode($folio)}</span>
+	                                                                </a>
+	                                                            </div>
+	                                                            <div style="left:130px;position:relative;float:left;">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>waiting-since</xrx:key>
+	                                                                    <xrx:default>Waiting since</xrx:default>
+	                                                                </xrx:i18n>:
+	                                                <span>{string($waitdays)}&#160;</span>
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>days</xrx:key>
+	                                                                    <xrx:default>days</xrx:default>
+	                                                                </xrx:i18n>
+	                                                            </div>
+	                                                            <img src="{ conf:param('request-root') }plus.png" id="pubarrow{$number}" style="position:absolute;left:720px;top:8px;width:15px"/>
+	                                                        </div>
+	                                                    </div>
+	                                       							,<div id="pubfield{$number}" class="infofield" style="{ if($comment gt 0)then 'height:650px;' else () }">
+	                                                        <div id="pubviewport{$number}" class="requestviewport">
+	                                                            <div id="pub{$number}">
+	                                                                <img id="pubimg{$number}" src="{string($surfaceGrp//*:graphic/@url)}" class="rimg"/>
+	                                                                <div id="pubfields{$number}">
+		                                                            		{
+		                                                            		let $surfaces := $surfaceGrp//*:surface
+		                                                            		let $jQuery-on-strings :=
+		                                                            		for $surface at $index in $surfaces
+		                                                            		return
+		                                                            		concat("jQuery('#pubannofield", $number, "-", $index, "').css('border-color','blue');")
+		                                                            		let $jQuery-out-strings :=
+		                                                            		for $surface at $index in $surfaces
+		                                                            		return
+		                                                            		concat("jQuery('#pubannofield", $number, "-", $index, "').css('border-color','#EF6A2F');")
+		                                                            		let $on-mouse-over := 
+		                                                            		string-join(
+		                                                            		$jQuery-on-strings,
+		                                                            		' '                   
+		                                                            		)
+		                                                            		let $on-mouse-out := 
+		                                                            		string-join(
+		                                                            		$jQuery-out-strings,
+		                                                            		' '                   
+		                                                            		)
+		                                                            		for $surface at $index in $surfaces
+		                                                            		return
+		                                                            		<div id="pubannofield{$number}-{$index}" class="direct" style="left:{xs:integer($surface/@ulx)}px;top:{xs:integer($surface/@uly)}px;height:{xs:integer($surface/@lrx)}px;width:{xs:integer($surface/@lry)}px;" onmouseover="{ $on-mouse-over }" onmouseout="{ $on-mouse-out }" onClick="loadInfoTool('{$id}', '{$xrx:user-id}', '{$number}', 'request', '{ $register }', '{ $folio }', '{ $xrx:lang }');" lang="{$surface/@id}"/>
+		                                                            		}
+		                                                            	</div>
+	                                                            </div>
+	                                                        		<!--  
+	                                                            <div id="directanno{$number}" class="directannos">
+	                                                                <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+	                                                                    <xrx:i18n>
+	                                                                        <xrx:key>category</xrx:key>
+	                                                                        <xrx:default>Category</xrx:default>
+	                                                                    </xrx:i18n>:
+	                                                                </span>
+	                                                                <select id="selectcategory{$number}" style="position:relative;float:left;left:10px;top:3px;width:107px;border: 1px solid rgb(142,163,132);background: transparent;">
+	                                                                {   
+	                                                                let $categories := doc(concat(conf:param('annotation-db-base-uri'), 'webapp-data/Categories.xml'))//*:category
+	                                                                for $category in $categories
+	                                                                return
+	                                                                <option id="{$category/text()}{$number}">
+	                                                                        <xrx:i18n>
+	                                                                            <xrx:key>{$category/text()}</xrx:key>
+	                                                                            <xrx:default>{$category/text()}</xrx:default>
+	                                                                        </xrx:i18n>
+	                                                                    </option>
+	                                                                }
+	                                                                </select>
+	                                                                <br/>
+	                                                                <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+	                                                                    <xrx:i18n>
+	                                                                        <xrx:key>keyword</xrx:key>
+	                                                                        <xrx:default>Keyword</xrx:default>
+	                                                                    </xrx:i18n>:
+	                                                                </span>
+	                                                                <input type="text" id="inputkeyword{$number}" style="position:relative;width:105px;left:13px;top:4px;float:left;border: 1px solid rgb(142,163,132);"/>,
+	                                                                <br/>
+	                                                                <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+	                                                                    <xrx:i18n>
+	                                                                        <xrx:key>transcription</xrx:key>
+	                                                                        <xrx:default>Transcription</xrx:default>
+	                                                                    </xrx:i18n>:
+	                                                                </span>
+	                                                                <textarea id="inputtranscription{$number}" class="transcriptions" name="annotation" style="position:relative;float:left;"/>
+	                                                                <br/>
+	                                                                <div style="position:relative;float:left;left:3px;">
+	                                                                    <div style="position:relative;float:left;">
+	                                                                        <p id="saveanno{$number}" class="button" onClick="" style="position:relative;top:0px;float:left;text-align:center;width:70px;">
+	                                                                            <xrx:i18n>
+	                                                                                <xrx:key>save</xrx:key>
+	                                                                                <xrx:default>Save</xrx:default>
+	                                                                            </xrx:i18n>
+	                                                                        </p>
+	                                                                    </div>
+	                                                                    <p id="cancel{$number}" class="button" onClick="jQuery('#directanno'+{$number}).css('display', 'none');" style="position:relative;float:left;text-align:center;top:0px;width:70px;">
+	                                                                        <xrx:i18n>
+	                                                                            <xrx:key>cancel</xrx:key>
+	                                                                            <xrx:default>Cancel</xrx:default>
+	                                                                        </xrx:i18n>
+	                                                                    </p>
+	                                                                </div>
+	                                                            </div>
+	                                                        		-->
+	                                                        </div>
+	                                       									<div id="pubzoomer{$number}" style="position:relative;left:310px;padding:5px;top:13px;">
+	                                                            <p class="button" onClick="requestZoom('in', '{$number}', 'pub');">
+	                                                                <img class="zoomer" src="{ conf:param('request-root') }zoom_in.png"/>
+	                                                            </p>
+	                                                            <p class="button" onClick="requestZoom('out', '{$number}', 'pub');">
+	                                                                <img class="zoomer" src="{ conf:param('request-root') }zoom_out.png"/>
+	                                                            </p>
+	                                                        </div>
+	                                                        <div>
+	                                                            {
+	                                                            if($comment gt 0)then
+	                                                               <div>
+	                                                                <span style="position:absolute;color:#999999;font-weight:bold;left:40px;top:380px;">
+	                                                                    <xrx:i18n>
+	                                                                        <xrx:key>user-comment</xrx:key>
+	                                                                        <xrx:default>User comment</xrx:default>
+	                                                                    </xrx:i18n>:
+	                                                                    </span>
+	                                                                <span style="position:absolute;top:420px;left:45px;">
+	                                                                        {$requestanno//xrx:comment/text()}
+	                                                                    </span>
+	                                                            </div>
+	                                                            else()
+	                                                            }
+	                                                        </div>
+	                                                        <span style="position:absolute;color:#999999;font-weight:bold;left:40px;{ if($comment gt 0)then 'top:500px;' else 'top:380px;' }">
+	                                                            <xrx:i18n>
+	                                                                <xrx:key>response-comment</xrx:key>
+	                                                                <xrx:default>Response comment</xrx:default>
+	                                                            </xrx:i18n>:
+	                                                        </span>
+	                                                        <textarea class="input" id="input{$number}" name="annotation" style="{ if($comment gt 0)then 'top:530px;' else() }"/>
+	                                                        <div style="position:absolute;{ if($comment gt 0)then 'top:610px;' else 'top:460px;' }left:220px;">
+	                                                        		<p id="accept{$number}" class="button" onClick="answerRequest('accept' , '{string($surfaceGrp/@id)}' , '{$number}', '{$xrx:user-id}', '{ $xrx:lang }', '{ $register }', '{ $folio}');">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>accept-publication</xrx:key>
+	                                                                    <xrx:default>Accept Publication</xrx:default>
+	                                                                </xrx:i18n>
+	                                                            </p>
+	                                                        		<p style="position:relative;left:5px;" id="decline{$number}" class="button" onClick="answerRequest('decline' , '{string($surfaceGrp/@id)}' , '{$number}', '{$xrx:user-id}', '{ $xrx:lang }', '{ $register }', '{ $folio}');">
+	                                                                <xrx:i18n>
+	                                                                    <xrx:key>send-back-to-user</xrx:key>
+	                                                                    <xrx:default>Send back to user</xrx:default>
+	                                                                </xrx:i18n>
+	                                                            </p>
+	                                                        </div>
+	                                                    </div>,
+	                                       <br/>
+	                                       }
+	                                            </div>
+	                                            }
+	                             </div>    
+	                        }
+                        </div>
+                        </div>
+                                        <div>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            <span style="position:relative;color:#999999;font-weight:bold;left:10px;top:20px;">
+                                                <xrx:i18n>
+                                                    <xrx:key>open-annotation-reports</xrx:key>
+                                                    <xrx:default>Open Annotation Reports</xrx:default>
+                                                </xrx:i18n>:
+                            </span>
+                                            <br/>
+                            <div id="allReports">
+                            {
+                            let $xslt := collection('/db/www')/xsl:stylesheet[@id='anno-tei2html']
+                            let $requestannos := collection(concat(conf:param('xrx-user-db-base-uri'), xmldb:encode($xrx:user-id), '/metadata.annotation.report'))//atom:entry[.//xrx:operation = 'report']
+                            for $requestanno at $number in $requestannos
+                            order by xs:date($requestanno//xrx:revision/xrx:when/text()) ascending
+                            return
+                                <div>
+                                    {
+                                    let $comment := string-length(xs:string($requestanno//xrx:revision/xrx:comment/text()))
+                                    let $waitdays := days-from-duration(current-date()-xs:date($requestanno//xrx:revision/xrx:when/text()))
+                                    let $object-uri := substring-after($requestanno//atom:id/text(), 'annotation/')
+                                    let $tokens := tokenize($object-uri, '/')
+                                    let $register := $tokens[1]
+                                    let $folio := $tokens[2]
+                                    let $id := $tokens[3]
+                                    let $image-title := xmldb:decode($folio)
+                                    let $surfaceGrp := $requestanno//xrx:revision/xrx:annotation/*:TEI/*:facsimile/*:surfaceGrp
+                                    return
+                                    <div>
+                                    {
+                                    if($waitdays lt 10) then
+                                    
+                                    					<div class="requests" id="report{$number}" onclick="showRequest('start', '{$id}' , '{$number}', '{$xrx:user-id}' , 'report', '{ $xrx:lang }');">
+                                                        <div style="position:relative;float:left;">
+                                                            <span>
+                                                                <xrx:i18n>
+                                                                    <xrx:key>user</xrx:key>
+                                                                    <xrx:default>User</xrx:default>
+                                                                </xrx:i18n>:&#160;</span>
+                                                            <span>{xmldb:decode($requestanno//xrx:who/text())}</span>
+                                                        </div>
+                                                        <div class="informations" style="left:50px;position:relative;float:left;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>register</xrx:key>
+                                                                <xrx:default>Register</xrx:default>
+                                                            </xrx:i18n>:
+                                                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/register">
+                                                                <span>{xmldb:decode($register)}</span>
+                                                            </a>
+                                                        </div>
+                                                        <div style="position:relative;left:90px;float:left;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>folio</xrx:key>
+                                                                <xrx:default>Folio</xrx:default>
+                                                            </xrx:i18n>:
+                                                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/{ xmldb:decode($folio) }/folio">
+                                                                <span>{xmldb:decode($folio)}</span>
+                                                            </a>
+                                                        </div>
+                                                        <div style="left:130px;position:relative;float:left;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>waiting-since</xrx:key>
+                                                                <xrx:default>Waiting since</xrx:default>
+                                                            </xrx:i18n>:
+                                                            <span>{string($waitdays)}&#160;</span>
+                                                            <xrx:i18n>
+                                                                <xrx:key>days</xrx:key>
+                                                                <xrx:default>days</xrx:default>
+                                                            </xrx:i18n>
+                                                        </div>
+                                                        <img src="{ conf:param('request-root') }plus.png" id="reparrow{$number}" style="position:absolute;left:720px;top:8px;width:15px"/>
+                                                    </div>
+                                                
+                                    else
+                                                    <div class="requests" id="report{$number}" onclick="showRequest('start', '{string($requestanno//@id)}' , '{$number}', '{$xrx:user-id}' , 'report', '{ $xrx:lang }');" style="color:red;">
+                                                        <div style="position:relative;float:left;">
+                                                            <span>
+                                                                <xrx:i18n>
+                                                                    <xrx:key>user</xrx:key>
+                                                                    <xrx:default>User</xrx:default>
+                                                                </xrx:i18n>:&#160;</span>
+                                                            <span>{xmldb:decode($requestanno//xrx:who/text())}</span>
+                                                        </div>
+                                                        <div class="informations" style="left:50px;position:relative;float:left;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>register</xrx:key>
+                                                                <xrx:default>Register</xrx:default>
+                                                            </xrx:i18n>:
+                                                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/register">
+                                                                <span>{xmldb:decode($register)}</span>
+                                                            </a>
+                                                        </div>
+                                                        <div style="position:relative;left:90px;float:left;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>folio</xrx:key>
+                                                                <xrx:default>Folio</xrx:default>
+                                                            </xrx:i18n>:
+                                                            <a href="{ conf:param('request-root') }{ xmldb:decode($register) }/{ xmldb:decode($folio) }/folio">
+                                                                <span>{xmldb:decode($folio)}</span>
+                                                            </a>
+                                                        </div>
+                                                        <div style="left:130px;position:relative;float:left;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>waiting-since</xrx:key>
+                                                                <xrx:default>Waiting since</xrx:default>
+                                                            </xrx:i18n>:
+                                                            <span>{string($waitdays)}&#160;</span>
+                                                            <xrx:i18n>
+                                                                <xrx:key>days</xrx:key>
+                                                                <xrx:default>days</xrx:default>
+                                                            </xrx:i18n>
+                                                        </div>
+                                                        <img src="{ conf:param('request-root') }plus.png" id="reparrow{$number}" style="position:absolute;left:720px;top:8px;width:15px"/>
+                                                    </div>
+                                                
+								                                    ,
+								                                    <div id="repfield{$number}" class="infofield" style="height:650px;">
+                                                        <div id="repviewport{$number}" class="requestviewport">
+                                                            <div id="viewsrep{$number}">
+                                                                <img id="repimg{$number}" src="{string($surfaceGrp//*:graphic/@url)}" class="rimg"/>
+                                                                <div id="repfields{$number}">
+	                                                            		{
+	                                                            		let $surfaces := $surfaceGrp//*:surface
+	                                                            		let $jQuery-on-strings :=
+		                                                            		for $surface at $index in $surfaces
+		                                                            		return
+		                                                            		concat("jQuery('#repannofield", $number, "-", $index, "').css('border-color','blue');")
+	                                                            		let $jQuery-out-strings :=
+		                                                            		for $surface at $index in $surfaces
+		                                                            		return
+		                                                            		concat("jQuery('#repannofield", $number, "-", $index, "').css('border-color','#EF6A2F');")
+	                                                            		let $on-mouse-over := 
+		                                                            		string-join(
+		                                                            		$jQuery-on-strings,
+		                                                            		' '                   
+		                                                            		)
+	                                                            		let $on-mouse-out := 
+		                                                            		string-join(
+		                                                            		$jQuery-out-strings,
+		                                                            		' '                   
+		                                                            		)
+	                                                            		for $surface at $index in $surfaces
+	                                                            		return
+	                                                            		<div id="repannofield{$number}-{$index}" class="direct" style="left:{xs:integer($surface/@ulx)}px;top:{xs:integer($surface/@uly)}px;height:{xs:integer($surface/@lrx)}px;width:{xs:integer($surface/@lry)}px;" onmouseover="{ $on-mouse-over }" onmouseout="{ $on-mouse-out }" onClick="loadInfoTool('{$id}', '{$xrx:user-id}', '{$number}', 'report', '{ $register }', '{ $folio }', '{ $xrx:lang }');" lang="{$surface/@id}"/>
+	                                                            		}
+	                                                            	</div>
+                                                            </div>
+                                                        		<!--  
+                                                            <div id="repanno{$number}" class="directannos">
+                                                                <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                                                                    <xrx:i18n>
+                                                                        <xrx:key>related-act</xrx:key>
+                                                                        <xrx:default>Related Act</xrx:default>
+                                                                    </xrx:i18n>:
+                                                            </span>
+                                                                <select id="rep-act-select{$number}" style="position:relative;float:left;left:10px;top:2px;width:88px;border: 1px solid rgb(142,163,132);background: transparent;">
+                                                                {
+                                                                if(count($related-acts) gt 0) then   
+                                                                for $act at $pos in $related-acts
+                                                                let $act-name := $act/ead:did/ead:unitid/text()
+                                                                return
+                                                                if(not($pos = count($related-acts))) then
+                                                                <option id="rep{$act-name}{$number}">
+                                                                    { $act-name }
+                                                                </option>
+                                                                else
+                                                                (<option id="rep{$act-name}{$number}">
+                                                                    { $act-name }
+                                                                </option>,
+                                                                <option id="rep-no-act{$number}">
+                                                                    No related act
+                                                                </option>
+                                                                )
+                                                                else
+                                                                <option id="rep-no-act{$number}">
+                                                                    No related act
+                                                                </option>
+                                                                }
+                                                            </select>
+                                                                <br/>
+                                                                <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                                                                    <xrx:i18n>
+                                                                        <xrx:key>category</xrx:key>
+                                                                        <xrx:default>Category</xrx:default>
+                                                                    </xrx:i18n>:
+                                                            </span>
+                                                                <select id="repselectcategory{$number}" style="position:relative;float:left;left:10px;top:3px;width:107px;border: 1px solid rgb(142,163,132);background: transparent;">
+                                                                {   
+                                                                let $categories := doc(concat(conf:param('annotation-db-base-uri'), 'webapp-data/Categories.xml'))//*:category
+                                                                for $category in $categories
+                                                                return
+                                                                <option id="rep{$category/text()}{$number}">
+                                                                        <xrx:i18n>
+                                                                            <xrx:key>{$category/text()}</xrx:key>
+                                                                            <xrx:default>{$category/text()}</xrx:default>
+                                                                        </xrx:i18n>
+                                                                    </option>
+                                                                }
+                                                            </select>
+                                                                <br/>
+                                                                <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                                                                    <xrx:i18n>
+                                                                        <xrx:key>keyword</xrx:key>
+                                                                        <xrx:default>Keyword</xrx:default>
+                                                                    </xrx:i18n>:
+                                                            </span>
+                                                                <input type="text" id="repinputkeyword{$number}" style="position:relative;width:105px;left:13px;top:4px;float:left;border: 1px solid rgb(142,163,132);"/>,
+                                                            <br/>
+                                                                <span style="position:relative;float:left;top:4px;left:5px;font-weight:bold;font-size:13;color:rgb(142,163,132);">
+                                                                    <xrx:i18n>
+                                                                        <xrx:key>transcription</xrx:key>
+                                                                        <xrx:default>Transcription</xrx:default>
+                                                                    </xrx:i18n>:
+                                                            </span>
+                                                                <textarea id="repinputtranscription{$number}" class="transcriptions" name="annotation" style="position:relative;float:left;"/>
+                                                                <br/>
+                                                                <div style="position:relative;float:left;left:3px;">
+                                                                    <div style="position:relative;float:left;">
+                                                                        <p id="saverep{$number}" class="button" onClick="" style="position:relative;top:0px;float:left;text-align:center;width:70px;">
+                                                                            <xrx:i18n>
+                                                                                <xrx:key>save</xrx:key>
+                                                                                <xrx:default>Save</xrx:default>
+                                                                            </xrx:i18n>
+                                                                        </p>
+                                                                    </div>
+                                                                    <p id="repcancel{$number}" class="button" onClick="jQuery('#directanno'+{$number}).css('display', 'none');" style="position:relative;float:left;text-align:center;top:0px;width:70px;">
+                                                                        <xrx:i18n>
+                                                                            <xrx:key>cancel</xrx:key>
+                                                                            <xrx:default>Cancel</xrx:default>
+                                                                        </xrx:i18n>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        		-->
+                                                        </div>
+								                                    		<div id="repzoomer{$number}" style="position:relative;left:310px;padding:5px;top:13px;">
+                                                            <p class="button" onClick="requestZoom('in', '{$number}', 'report');">
+                                                                <img class="zoomer" src="{ conf:param('request-root') }zoom_in.png"/>
+                                                            </p>
+                                                            <p class="button" onClick="requestZoom('out', '{$number}', 'report');">
+                                                                <img class="zoomer" src="{ conf:param('request-root') }zoom_out.png"/>
+                                                            </p>
+                                                        </div>
+                                                        <span style="position:absolute;color:#999999;font-weight:bold;left:40px;top:380px;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>user-comment</xrx:key>
+                                                                <xrx:default>User comment</xrx:default>
+                                                            </xrx:i18n>:
+                                                    </span>
+                                                        <span style="position:absolute;left:50px;top:400px;">{$requestanno//*:comment/text()}</span>
+                                                        <span style="position:absolute;color:#999999;font-weight:bold;left:40px;top:480px;">
+                                                            <xrx:i18n>
+                                                                <xrx:key>response-comment</xrx:key>
+                                                                <xrx:default>Response comment</xrx:default>
+                                                            </xrx:i18n>:
+                                                    </span>
+                                                        <textarea class="input" id="repInput{$number}" name="annotation" style="top:500px;"/>
+                                                        <div class="deletefield">
+                                                            <input type="checkbox" id="deleteAnno{$number}" value="Delete Annotation"/>
+                                                            <span style="position:relative;left:4px;top:-2.3px;color:#EF6A2F;font-weight:bold;">
+                                                                <xrx:i18n>
+                                                                    <xrx:key>delete-annotation</xrx:key>
+                                                                    <xrx:default>Delete Annotation</xrx:default>
+                                                                </xrx:i18n>
+                                                            </span>
+                                                        </div>
+                                                        <div style="position:absolute;top:620px;left:315px;">
+                                                            <p style="position:relative;" id="answer{$number}" class="button" onClick="answerReport('{$id}' , '{$number}', '{$xrx:user-id}', '{ $xrx:lang }', '{ $register }', '{ $folio}');">
+                                                                <xrx:i18n>
+                                                                    <xrx:key>answer-report</xrx:key>
+                                                                    <xrx:default>Answer Report</xrx:default>
+                                                                </xrx:i18n>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                    ,
+                                    <br/>
+                                    }
+                                    </div>    
+                                    }
+                                </div>
+                            }
+														</div>                            
+                        </div>
+                                    </div>
+                                </div>
+                            </xrx:true>
+                            <xrx:false>
+                                <div/>
+                            </xrx:false>
+                        </xrx:auth>
+                    </div>
+                </xrx:true>
+                <xrx:false>
+                    <div>
+                        <div class="h2">
+                            <xrx:i18n>
+                                <xrx:key>annotations-to-moderate</xrx:key>
+                                <xrx:default>Annotations to moderate</xrx:default>
+                            </xrx:i18n>
+                        </div>
+                        <xrx:i18n>
+                            <xrx:key>protected-page-message</xrx:key>
+                            <xrx:default>Protected page. Please login first.</xrx:default>
+                        </xrx:i18n>
+                        <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/login2</xrx:subwidget>
+                    </div>
+                </xrx:false>
+            </xrx:auth>
+        </div>
+    </xrx:view>
+</xrx:widget>

@@ -1,0 +1,343 @@
+<xrx:widget xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xrx="http://www.monasterium.net/NS/xrx"
+  xmlns:ev="http://www.w3.org/2001/xml-events"
+  xmlns:xf="http://www.w3.org/2002/xforms"
+  xmlns:bfc="http://betterform.sourceforge.net/xforms/controls">
+  <xrx:id>tag:itineranova.be,2011:/in/widget/iipmooviewer</xrx:id>
+  <xrx:title>
+    <xrx:i18n>
+      <xrx:key></xrx:key>
+      <xrx:default></xrx:default>
+    </xrx:i18n>
+  </xrx:title>
+  <xrx:subtitle></xrx:subtitle>
+  <xrx:description></xrx:description>
+  <xrx:portal>tag:itineranova.be,2011:/in/portal/fullscreen</xrx:portal>
+  <xrx:author>jochen.graf@uni-koeln.de</xrx:author>
+  <xrx:licence></xrx:licence>
+  <xrx:init>
+    <xrx:processor>
+      <xrx:xformsflag>true</xrx:xformsflag>
+    </xrx:processor>
+  </xrx:init>
+  <xrx:res>
+    <xrx:js>
+      <script type="text/javascript" src="{ conf:param('request-root') }mootools-1.2-core-compressed.js"></script> 
+      <script type="text/javascript" src="{ conf:param('request-root') }mootools-1.2-more-compressed.js"></script> 
+      <script type="text/javascript" src="{ conf:param('request-root') }iipmooviewer-1.1.js"></script>
+      <script type="text/javascript" src="{ conf:param('request-root') }iipmooviewer.js" defer="defer"/>
+    </xrx:js>
+    <xrx:css>
+      <link rel="stylesheet" type="text/css" media="all" href="{ conf:param('request-root') }iip.css" />
+      <style type="text/css">
+
+body{{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:transparent;
+}}
+      
+#diipmooviewer{{
+  position:absolute;
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+}}
+
+#navi{{
+  position:absolute;
+  width:100%;
+  margin:0px;
+  padding:0px;
+  z-index:5;
+}}
+
+#targetframe{{
+  position:abolute;
+  width:100%;
+  height:100%;
+}}
+
+#navigation-buttons{{
+  position:absolute;
+  right:0px;
+}}
+
+.gotoinput .xfValue, .newactinput .xfValue{{
+  padding:3px;
+  width:50px;
+}}
+
+.xfDialog{{
+  width:500px;
+}}
+
+      </style>
+    </xrx:css>
+  </xrx:res>
+  <xrx:model>
+  {
+    let $register := $xrx:tokenized-uri[1]
+    return
+    <xf:model id="miipmooviewer">
+      <xf:instance id="inavi">
+        <data xmlns="">
+          <baseuri>{ conf:param('request-root') }embeddedwidget/</baseuri>
+          <embeddedwidget>atomid=tag:itineranova.be,2011:/in/widget/iipmooviewport</embeddedwidget>
+          <mode>{ $xrx:tokenized-uri[2] }</mode>
+          <register>{ $register }</register>
+          <gotofolio/>
+          <nav>0</nav>
+          <pos>{ xs:integer(request:get-parameter('_start', '1')) }</pos>
+          <uri></uri>
+        </data>
+      </xf:instance>
+      <xf:instance id="irename-folio">
+        <data xmlns="">
+          <oldname/>
+          <newname>°</newname>
+          <register>{ $register }</register>
+        </data>
+      </xf:instance>
+      <xf:instance id="iresponse">
+        <xrx:response xmlns:xrx="http://www.monasterium.net/NS/xrx" status="0"/>
+      </xf:instance>
+      
+      <xf:submission id="srenamefolio" ref="instance('irename-folio')" 
+        action="{ conf:param('request-root') }service/?atomid=tag:itineranova.be,2011:/in/service/rename-folio" 
+        method="post" 
+        replace="instance" 
+        instance="iresponse">
+      </xf:submission>
+      
+      <xf:action ev:event="egetfolio">
+        <xf:setvalue ref="instance('irename-folio')/oldname" value="event('param1')"/>
+        <xf:setvalue ref="instance('inavi')/gotofolio" value="event('pgotofolio')"/>
+        <xf:setvalue ref="instance('inavi')/pos" value="event('ppos')"/>
+        <xf:setvalue ref="instance('inavi')/nav" value="event('pnav')"/>
+      </xf:action>
+      
+      <xf:action ev:event="egotofolio">
+        <xf:setvalue ref="instance('inavi')/gotofolio" value="pgotofolio"/>
+      </xf:action>
+      
+      <xf:bind id="buri" nodeset="uri" calculate="concat(../baseuri, '?', ../embeddedwidget, '&amp;register=', ../register, '&amp;pos=', ../pos, '&amp;gotofolio=', ../gotofolio, '&amp;mode=', ../mode)"/>
+      <xf:bind id="bpos" nodeset="pos" calculate="sum(. + ../nav)" relevant=". &gt; 0"/>
+      <xf:bind id="boldname" nodeset="instance('irename-folio')/oldname"/>
+      <xf:bind id="bnewname" nodeset="instance('irename-folio')/newname" constraint="ends-with(., '°')"/>
+    </xf:model>
+  }
+  </xrx:model>
+  <xrx:view>
+  {
+    let $register := $xrx:tokenized-uri[1]
+    let $metadata-db-base-collection := metadata:base-collection('register', $register, 'public')
+    let $image-count :=
+      count($metadata-db-base-collection//ead:archdesc/ead:dao)
+    return
+    <div id="diipmooviewer">
+      <div id="navi">
+        <xf:group model="miipmooviewer">
+	        <div id="navigation-buttons">
+	          <div style="display:none">
+		          <xf:trigger id="tstart">
+                <xf:setvalue ref="gotofolio" value="''"/>
+                <xf:recalculate/>
+                <xf:load show="embed" targetid="diipmooviewport">
+                  <xf:resource value="uri"/> 
+                </xf:load>
+                <xf:setvalue ref="nav" value="0"/>		            
+		          </xf:trigger>
+            </div>
+            <xf:trigger>
+              <xf:label>
+                <xrx:i18n>
+                  <xrx:key>close-viewer</xrx:key>
+                  <xrx:default>Close Viewer</xrx:default>
+                </xrx:i18n>
+              </xf:label>
+              <xf:action ev:event="DOMActivate">
+                <xf:load show="replace">
+                  <xf:resource value="concat('{ conf:param('request-root') }{ $register }/', gotofolio, '/folio')"/>
+                </xf:load>
+              </xf:action>
+            </xf:trigger>
+	          <xrx:auth>
+	            <xrx:rules>
+	              <xrx:rule>
+	                <xrx:user/>
+	                <xrx:role>archivist</xrx:role>
+	              </xrx:rule>
+	            </xrx:rules>
+	            <xrx:true>
+	              <div style="float:left;position:relative;">
+		              <xf:trigger>
+		                <xf:label>
+			                <xrx:i18n>
+			                  <xrx:key>rename-folio</xrx:key>
+			                  <xrx:default>Rename folio</xrx:default>
+			                </xrx:i18n>
+	                  </xf:label>
+	                  <bfc:show dialog="rename-folio-dialog" ev:event="DOMActivate"/>
+		              </xf:trigger>
+		              <bfc:dialog id="rename-folio-dialog">
+								    <xf:label>
+								      <xrx:i18n>
+								        <xrx:key>rename-folio</xrx:key>
+								        <xrx:default>Rename folio</xrx:default>
+								      </xrx:i18n>
+								    </xf:label>
+								    <xrx:subwidget>tag:www.monasterium.net,2011:/core/widget/response-info-div</xrx:subwidget>
+								    <xf:switch>
+								      <xf:case id="cstatus0">
+							          <table>
+							            <tr>
+							              <td>
+							                <span>New name for folio '</span>
+							                <xf:output bind="boldname" />
+							              </td>
+							            </tr>
+							            <tr>
+							              <td>
+							                <span>
+							                  <xf:input bind="bnewname">
+							                    <xf:hint>Enter the new name here.</xf:hint>
+							                    <xf:alert>Folio Name MUST end with °</xf:alert>
+							                  </xf:input>
+							                </span>
+							              </td>
+							            </tr>
+							          </table>
+		                    <br/>
+		                    <br/>
+		                    <div id="dialog-buttons">
+		                      <xf:trigger>
+		                         <xf:label>
+		                           <xrx:i18n>
+		                             <xrx:key>cancel</xrx:key>
+		                             <xrx:default>Cancel</xrx:default>
+		                           </xrx:i18n>
+		                         </xf:label>
+		                         <bfc:hide dialog="rename-folio-dialog" ev:event="DOMActivate"/>
+		                      </xf:trigger>
+		                      <xf:trigger>
+		                        <xf:label>Rename</xf:label>
+		                        <xf:action ev:event="DOMActivate">
+		                          <xf:send submission="srenamefolio" />
+                              <xf:toggle case="cstatus1" if="instance('iresponse')//@status = '1'"/>
+		                        </xf:action>
+		                      </xf:trigger>
+		                    </div>
+						          </xf:case>
+						          <xf:case id="cstatus1">
+						            <div id="dialog-buttons">
+							            <xf:trigger>
+	                          <xf:label>Ok</xf:label>
+	                          <xf:action ev:event="DOMActivate">
+	                            <xf:setvalue ref="gotofolio" value="instance('irename-folio')/newname"/>
+	                            <xf:setvalue ref="nav" value="0"/>
+	                            <xf:recalculate/>
+	                            <xf:load show="embed" targetid="diipmooviewport">
+	                              <xf:resource value="uri"/> 
+	                            </xf:load>
+	                          </xf:action>
+	                          <bfc:hide dialog="rename-folio-dialog" ev:event="DOMActivate"></bfc:hide>
+	                          <xf:toggle case="cstatus0"/>
+	                          <xf:delete nodeset="instance('iresponse')/*" at="1"/>
+	                          <xf:delete nodeset="instance('iresponse')/*" at="2"/>
+	                        </xf:trigger>
+	                      </div>
+						          </xf:case>
+						        </xf:switch>
+					        <!-- xf:group ref="instance('iresponse')//xrx:response[@status='1']">
+					          <div style="position:absolute;bottom:20px;right:20px">
+					            <div style="text-align:right">
+					              <xf:trigger>
+					                <xf:label>Ok</xf:label>
+					                <xf:action ev:event="DOMActivate">
+					                  <bfc:hide dialog="rename-folio-dialog" ev:event="DOMActivate"></bfc:hide>
+					                </xf:action>
+					              </xf:trigger>
+					            </div>
+					          </div>
+					        </xf:group>
+					        <xf:group ref="instance('iresponse')//xrx:response[@status='2']">
+					          <div style="position:absolute;bottom:20px;right:20px;text-align:right">
+                        <xf:trigger>
+                          <xf:label>Ok</xf:label>
+                          <xf:action ev:event="DOMActivate">
+                            <bfc:hide dialog="rename-folio-dialog" ev:event="DOMActivate"></bfc:hide>
+                          </xf:action>
+                        </xf:trigger>
+					          </div>
+					        </xf:group-->
+								</bfc:dialog>
+		            </div>
+	            </xrx:true>
+	            <xrx:false>
+	              <span/>
+	            </xrx:false>
+	          </xrx:auth>
+	          <xf:trigger id="first-image">
+              <xf:label>|&lt;</xf:label>
+              <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="nav" value="0"/>
+                <xf:setvalue ref="pos" value="1"/>
+                <xf:setvalue ref="gotofolio" value="''"/>
+                <xf:recalculate/>
+                <xf:load show="embed" targetid="diipmooviewport">
+                  <xf:resource value="uri"/> 
+                </xf:load>
+              </xf:action>
+            </xf:trigger>
+	        {
+	          let $labels := ('-100', '-10', '-1', '+1', '+10', '+100')
+	          let $moves := ('-100', '-10', '-1', '1', '10', '100')
+	          for $move at $pos in $moves
+	          return
+            <xf:trigger>
+              <xf:label>{ $labels[$pos] }</xf:label>
+              <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="nav" value="xs:integer({ $move })" if="pos + { $move } &gt; 0 and pos + { $move } &lt;= { $image-count }"/>
+                <xf:setvalue ref="gotofolio" value="''"/>
+                <xf:recalculate/>
+                <xf:load show="embed" targetid="diipmooviewport">
+                  <xf:resource value="uri"/> 
+                </xf:load>
+                <xf:setvalue ref="nav" value="0"/>
+              </xf:action>
+            </xf:trigger>
+	        }
+	          <xf:trigger>
+              <xf:label>&gt;|</xf:label>
+              <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="nav" value="0"/>
+                <xf:setvalue ref="pos" value="{ $image-count }"/>
+                <xf:setvalue ref="gotofolio" value="''"/>
+                <xf:recalculate/>
+                <xf:load show="embed" targetid="diipmooviewport">
+                  <xf:resource value="uri"/> 
+                </xf:load>
+              </xf:action>
+            </xf:trigger>          
+	          <xf:input class="gotoinput" ref="gotofolio" />
+	          <xf:trigger>
+	            <xf:label>Go!</xf:label>
+	            <xf:action ev:event="DOMActivate">
+	              <xf:setvalue ref="nav" value="0"/>
+	              <xf:recalculate/>
+	              <xf:load show="embed" targetid="diipmooviewport">
+	                <xf:resource value="uri"/> 
+	              </xf:load>
+	            </xf:action>
+	          </xf:trigger>
+	        </div>
+	      </xf:group>
+      </div>
+      <div id="diipmooviewport"/>
+	  </div>
+	}
+  </xrx:view>
+</xrx:widget>

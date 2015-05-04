@@ -1,0 +1,11 @@
+<xrx:template xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:www.monasterium.net,2011:/core/template/revision</xrx:id>
+  <xrx:xml>
+		<xrx:revision>
+		  <xrx:id></xrx:id>
+		  <xrx:who></xrx:who>
+		  <xrx:when></xrx:when>
+		  <xrx:comment></xrx:comment>
+		</xrx:revision>
+  </xrx:xml>
+</xrx:template>

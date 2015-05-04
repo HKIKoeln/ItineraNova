@@ -1,0 +1,27 @@
+<xrx:xsd xmlns:xrx="http://www.monasterium.net/NS/xrx">
+  <xrx:id>tag:www.monasterium.net,2011:/core/schema/service</xrx:id>
+  <xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.monasterium.net/NS/xrx"
+    xmlns="http://www.monasterium.net/NS/xrx">
+  
+    <xs:element name="service">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="id"/>
+          <xs:element name="inherits"/>
+          <xs:element name="title"/>
+          <xs:element name="subtitle"/>
+          <xs:element name="description"/>
+          <xs:element name="author"/>
+          <xs:element name="licence"/>
+          <xs:element name="init"/>
+          <xs:element name="variables"/>
+          <xs:element name="emails"/>
+          <xs:element name="body"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+    
+  </xs:schema>
+</xrx:xsd>
