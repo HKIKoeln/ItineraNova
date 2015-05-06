@@ -5,7 +5,7 @@ The platform was developed by HKI Cologne between 2009 and 2012. The Itinera Nov
 
 The core of the platform is an easy to use XML/TEI WYSIWYM editor, which presents a (life-validating) wiki-syntax to the user that is internally converted into TEI. The editor is embedded in a readactory system where volunteers and moderators can critically discuss their revisions with the help of a version difference tool. See the eLearning platform below to get an impression of the features.
 
-> Since May 2015 the platform is not hosted on servers of HKI cologne any more. The new provider is [http://kangaroot.net/](http://kangaroot.net/).
+> Since May 2015 the platform is not hosted on servers of HKI <span style="color:red">cologne</span> any more. The new provider is [http://kangaroot.net/](http://kangaroot.net/).
 
 Itinera Nova: [http://itineranova.be](http://itineranova.be)
 
