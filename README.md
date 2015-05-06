@@ -9,7 +9,8 @@ Itinera Nova: [http://itineranova.be](http://itineranova.be)
 
 Facebook: [https://www.facebook.com/SALitineranova](https://www.facebook.com/SALitineranova)
 
-eLearning Platform: [http://tutorial.itineranova.be/moodle/index.php](http://tutorial.itineranova.be/moodle/index.php)
+### eLearning Platform
+[http://tutorial.itineranova.be/moodle/index.php](http://tutorial.itineranova.be/moodle/index.php)
 * [Overview](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=61)
 * [Browsing transcriptions](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=62)
 * [Search transcriptions](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=63)
