@@ -11,10 +11,11 @@ Itinera Nova: [http://itineranova.be](http://itineranova.be)
 
 Facebook: [https://www.facebook.com/SALitineranova](https://www.facebook.com/SALitineranova)
 
-### News
+### News and Hints
 ---
 
 > Since May 2015 the platform is not hosted on servers of HKI cologne any more. The new provider is [kangaroot](http://kangaroot.net/).
+> The installation scripts may be out of date, thus, if you try to install the software, the installation may fail.
 
 ---
 
