@@ -13,7 +13,7 @@ eLearning Platform: [http://tutorial.itineranova.be/moodle/index.php](http://tut
 * [Search transcriptions](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=63)
 * [Using the transcription editor](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=76)
 
-## Developers
+### Developers
 * Jochen Graf
 * Christian Weitz
 * André Streicher
