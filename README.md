@@ -3,6 +3,12 @@
 [Itinera Nova](http://itineranova.be) is the collaborative transcription platform of the City Archive of Leuven.
 The platform was developed by HKI Cologne between 2009 and 2012. The Itinera Nova project has an active user community of volunteers so that the database meanwhile contains several thousand transcribed register book pages.
 
+## Developers
+* Jochen Graf
+* Christian Weitz
+* André Streicher
+
+## Links
 Itinera Nova: [http://itineranova.be](http://itineranova.be)
 
 Facebook: [https://www.facebook.com/SALitineranova](https://www.facebook.com/SALitineranova)
