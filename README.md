@@ -5,6 +5,8 @@ The platform was developed by HKI Cologne between 2009 and 2012. The Itinera Nov
 
 The core of the platform is an easy to use XML/TEI WYSIWYM editor, which presents a (life-validating) wiki-syntax to the user that is internally converted into TEI. The editor is embedded in a readactory system where volunteers and moderators can critically discuss their revisions with the help of a version difference tool. See the eLearning platform below to get an impression of the features.
 
+### Links
+
 Itinera Nova: [http://itineranova.be](http://itineranova.be)
 
 Facebook: [https://www.facebook.com/SALitineranova](https://www.facebook.com/SALitineranova)
