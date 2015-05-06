@@ -15,7 +15,7 @@ Facebook: [https://www.facebook.com/SALitineranova](https://www.facebook.com/SAL
 ---
 
 > Since May 2015 the platform is not hosted on servers of HKI cologne any more. The new provider is [kangaroot](http://kangaroot.net/).
-> The installation scripts may be out of date, thus, if you try to install the software, the installation may fail.
+> The installation scripts may be slightly out of date. If you are interested to install the software, please contact HKI Cologne.
 
 ---
 
