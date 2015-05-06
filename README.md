@@ -11,18 +11,19 @@ Itinera Nova: [http://itineranova.be](http://itineranova.be)
 
 Facebook: [https://www.facebook.com/SALitineranova](https://www.facebook.com/SALitineranova)
 
+### News
+---
+
+> Since May 2015 the platform is not hosted on servers of HKI cologne any more. The new provider is [kangaroot](http://kangaroot.net/).
+
+---
+
 ### eLearning Platform
 [http://tutorial.itineranova.be/moodle/index.php](http://tutorial.itineranova.be/moodle/index.php)
 * [Overview](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=61)
 * [Browsing transcriptions](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=62)
 * [Search transcriptions](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=63)
 * [Using the transcription editor](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=76)
-
----
-
-> Since May 2015 the platform is not hosted on servers of HKI cologne any more. The new provider is [kangaroot](http://kangaroot.net/).
-
----
 
 ### Developers
 * Jochen Graf
