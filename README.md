@@ -5,12 +5,6 @@ The platform was developed by HKI Cologne between 2009 and 2012. The Itinera Nov
 
 The core of the platform is an easy to use XML/TEI WYSIWYM editor, which presents a (life-validating) wiki-syntax to the user that is internally converted into TEI. The editor is embedded in a readactory system where volunteers and moderators can critically discuss their revisions with the help of a version difference tool. See the eLearning platform below to get an impression of the features.
 
----
-
-> Since May 2015 the platform is not hosted on servers of HKI cologne any more. The new provider is [kangaroot](http://kangaroot.net/).
-
----
-
 Itinera Nova: [http://itineranova.be](http://itineranova.be)
 
 Facebook: [https://www.facebook.com/SALitineranova](https://www.facebook.com/SALitineranova)
@@ -20,6 +14,12 @@ eLearning Platform: [http://tutorial.itineranova.be/moodle/index.php](http://tut
 * [Browsing transcriptions](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=62)
 * [Search transcriptions](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=63)
 * [Using the transcription editor](http://tutorial.itineranova.be/moodle/mod/videolightbox/view.php?id=76)
+
+---
+
+> Since May 2015 the platform is not hosted on servers of HKI cologne any more. The new provider is [kangaroot](http://kangaroot.net/).
+
+---
 
 ### Developers
 * Jochen Graf
